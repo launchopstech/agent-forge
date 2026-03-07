@@ -55,7 +55,7 @@
   ```
 
 ### 1.3 Folder Structure
-- [ ] Scaffold under `src/`:
+- [x] Scaffold under `src/`:
   ```
   src/
   ├── app/
@@ -69,13 +69,13 @@
   ├── styles/
   └── types/
   ```
-- [ ] Add `index.ts` barrel exports to each directory
+- [x] Add `index.ts` barrel exports to each directory
 
 ### 1.4 Environment Config Validation
-- [ ] Install `zod`
-- [ ] Create `src/config/env.ts` — validates all `process.env` values with Zod, throws descriptive error on startup if required vars are missing
-- [ ] Create `.env.example` with all keys documented
-- [ ] Add `.env.local` to `.gitignore`
+- [x] Install `zod`
+- [x] Create `src/config/env.ts` — validates all `process.env` values with Zod, throws descriptive error on startup if required vars are missing
+- [x] Create `.env.example` with all keys documented
+- [x] Add `.env.local` to `.gitignore`
 
 ### 1.5 Pre-commit Hooks
 - [ ] Install `husky` and `lint-staged`
