@@ -2,6 +2,7 @@ import nextConfig from 'eslint-config-next'
 import tseslint from 'typescript-eslint'
 
 const eslintConfig = [
+  { ignores: ['node_modules', '.next', 'dist', 'storybook-static'] },
   ...nextConfig,
   {
     rules: {
