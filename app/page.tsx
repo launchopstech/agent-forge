@@ -8,9 +8,9 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="flex items-center justify-between border-b border-border bg-card px-6 py-4 sm:px-8">
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="AgentForge" className="h-8 w-8" />
-          <span className="text-xl font-bold text-foreground">AgentForge</span>
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="AgentForge" className="h-10 w-10" />
+          <span className="text-lg font-bold text-foreground">AgentForge</span>
         </div>
         <div className="hidden items-center gap-8 md:flex">
           <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
