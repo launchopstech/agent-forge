@@ -41,7 +41,7 @@
 - [x] Add `.eslintignore` for `node_modules`, `.next`, `dist`, `storybook-static`
 
 ### 1.2 Absolute Imports & Path Aliases
-- [ ] Configure `tsconfig.json` paths:
+- [x] Configure `tsconfig.json` paths:
   ```json
   {
     "@/*": ["./src/*"],
