@@ -5,7 +5,8 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'AgentForge - AI Agent Platform',
-  description: 'Build, deploy, and manage AI agents with AgentForge. The complete platform for intelligent automation.',
+  description:
+    'Build, deploy, and manage AI agents with AgentForge. The complete platform for intelligent automation.',
   generator: 'v0.app',
   icons: {
     icon: [

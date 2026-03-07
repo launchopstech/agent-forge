@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Brain, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button'
+import { ArrowRight, Zap, Brain, Shield } from 'lucide-react'
 
 export default function Home() {
   return (
@@ -13,13 +13,22 @@ export default function Home() {
           <span className="text-xl font-bold text-foreground">AgentForge</span>
         </div>
         <div className="hidden items-center gap-8 md:flex">
-          <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#features"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Features
           </a>
-          <a href="#benefits" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#benefits"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Benefits
           </a>
-          <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <a
+            href="#pricing"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             Pricing
           </a>
         </div>
@@ -50,7 +59,8 @@ export default function Home() {
             Build intelligent agents that work for you
           </h1>
           <p className="mt-6 text-balance text-xl text-muted-foreground">
-            AgentForge is the complete platform for building, deploying, and managing AI agents. Automate complex workflows with enterprise-grade reliability.
+            AgentForge is the complete platform for building, deploying, and managing AI agents.
+            Automate complex workflows with enterprise-grade reliability.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -68,7 +78,9 @@ export default function Home() {
           <div className="rounded-lg border border-border bg-card p-6">
             <Zap className="h-6 w-6 text-primary" />
             <p className="mt-4 font-semibold text-foreground">Fast Deployment</p>
-            <p className="mt-2 text-sm text-muted-foreground">Deploy agents in minutes, not weeks</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Deploy agents in minutes, not weeks
+            </p>
           </div>
           <div className="rounded-lg border border-border bg-card p-6">
             <Brain className="h-6 w-6 text-primary" />
@@ -88,13 +100,18 @@ export default function Home() {
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <h2 className="text-4xl font-bold text-foreground">Powerful features</h2>
-            <p className="mt-4 text-lg text-muted-foreground">Everything you need to build sophisticated AI agents</p>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Everything you need to build sophisticated AI agents
+            </p>
           </div>
 
           <div className="mt-16 grid gap-8 sm:grid-cols-2">
             {[
               { title: 'API Integration', desc: 'Connect to any API or service seamlessly' },
-              { title: 'Real-time Monitoring', desc: 'Track agent performance with live dashboards' },
+              {
+                title: 'Real-time Monitoring',
+                desc: 'Track agent performance with live dashboards',
+              },
               { title: 'Custom Workflows', desc: 'Design complex multi-step agent behaviors' },
               { title: 'Version Control', desc: 'Manage agent versions and rollbacks easily' },
             ].map((feature, i) => (
@@ -127,7 +144,10 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section id="pricing" className="border-t border-border bg-primary px-6 py-24 text-center sm:px-8">
+      <section
+        id="pricing"
+        className="border-t border-border bg-primary px-6 py-24 text-center sm:px-8"
+      >
         <h2 className="text-4xl font-bold text-primary-foreground">Ready to get started?</h2>
         <p className="mt-4 text-lg text-primary-foreground/80">
           Join hundreds of teams building intelligent automation with AgentForge.
@@ -149,25 +169,61 @@ export default function Home() {
             <div>
               <p className="font-semibold text-foreground">Product</p>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Security
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <p className="font-semibold text-foreground">Company</p>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Careers
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <p className="font-semibold text-foreground">Legal</p>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Privacy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Terms
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -177,5 +233,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-  );
+  )
 }

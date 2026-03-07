@@ -1,4 +1,5 @@
 # Next.js Frontend — Agent Build Spec v2
+
 **Project:** Scalable, white-label-ready Next.js frontend
 **Stack:** Next.js (App Router), TypeScript, Tailwind CSS, Vercel
 **Objective:** Build a reusable, agency-ready template codebase with zero branding lock-in, full test coverage, and a human-in-the-loop visual review system
@@ -29,9 +30,11 @@
 ---
 
 ## Phase 1 — Project Foundation
-*Goal: Non-negotiable architectural decisions before any UI is built.*
+
+_Goal: Non-negotiable architectural decisions before any UI is built._
 
 ### 1.1 TypeScript & ESLint Hardening
+
 - [x] Enable `strict: true` in `tsconfig.json`
 - [x] Add `noUncheckedIndexedAccess: true` to `tsconfig.json`
 - [x] Install and configure `eslint-config-next` with custom rules:
@@ -41,6 +44,7 @@
 - [x] Add `.eslintignore` for `node_modules`, `.next`, `dist`, `storybook-static`
 
 ### 1.2 Absolute Imports & Path Aliases
+
 - [x] Configure `tsconfig.json` paths:
   ```json
   {
@@ -55,6 +59,7 @@
   ```
 
 ### 1.3 Folder Structure
+
 - [x] Scaffold under `src/`:
   ```
   src/
@@ -72,18 +77,21 @@
 - [x] Add `index.ts` barrel exports to each directory
 
 ### 1.4 Environment Config Validation
+
 - [x] Install `zod`
 - [x] Create `src/config/env.ts` — validates all `process.env` values with Zod, throws descriptive error on startup if required vars are missing
 - [x] Create `.env.example` with all keys documented
 - [x] Add `.env.local` to `.gitignore`
 
 ### 1.5 Pre-commit Hooks
-- [ ] Install `husky` and `lint-staged`
-- [ ] Configure `lint-staged`: run `eslint --fix` on `*.ts/*.tsx`, `prettier --write` on all staged files
-- [ ] Add `husky pre-commit` hook that runs `lint-staged`
-- [ ] Add `husky commit-msg` hook enforcing conventional commit format
+
+- [x] Install `husky` and `lint-staged`
+- [x] Configure `lint-staged`: run `eslint --fix` on `*.ts/*.tsx`, `prettier --write` on all staged files
+- [x] Add `husky pre-commit` hook that runs `lint-staged`
+- [x] Add `husky commit-msg` hook enforcing conventional commit format
 
 ### ✅ Phase 1 Gate Check
+
 ```bash
 npx tsc --noEmit          # Must pass with zero errors
 npx eslint src/           # Must pass with zero errors
@@ -92,9 +100,11 @@ npx eslint src/           # Must pass with zero errors
 ---
 
 ## Phase 2 — Design System & Theming
-*Goal: Token-based design system — swap any brand in one config file.*
+
+_Goal: Token-based design system — swap any brand in one config file._
 
 ### 2.1 Tailwind Design Tokens
+
 - [ ] Extend `tailwind.config.ts`:
   ```ts
   colors: {
@@ -113,20 +123,24 @@ npx eslint src/           # Must pass with zero errors
 - [ ] Import `tokens.css` in `app/globals.css`
 
 ### 2.2 Dark Mode
+
 - [ ] Configure Tailwind `darkMode: 'class'`
 - [ ] Add dark mode overrides under `.dark { }` in `tokens.css`
 - [ ] Create `src/hooks/use-theme.ts` — reads localStorage, syncs with system preference, exposes `theme`, `setTheme`, `toggleTheme`
 - [ ] Create `ThemeProvider` component that applies the class to `<html>`
 
 ### 2.3 Typography Scale
+
 - [ ] Install and configure `next/font` with 2 variable fonts (one sans, one mono)
 - [ ] Expose as CSS variables so they feed into Tailwind tokens
 
 ### 2.4 Theme Presets
+
 - [ ] Create `src/config/themes/` with `default.ts` and `dark.ts` — each exports CSS variable overrides
 - [ ] Create `ThemeSwitcher` dev-only component (hidden via `process.env.NODE_ENV !== 'development'` check)
 
 ### ✅ Phase 2 Gate Check
+
 - [ ] Open app in browser — default theme loads correctly
 - [ ] Toggle dark mode — all tokens switch, no hardcoded colors visible
 - [ ] `ThemeSwitcher` visible in dev, hidden in production build
@@ -134,14 +148,17 @@ npx eslint src/           # Must pass with zero errors
 ---
 
 ## Phase 3 — Core UI Component Library
-*Goal: Composable, accessible primitives. Every component ships with a Storybook story.*
+
+_Goal: Composable, accessible primitives. Every component ships with a Storybook story._
 
 ### 3.1 Setup
+
 - [ ] Install `class-variance-authority`, `clsx`, `tailwind-merge`
 - [ ] Create `src/lib/utils.ts` with `cn()` helper combining `clsx` + `twMerge`
 - [ ] Install Radix UI primitives: `@radix-ui/react-dialog`, `@radix-ui/react-dropdown-menu`, `@radix-ui/react-tabs`, `@radix-ui/react-tooltip`
 
 ### 3.2 Primitive Components
+
 Each must have: TypeScript props interface, cva variants, `className` passthrough, `forwardRef`, and a `.stories.tsx` file.
 
 - [ ] `Button` — variants: `default | outline | ghost | destructive | link`; sizes: `sm | md | lg`; loading state with spinner
@@ -155,6 +172,7 @@ Each must have: TypeScript props interface, cva variants, `className` passthroug
 - [ ] `Separator` — horizontal and vertical
 
 ### 3.3 Composite Components
+
 Each must have a `.stories.tsx` file showing all states.
 
 - [ ] `Card` — with `CardHeader`, `CardContent`, `CardFooter` sub-components
@@ -167,11 +185,13 @@ Each must have a `.stories.tsx` file showing all states.
 - [ ] `EmptyState` — icon slot, title, description, CTA slot
 
 ### 3.4 Form Pattern
+
 - [ ] Install `react-hook-form` and `@hookform/resolvers`
 - [ ] Create `FormField` wrapper that integrates `react-hook-form` context with Input/Select/Textarea
 - [ ] Create `src/features/example/ExampleForm.tsx` demonstrating: Zod schema, validation, error display, submit state
 
 ### ✅ Phase 3 Gate Check
+
 - [ ] Run Storybook — every component renders in all variants without errors
 - [ ] No TypeScript errors in component files
 - [ ] Dark mode toggle in Storybook — all components adapt correctly
@@ -179,25 +199,30 @@ Each must have a `.stories.tsx` file showing all states.
 ---
 
 ## Phase 4 — Layout Architecture
-*Goal: Flexible multi-layout shells, all white-label ready.*
+
+_Goal: Flexible multi-layout shells, all white-label ready._
 
 ### 4.1 Root Layout
+
 - [ ] `app/layout.tsx` — wraps in `ThemeProvider`, injects fonts, sets metadata defaults
 - [ ] No hardcoded text anywhere in layout files
 
 ### 4.2 Layout Variants
+
 - [ ] `DashboardLayout` — sidebar + topbar + main content area
 - [ ] `MarketingLayout` — full-width navbar + hero slot + footer
 - [ ] `AuthLayout` — centered card layout
 - [ ] Each accepts `children` + optional config props (`showSidebar`, `showFooter`, etc.)
 
 ### 4.3 Navigation Components
+
 - [ ] `Navbar` — responsive, mobile hamburger, accepts `navItems: NavItem[]` prop
 - [ ] `Sidebar` — collapsible, icon + label, accepts `navItems: NavItem[]` prop
 - [ ] `Footer` — accepts `links` and `copyrightText` as props
 - [ ] Create `src/config/nav.ts` — all nav items defined here, zero hardcoded nav copy in components
 
 ### 4.4 Page Templates
+
 - [ ] `src/app/(marketing)/page.tsx` — landing page shell
 - [ ] `src/app/(dashboard)/dashboard/page.tsx` — dashboard shell
 - [ ] `src/app/(auth)/login/page.tsx` — auth shell
@@ -205,6 +230,7 @@ Each must have a `.stories.tsx` file showing all states.
 - [ ] `src/app/error.tsx` — global error boundary UI
 
 ### ✅ Phase 4 Gate Check
+
 - [ ] All three layouts render without errors
 - [ ] Navbar collapses correctly on mobile (test at 375px)
 - [ ] No hardcoded copy found anywhere in layout files (`grep -r "Copyright\|Home\|Dashboard" src/components/layout/` returns zero results)
@@ -212,28 +238,34 @@ Each must have a `.stories.tsx` file showing all states.
 ---
 
 ## Phase 5 — Performance & Optimization
-*Goal: Core Web Vitals-ready out of the box.*
+
+_Goal: Core Web Vitals-ready out of the box._
 
 ### 5.1 Image Optimization
+
 - [ ] Wrap `next/image` in a `ResponsiveImage` component with sensible `sizes` defaults and a `priority` prop
 - [ ] Add `remotePatterns` to `next.config.ts` for common CDN domains
 
 ### 5.2 Bundle Analysis
+
 - [ ] Install `@next/bundle-analyzer`
 - [ ] Add `"analyze": "ANALYZE=true next build"` npm script
 - [ ] Run analysis once, document baseline in `PERFORMANCE.md`
 
 ### 5.3 Loading States
+
 - [ ] Add `loading.tsx` to each major route group
 - [ ] All async components wrapped in Suspense with Skeleton fallbacks from Phase 3
 
 ### 5.4 Metadata & SEO
+
 - [ ] Create `src/config/site.ts` — site name, description, OG image URL, base URL
 - [ ] Create `generateMetadata()` utility merging page overrides with site defaults
 - [ ] Add `robots.ts` and `sitemap.ts` route handlers
 - [ ] Root layout includes OG and Twitter card tags driven by `site.ts`
 
 ### ✅ Phase 5 Gate Check
+
 ```bash
 npm run build             # Must complete with no errors
 npm run analyze           # Review output, no single chunk > 250kb
@@ -242,24 +274,29 @@ npm run analyze           # Review output, no single chunk > 250kb
 ---
 
 ## Phase 6 — Auth Scaffolding
-*Goal: Plug-in-ready auth, not tied to any specific provider.*
+
+_Goal: Plug-in-ready auth, not tied to any specific provider._
 
 ### 6.1 Auth Abstraction
+
 - [ ] Install `next-auth` or `@clerk/nextjs` (document the choice in README)
 - [ ] Create `src/lib/auth.ts` as single source of auth config
 - [ ] Expose: `getSession()`, `requireAuth()` server utilities, `useUser()` client hook
 
 ### 6.2 Route Protection
+
 - [ ] Create `middleware.ts` protecting `/dashboard/*`
 - [ ] Create `withAuth` HOC for client-side page protection
 - [ ] Auth route group: login, signup, forgot-password pages (UI shells, no logic yet)
 
 ### 6.3 User Context
+
 - [ ] `UserProvider` wraps root layout
 - [ ] `useUser()` hook exposes `user`, `isLoading`, `isAuthenticated`
 - [ ] User avatar + name rendered in Topbar from `useUser()`
 
 ### ✅ Phase 6 Gate Check
+
 - [ ] Visiting `/dashboard` unauthenticated redirects to `/login`
 - [ ] Visiting `/dashboard` authenticated renders correctly
 - [ ] `src/lib/auth.ts` is the only file referencing the auth provider package directly
@@ -267,28 +304,35 @@ npm run analyze           # Review output, no single chunk > 250kb
 ---
 
 ## Phase 7 — Data Layer Abstraction
-*Goal: UI components stay agnostic to data source.*
+
+_Goal: UI components stay agnostic to data source._
 
 ### 7.1 API Client
+
 - [ ] Create `src/lib/api-client.ts` — typed fetch wrapper with base URL from env, auth token injection, error normalization, TypeScript generics: `apiClient.get<User>('/me')`
 
 ### 7.2 Server Actions Pattern
+
 - [ ] Create `src/features/example/actions.ts` demonstrating: Zod input validation → action → typed response
 
 ### 7.3 CMS-Ready Content Layer
+
 - [ ] Create `src/lib/content.ts` with abstract functions: `getPage(slug)`, `getPosts()`, `getPost(slug)`
 - [ ] Implement with static JSON for now, add `// TODO: swap with Contentful/Sanity` comment at each function
 
 ### ✅ Phase 7 Gate Check
+
 - [ ] `npx tsc --noEmit` passes
 - [ ] API client returns correct TypeScript types (verify with a test call)
 
 ---
 
 ## Phase 8 — Testing Infrastructure
-*Goal: Automated quality gates that run in CI. Three layers: unit, component, and E2E.*
+
+_Goal: Automated quality gates that run in CI. Three layers: unit, component, and E2E._
 
 ### 8.1 Vitest — Unit Tests
+
 - [ ] Install `vitest`, `@vitest/ui`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`
 - [ ] Configure `vitest.config.ts` with jsdom environment and path aliases matching `tsconfig.json`
 - [ ] Add npm scripts:
@@ -307,6 +351,7 @@ npm run analyze           # Review output, no single chunk > 250kb
   - [ ] `ExampleForm` — validation errors show on submit with empty fields, submits with valid data
 
 ### 8.2 Playwright — End-to-End Tests
+
 - [ ] Install `@playwright/test`, run `npx playwright install`
 - [ ] Create `playwright.config.ts` — base URL from env, 3 browsers (chromium, firefox, webkit), screenshot on failure
 - [ ] Add npm scripts:
@@ -319,6 +364,7 @@ npm run analyze           # Review output, no single chunk > 250kb
   - [ ] `tests/e2e/404.spec.ts` — unknown routes render the 404 page
 
 ### 8.3 Accessibility Tests
+
 - [ ] Install `axe-core` and `@axe-core/playwright`
 - [ ] Add accessibility check to each Playwright test:
   ```ts
@@ -328,6 +374,7 @@ npm run analyze           # Review output, no single chunk > 250kb
 - [ ] Add `@axe-core/react` to Storybook config for per-story a11y panel
 
 ### ✅ Phase 8 Gate Check
+
 ```bash
 npm run test              # All Vitest unit tests pass
 npm run test:coverage     # Coverage > 80% on src/lib/
@@ -337,9 +384,11 @@ npm run test:e2e          # All Playwright tests pass in chromium
 ---
 
 ## Phase 9 — Storybook & Visual Review System
-*Goal: Human-in-the-loop component review with automated visual regression.*
+
+_Goal: Human-in-the-loop component review with automated visual regression._
 
 ### 9.1 Storybook Setup
+
 - [ ] Install `@storybook/nextjs`, `@storybook/addon-essentials`, `@storybook/addon-a11y`, `@storybook/addon-themes`
 - [ ] Configure `.storybook/main.ts`:
   - Enable Next.js framework
@@ -355,6 +404,7 @@ npm run test:e2e          # All Playwright tests pass in chromium
 - [ ] Deploy Storybook to Vercel as a separate project (or subdirectory) so it's always accessible at a URL
 
 ### 9.2 Story Files
+
 Each story file must cover: default state, all variants, all sizes, error/disabled states, dark mode.
 
 - [ ] `Button.stories.tsx` — all variants × sizes, loading state, disabled state, icon button
@@ -370,6 +420,7 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 - [ ] `ExampleForm.stories.tsx` — idle, validation errors, submitting, success
 
 ### 9.3 Visual Regression with Chromatic
+
 - [ ] Create Chromatic account and connect to the GitHub repo
 - [ ] Install `chromatic` package
 - [ ] Add npm script: `"chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"`
@@ -377,6 +428,7 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 - [ ] Chromatic runs on every PR and blocks merge until visual changes are approved
 
 ### 9.4 Human-in-the-Loop Preview Page
+
 - [ ] Create `src/app/_dev/preview/page.tsx` (only accessible in development — add a middleware guard that returns 404 in production)
 - [ ] Page renders a full component catalog:
   - Section per component group (Primitives, Composite, Layout, Forms)
@@ -394,6 +446,7 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 - [ ] Add a link to the preview page in the README under "Development"
 
 ### ✅ Phase 9 Gate Check
+
 - [ ] `npm run storybook` — opens without errors, all stories render in both light and dark mode
 - [ ] `npm run chromatic` — runs successfully and registers baseline screenshots
 - [ ] `/_dev/preview` — renders all components, theme switcher works, checklist state saves
@@ -401,9 +454,11 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 ---
 
 ## Phase 10 — CI/CD Pipeline
-*Goal: Every PR runs all quality gates automatically. Nothing merges without passing.*
+
+_Goal: Every PR runs all quality gates automatically. Nothing merges without passing._
 
 ### 10.1 GitHub Actions CI
+
 - [ ] Create `.github/workflows/ci.yml`:
   ```yaml
   on: [push, pull_request]
@@ -428,11 +483,13 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 - [ ] Set branch protection rules on `main`: require all 3 jobs to pass before merge
 
 ### 10.2 PR Workflow
+
 - [ ] Vercel preview deployments enabled — every PR gets a preview URL
 - [ ] Add Storybook build to Vercel — deployed at `storybook.yourproject.vercel.app`
 - [ ] Add PR comment bot that posts: preview URL, Storybook URL, Chromatic review link
 
 ### ✅ Phase 10 Gate Check
+
 - [ ] Open a test PR — all 3 CI jobs run and pass
 - [ ] Chromatic posts a review link in the PR
 - [ ] Vercel posts a preview deployment link in the PR
@@ -440,9 +497,11 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 ---
 
 ## Phase 11 — Developer Experience & Documentation
-*Goal: Handoff-ready for agency clients or new team members.*
+
+_Goal: Handoff-ready for agency clients or new team members._
 
 ### 11.1 README
+
 - [ ] Project overview and tech stack
 - [ ] Setup: clone → install → `.env` → run
 - [ ] Folder structure explanation
@@ -453,11 +512,13 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 - [ ] Link to `/_dev/preview`
 
 ### 11.2 Additional Docs
+
 - [ ] `CONTRIBUTING.md` — code style, PR process, conventional commits
 - [ ] `PERFORMANCE.md` — baseline bundle sizes, Lighthouse scores
 - [ ] `THEMING.md` — how to create a new theme preset, token reference
 
 ### 11.3 i18n Scaffolding
+
 - [ ] Install `next-intl`
 - [ ] Set up locale routing under `src/app/[locale]/`
 - [ ] Create `src/messages/en.json` as default locale
@@ -467,19 +528,19 @@ Each story file must cover: default state, all variants, all sizes, error/disabl
 
 ## Master Completion Checklist
 
-| Phase | Description | Gate Check | Status |
-|-------|-------------|------------|--------|
-| 1 | Project Foundation | `tsc` + `eslint` pass | ⬜ |
-| 2 | Design System & Theming | Tokens load, dark mode works | ⬜ |
-| 3 | Core UI Components | All stories render | ⬜ |
-| 4 | Layout Architecture | All layouts render, no hardcoded copy | ⬜ |
-| 5 | Performance | Build passes, no chunk > 250kb | ⬜ |
-| 6 | Auth Scaffolding | Redirect works, one auth file | ⬜ |
-| 7 | Data Layer | Types pass, API client works | ⬜ |
-| 8 | Testing Infrastructure | Unit + E2E pass, >80% coverage | ⬜ |
-| 9 | Storybook & Visual Review | Stories render, Chromatic baseline set | ⬜ |
-| 10 | CI/CD Pipeline | All 3 CI jobs pass on test PR | ⬜ |
-| 11 | Docs & DX | README complete, i18n scaffolded | ⬜ |
+| Phase | Description               | Gate Check                             | Status |
+| ----- | ------------------------- | -------------------------------------- | ------ |
+| 1     | Project Foundation        | `tsc` + `eslint` pass                  | ⬜     |
+| 2     | Design System & Theming   | Tokens load, dark mode works           | ⬜     |
+| 3     | Core UI Components        | All stories render                     | ⬜     |
+| 4     | Layout Architecture       | All layouts render, no hardcoded copy  | ⬜     |
+| 5     | Performance               | Build passes, no chunk > 250kb         | ⬜     |
+| 6     | Auth Scaffolding          | Redirect works, one auth file          | ⬜     |
+| 7     | Data Layer                | Types pass, API client works           | ⬜     |
+| 8     | Testing Infrastructure    | Unit + E2E pass, >80% coverage         | ⬜     |
+| 9     | Storybook & Visual Review | Stories render, Chromatic baseline set | ⬜     |
+| 10    | CI/CD Pipeline            | All 3 CI jobs pass on test PR          | ⬜     |
+| 11    | Docs & DX                 | README complete, i18n scaffolded       | ⬜     |
 
 ---
 
