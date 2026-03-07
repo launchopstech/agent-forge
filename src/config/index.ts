@@ -1,1 +1,1 @@
-// config exports
+export * from './env'
