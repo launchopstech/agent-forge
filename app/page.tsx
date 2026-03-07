@@ -9,7 +9,7 @@ export default function Home() {
       {/* Navigation */}
       <nav className="flex items-center justify-between border-b border-border bg-card px-6 py-4 sm:px-8">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary" />
+          <img src="/logo.png" alt="AgentForge" className="h-8 w-8" />
           <span className="text-xl font-bold text-foreground">AgentForge</span>
         </div>
         <div className="hidden items-center gap-8 md:flex">
