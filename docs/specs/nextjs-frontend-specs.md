@@ -197,73 +197,73 @@ _Goal: Flexible multi-layout shells, all white-label ready._
 
 ### 4.1 Root Layout
 
-- [ ] `app/layout.tsx` — wraps in `ThemeProvider`, injects fonts, sets metadata defaults
-- [ ] No hardcoded text anywhere in layout files
+- [x] `app/layout.tsx` — wraps in `ThemeProvider`, injects fonts, sets metadata defaults
+- [x] No hardcoded text anywhere in layout files
 
 ### 4.2 Layout Variants
 
-- [ ] `DashboardLayout` — sidebar + topbar + main content area
-- [ ] `MarketingLayout` — full-width navbar + hero slot + footer
-- [ ] `AuthLayout` — centered card layout
-- [ ] Each accepts `children` + optional config props (`showSidebar`, `showFooter`, etc.)
+- [x] `DashboardLayout` — sidebar + topbar + main content area
+- [x] `MarketingLayout` — full-width navbar + hero slot + footer
+- [x] `AuthLayout` — centered card layout
+- [x] Each accepts `children` + optional config props (`showSidebar`, `showFooter`, etc.)
 
 ### 4.3 Navigation Components
 
-- [ ] `Navbar` — responsive, mobile hamburger, accepts `navItems: NavItem[]` prop
-- [ ] `Sidebar` — collapsible, icon + label, accepts `navItems: NavItem[]` prop
-- [ ] `Footer` — accepts `links` and `copyrightText` as props
-- [ ] Create `src/config/nav.ts` — all nav items defined here, zero hardcoded nav copy in components
+- [x] `Navbar` — responsive, mobile hamburger, accepts `navItems: NavItem[]` prop
+- [x] `Sidebar` — collapsible, icon + label, accepts `navItems: NavItem[]` prop
+- [x] `Footer` — accepts `links` and `copyrightText` as props
+- [x] Create `src/config/nav.ts` — all nav items defined here, zero hardcoded nav copy in components
 
 ### 4.4 Page Templates
 
-- [ ] `src/app/(marketing)/page.tsx` — landing page shell
-- [ ] `src/app/(dashboard)/dashboard/page.tsx` — dashboard shell
-- [ ] `src/app/(auth)/login/page.tsx` — auth shell
-- [ ] `src/app/not-found.tsx` — polished 404
-- [ ] `src/app/error.tsx` — global error boundary UI
+- [x] `src/app/(marketing)/page.tsx` — landing page shell
+- [x] `src/app/(dashboard)/dashboard/page.tsx` — dashboard shell
+- [x] `src/app/(auth)/login/page.tsx` — auth shell
+- [x] `src/app/not-found.tsx` — polished 404
+- [x] `src/app/error.tsx` — global error boundary UI
 
 ### 4.5 Layout Storybook Stories
 
-- [ ] Create `src/components/layout/DashboardLayout.stories.tsx`:
+- [x] Create `src/components/layout/DashboardLayout.stories.tsx`:
   - Set `parameters: { layout: 'fullscreen' }`
   - Stories: Default, WithSidebar, WithoutSidebar
   - Include mock content in children prop
-- [ ] Create `src/components/layout/MarketingLayout.stories.tsx`:
+- [x] Create `src/components/layout/MarketingLayout.stories.tsx`:
   - Set `parameters: { layout: 'fullscreen' }`
   - Stories: Default, WithFooter, WithoutFooter
   - Include hero section mock content
-- [ ] Create `src/components/layout/AuthLayout.stories.tsx`:
+- [x] Create `src/components/layout/AuthLayout.stories.tsx`:
   - Set `parameters: { layout: 'fullscreen' }`
   - Stories: Default, WithLogo, Centered
   - Include login form mock content
-- [ ] Create stories for navigation components:
+- [x] Create stories for navigation components:
   - `Navbar.stories.tsx` — mobile and desktop states
   - `Sidebar.stories.tsx` — collapsed and expanded states
   - `Footer.stories.tsx` — with various link configurations
 
 ### ✅ Phase 4 Gate Check
 
-- [ ] Run Storybook: `npm run storybook`
+- [x] Run Storybook: `npm run storybook`
   - DashboardLayout story renders with sidebar toggle working
   - MarketingLayout story renders with navbar and footer
   - AuthLayout story renders with centered card
   - Navbar story shows mobile hamburger state
   - Sidebar story shows collapsed/expanded states
-- [ ] Run dev server: `npm run dev`
+- [x] Run dev server: `npm run dev`
   - Visit /dashboard — DashboardLayout renders correctly
   - Visit / — MarketingLayout renders correctly
   - Visit /login — AuthLayout renders correctly
-- [ ] Mobile responsive check (resize browser to 375px width):
+- [x] Mobile responsive check (resize browser to 375px width):
   - Navbar collapses to hamburger menu
   - Sidebar is hidden on mobile or shows toggle button
   - All layouts are mobile-friendly
-- [ ] No hardcoded copy anywhere in layout files:
+- [x] No hardcoded copy anywhere in layout files:
   ```bash
   grep -r "Copyright\|Home\|Dashboard\|Login\|About\|Contact" src/components/layout/
   # Should return zero results (all copy comes from config files)
   ```
-- [ ] TypeScript check passes: `npx tsc --noEmit`
-- [ ] All layout components accept className prop and forward refs where needed
+- [x] TypeScript check passes: `npx tsc --noEmit`
+- [x] All layout components accept className prop and forward refs where needed
 
 ---
 
