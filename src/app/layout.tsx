@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeSwitcher } from '@/components/ui/theme-switcher'
+import { siteConfig } from '@/config/site'
 import '@/config/env'
 import './globals.css'
 
@@ -17,9 +18,8 @@ const fontMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'AgentForge - AI Agent Platform',
-  description:
-    'Build, deploy, and manage AI agents with AgentForge. The complete platform for intelligent automation.',
+  title: siteConfig.name,
+  description: siteConfig.description,
   generator: 'v0.app',
   icons: {
     icon: [

@@ -9,8 +9,15 @@ const config: StorybookConfig = {
     options: {},
   },
   async viteFinal(config) {
-    const { mergeConfig } = await import('vite')
+    const { mergeConfig, loadEnv } = await import('vite')
+    const env = loadEnv('development', process.cwd(), '')
+    const define = Object.fromEntries(
+      Object.entries(env)
+        .filter(([key]) => key.startsWith('NEXT_PUBLIC_'))
+        .map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)])
+    )
     return mergeConfig(config, {
+      define,
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '../src'),
@@ -20,6 +27,8 @@ const config: StorybookConfig = {
           '@/hooks': path.resolve(__dirname, '../src/hooks'),
           '@/types': path.resolve(__dirname, '../src/types'),
           '@/config': path.resolve(__dirname, '../src/config'),
+          'next/navigation': path.resolve(__dirname, './mocks/next-navigation.ts'),
+          'next/link': path.resolve(__dirname, './mocks/next-link.tsx'),
         },
       },
     })

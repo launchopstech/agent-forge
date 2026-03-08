@@ -23,13 +23,20 @@ const preview: Preview = {
       },
       defaultTheme: 'light',
     }),
-    (Story) => (
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-        <div className="min-h-screen bg-background text-foreground p-6">
-          <Story />
-        </div>
-      </ThemeProvider>
-    ),
+    (Story, context) => {
+      const noWrapper = context.parameters['noLayoutWrapper'] as boolean | undefined
+      return (
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {noWrapper ? (
+            <Story />
+          ) : (
+            <div className="min-h-screen bg-background text-foreground p-6">
+              <Story />
+            </div>
+          )}
+        </ThemeProvider>
+      )
+    },
   ],
 }
 
