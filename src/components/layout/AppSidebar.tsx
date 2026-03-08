@@ -22,6 +22,7 @@ interface AppSidebarProps {
   footerItems?: NavItem[]
   logoText?: string
   logoHref?: string
+  className?: string
 }
 
 export function AppSidebar({
@@ -29,12 +30,13 @@ export function AppSidebar({
   footerItems = dashboardFooterNavItems,
   logoText,
   logoHref = '/',
+  className,
 }: AppSidebarProps) {
   const pathname = usePathname()
   const name = logoText ?? siteConfig.name
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className={cn(className)}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

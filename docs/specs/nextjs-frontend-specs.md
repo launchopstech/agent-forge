@@ -197,73 +197,73 @@ _Goal: Flexible multi-layout shells, all white-label ready._
 
 ### 4.1 Root Layout
 
-- [ ] `app/layout.tsx` — wraps in `ThemeProvider`, injects fonts, sets metadata defaults
-- [ ] No hardcoded text anywhere in layout files
+- [x] `app/layout.tsx` — wraps in `ThemeProvider`, injects fonts, sets metadata defaults
+- [x] No hardcoded text anywhere in layout files
 
 ### 4.2 Layout Variants
 
-- [ ] `DashboardLayout` — sidebar + topbar + main content area
-- [ ] `MarketingLayout` — full-width navbar + hero slot + footer
-- [ ] `AuthLayout` — centered card layout
-- [ ] Each accepts `children` + optional config props (`showSidebar`, `showFooter`, etc.)
+- [x] `DashboardLayout` — sidebar + topbar + main content area
+- [x] `MarketingLayout` — full-width navbar + hero slot + footer
+- [x] `AuthLayout` — centered card layout
+- [x] Each accepts `children` + optional config props (`showSidebar`, `showFooter`, etc.)
 
 ### 4.3 Navigation Components
 
-- [ ] `Navbar` — responsive, mobile hamburger, accepts `navItems: NavItem[]` prop
-- [ ] `Sidebar` — collapsible, icon + label, accepts `navItems: NavItem[]` prop
-- [ ] `Footer` — accepts `links` and `copyrightText` as props
-- [ ] Create `src/config/nav.ts` — all nav items defined here, zero hardcoded nav copy in components
+- [x] `Navbar` — responsive, mobile hamburger, accepts `navItems: NavItem[]` prop
+- [x] `Sidebar` — collapsible, icon + label, accepts `navItems: NavItem[]` prop
+- [x] `Footer` — accepts `links` and `copyrightText` as props
+- [x] Create `src/config/nav.ts` — all nav items defined here, zero hardcoded nav copy in components
 
 ### 4.4 Page Templates
 
-- [ ] `src/app/(marketing)/page.tsx` — landing page shell
-- [ ] `src/app/(dashboard)/dashboard/page.tsx` — dashboard shell
-- [ ] `src/app/(auth)/login/page.tsx` — auth shell
-- [ ] `src/app/not-found.tsx` — polished 404
-- [ ] `src/app/error.tsx` — global error boundary UI
+- [x] `src/app/(marketing)/page.tsx` — landing page shell
+- [x] `src/app/(dashboard)/dashboard/page.tsx` — dashboard shell
+- [x] `src/app/(auth)/login/page.tsx` — auth shell
+- [x] `src/app/not-found.tsx` — polished 404
+- [x] `src/app/error.tsx` — global error boundary UI
 
 ### 4.5 Layout Storybook Stories
 
-- [ ] Create `src/components/layout/DashboardLayout.stories.tsx`:
+- [x] Create `src/components/layout/DashboardLayout.stories.tsx`:
   - Set `parameters: { layout: 'fullscreen' }`
   - Stories: Default, WithSidebar, WithoutSidebar
   - Include mock content in children prop
-- [ ] Create `src/components/layout/MarketingLayout.stories.tsx`:
+- [x] Create `src/components/layout/MarketingLayout.stories.tsx`:
   - Set `parameters: { layout: 'fullscreen' }`
   - Stories: Default, WithFooter, WithoutFooter
   - Include hero section mock content
-- [ ] Create `src/components/layout/AuthLayout.stories.tsx`:
+- [x] Create `src/components/layout/AuthLayout.stories.tsx`:
   - Set `parameters: { layout: 'fullscreen' }`
   - Stories: Default, WithLogo, Centered
   - Include login form mock content
-- [ ] Create stories for navigation components:
+- [x] Create stories for navigation components:
   - `Navbar.stories.tsx` — mobile and desktop states
   - `Sidebar.stories.tsx` — collapsed and expanded states
   - `Footer.stories.tsx` — with various link configurations
 
 ### ✅ Phase 4 Gate Check
 
-- [ ] Run Storybook: `npm run storybook`
+- [x] Run Storybook: `npm run storybook`
   - DashboardLayout story renders with sidebar toggle working
   - MarketingLayout story renders with navbar and footer
   - AuthLayout story renders with centered card
   - Navbar story shows mobile hamburger state
   - Sidebar story shows collapsed/expanded states
-- [ ] Run dev server: `npm run dev`
+- [x] Run dev server: `npm run dev`
   - Visit /dashboard — DashboardLayout renders correctly
   - Visit / — MarketingLayout renders correctly
   - Visit /login — AuthLayout renders correctly
-- [ ] Mobile responsive check (resize browser to 375px width):
+- [x] Mobile responsive check (resize browser to 375px width):
   - Navbar collapses to hamburger menu
   - Sidebar is hidden on mobile or shows toggle button
   - All layouts are mobile-friendly
-- [ ] No hardcoded copy anywhere in layout files:
+- [x] No hardcoded copy anywhere in layout files:
   ```bash
   grep -r "Copyright\|Home\|Dashboard\|Login\|About\|Contact" src/components/layout/
   # Should return zero results (all copy comes from config files)
   ```
-- [ ] TypeScript check passes: `npx tsc --noEmit`
-- [ ] All layout components accept className prop and forward refs where needed
+- [x] TypeScript check passes: `npx tsc --noEmit`
+- [x] All layout components accept className prop and forward refs where needed
 
 ---
 
@@ -271,35 +271,117 @@ _Goal: Flexible multi-layout shells, all white-label ready._
 
 _Goal: Core Web Vitals-ready out of the box._
 
-### 5.1 Image Optimization
+### 5.1 React Performance Optimizations
+
+- [ ] Add `React.memo` to all layout components:
+  - `Navbar` — prevents re-render on parent state changes
+  - `Footer` — static component, should never re-render
+  - `AppSidebar` — memoize to avoid re-renders when parent updates
+  - `Topbar` — memoize unless user data changes
+- [ ] Add `useCallback` to event handlers in interactive components:
+  - Navbar mobile menu toggle
+  - Sidebar collapse/expand handlers
+  - Form submit handlers
+  - Any callback passed to child components or in dependency arrays
+- [ ] Add `useMemo` for expensive computations:
+  - Filtered/sorted navigation arrays
+  - Computed theme values
+  - Derived state in complex components
+- [ ] Document pattern in `PERFORMANCE.md`:
+  ```typescript
+  // Example: Memoized layout component
+  export const Navbar = React.memo(function Navbar({ navItems, className }) {
+    const handleToggle = useCallback(() => setOpen(!open), [])
+    const visibleItems = useMemo(() => navItems.filter(i => !i.disabled), [navItems])
+    return <nav>...</nav>
+  })
+  ```
+
+### 5.2 Code Splitting & Dynamic Imports
+
+- [ ] Add dynamic imports for heavy components:
+  ```typescript
+  // Example: Lazy load dashboard widgets
+  const HeavyChart = dynamic(() => import('@/components/HeavyChart'), {
+    ssr: true,
+    loading: () => <Skeleton />
+  })
+  ```
+- [ ] Identify candidates for code splitting:
+  - Rich text editors
+  - Chart libraries
+  - Heavy icon sets (if not using individual imports)
+  - Analytics dashboards
+- [ ] Verify Next.js automatic route-based code splitting in build output
+- [ ] Document code splitting strategy in `PERFORMANCE.md`
+
+### 5.3 Image Optimization
 
 - [ ] Wrap `next/image` in a `ResponsiveImage` component with sensible `sizes` defaults and a `priority` prop
 - [ ] Add `remotePatterns` to `next.config.ts` for common CDN domains
 
-### 5.2 Bundle Analysis
+### 5.4 Bundle Analysis
 
 - [ ] Install `@next/bundle-analyzer`
 - [ ] Add `"analyze": "ANALYZE=true next build"` npm script
 - [ ] Run analysis once, document baseline in `PERFORMANCE.md`
+- [ ] Set performance budgets (enforce in CI later):
+  - Main bundle: < 250kb
+  - Per-route bundles: < 150kb
+  - First Contentful Paint: < 1.5s
+  - Time to Interactive: < 3s
 
-### 5.3 Loading States
+### 5.5 Loading States
 
 - [ ] Add `loading.tsx` to each major route group
 - [ ] All async components wrapped in Suspense with Skeleton fallbacks from Phase 3
 
-### 5.4 Metadata & SEO
+### 5.6 Metadata & SEO
 
 - [ ] Create `src/config/site.ts` — site name, description, OG image URL, base URL
 - [ ] Create `generateMetadata()` utility merging page overrides with site defaults
 - [ ] Add `robots.ts` and `sitemap.ts` route handlers
 - [ ] Root layout includes OG and Twitter card tags driven by `site.ts`
 
+### 5.7 Performance Monitoring Setup
+
+- [ ] Add Vercel Analytics (or equivalent):
+
+  ```typescript
+  // app/layout.tsx
+  import { Analytics } from '@vercel/analytics/react'
+
+  export default function RootLayout({ children }) {
+    return (
+      <html>
+        <body>
+          {children}
+          <Analytics />
+        </body>
+      </html>
+    )
+  }
+  ```
+
+- [ ] Document Core Web Vitals targets in `PERFORMANCE.md`
+- [ ] Set up performance regression alerts (optional: Lighthouse CI)
+
 ### ✅ Phase 5 Gate Check
 
 ```bash
 npm run build             # Must complete with no errors
 npm run analyze           # Review output, no single chunk > 250kb
+npx tsc --noEmit          # Verify memo/callback types are correct
 ```
+
+**Performance Checklist:**
+
+- [ ] All layout components wrapped in React.memo
+- [ ] Event handlers use useCallback where appropriate
+- [ ] Expensive computations use useMemo
+- [ ] Heavy components lazy loaded with dynamic imports
+- [ ] Build output shows route-based code splitting
+- [ ] No bundle exceeds size budgets
 
 ---
 
@@ -675,7 +757,115 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 - [ ] Update `Navbar` to use brand nav items from config (no hardcoded nav)
 - [ ] Update `Footer` to use brand footer config
 
-### 12.4 Brand-Specific Assets
+### 12.4 Tenant Context Provider (for Multi-Tenant State)
+
+- [ ] Create `src/lib/tenant-context.tsx`:
+
+  ```typescript
+  'use client'
+
+  import { createContext, useContext } from 'react'
+  import type { BrandConfig } from '@/config/brands/types'
+
+  interface TenantContextValue {
+    config: BrandConfig
+    features: {
+      analytics: boolean
+      customBranding: boolean
+      apiAccess: boolean
+    }
+  }
+
+  const TenantContext = createContext<TenantContextValue | null>(null)
+
+  export function TenantProvider({
+    children,
+    config,
+    features
+  }: {
+    children: React.ReactNode
+    config: BrandConfig
+    features: TenantContextValue['features']
+  }) {
+    return (
+      <TenantContext.Provider value={{ config, features }}>
+        {children}
+      </TenantContext.Provider>
+    )
+  }
+
+  export function useTenant() {
+    const context = useContext(TenantContext)
+    if (!context) throw new Error('useTenant must be used within TenantProvider')
+    return context
+  }
+  ```
+
+- [ ] Update root layout to wrap app in TenantProvider:
+
+  ```typescript
+  export default async function RootLayout({ children }) {
+    const brand = await getBrand()
+    const features = {
+      analytics: brand.features?.includes('analytics') ?? false,
+      customBranding: brand.features?.includes('customBranding') ?? true,
+      apiAccess: brand.features?.includes('apiAccess') ?? false,
+    }
+
+    return (
+      <html lang="en">
+        <body>
+          <ThemeProvider>
+            <TenantProvider config={brand} features={features}>
+              {children}
+            </TenantProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    )
+  }
+  ```
+
+- [ ] Update `BrandConfig` type to include features array:
+  ```typescript
+  export interface BrandConfig {
+    name: string
+    logo: string
+    favicon: string
+    theme: string
+    colors: Record<string, any>
+    fonts: { sans: string; mono: string }
+    features?: string[] // Feature flags per tenant
+    metadata: {
+      title: string
+      description: string
+      ogImage: string
+    }
+    nav: Array<{ label: string; href: string }>
+    footer: {
+      copyrightText: string
+      links: Array<{ label: string; href: string }>
+    }
+  }
+  ```
+- [ ] Document usage pattern:
+
+  ```typescript
+  // In any client component:
+  import { useTenant } from '@/lib/tenant-context'
+
+  export function AnalyticsDashboard() {
+    const { features } = useTenant()
+
+    if (!features.analytics) {
+      return <UpgradePrompt feature="analytics" />
+    }
+
+    return <AnalyticsCharts />
+  }
+  ```
+
+### 12.5 Brand-Specific Assets
 
 - [ ] Create `public/brands/` folder structure:
   ```
@@ -696,7 +886,50 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 - [ ] Add placeholder assets for each brand
 - [ ] Verify no hardcoded asset paths in components (all use brand config)
 
-### 12.5 Vercel Environment Setup
+### 12.6 Tenant-Specific Lazy Loading
+
+- [ ] Implement dynamic brand config loading to reduce initial bundle:
+
+  ```typescript
+  // src/config/brands/index.ts
+  export const getBrand = async () => {
+    const brand = ACTIVE_BRAND || 'default'
+
+    // Lazy load brand config (reduces bundle size)
+    const config = await import(`./${brand}`).then((m) => m.brandConfig)
+
+    return config
+  }
+  ```
+
+- [ ] Add dynamic theme CSS loading (optional):
+
+  ```typescript
+  // Load tenant-specific CSS on demand
+  'use client'
+
+  import { useEffect } from 'react'
+  import { useTenant } from '@/lib/tenant-context'
+
+  export function TenantStyleLoader() {
+    const { config } = useTenant()
+
+    useEffect(() => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = `/brands/${config.name}/theme.css`
+      document.head.appendChild(link)
+
+      return () => document.head.removeChild(link)
+    }, [config.name])
+
+    return null
+  }
+  ```
+
+- [ ] Document when to use lazy loading vs. bundle-time config
+
+### 12.7 Vercel Environment Setup
 
 - [ ] Create Vercel project (if not exists)
 - [ ] Configure environment variables in Vercel:
@@ -708,7 +941,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   - Preview: Use branch-based env var switching
 - [ ] Test deployment triggers for each environment
 
-### 12.6 Domain Setup (GoDaddy + Vercel)
+### 12.8 Domain Setup (GoDaddy + Vercel)
 
 - [ ] Plan domain structure:
   - Production: `example.com` (+ `www.example.com`)
@@ -725,7 +958,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 - [ ] Verify domains in Vercel (wait for DNS propagation)
 - [ ] Confirm SSL certificates are provisioned automatically
 
-### 12.7 CI/CD Environment-Specific Updates
+### 12.9 CI/CD Environment-Specific Updates
 
 - [ ] Update GitHub Actions workflow to run tests per environment:
   ```yaml
@@ -744,7 +977,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   ```
 - [ ] Update Chromatic workflow to capture visual diffs per brand (optional)
 
-### 12.8 Multi-Tenant Domain Mapping (Optional Advanced)
+### 12.10 Multi-Tenant Domain Mapping (Optional Advanced)
 
 If multiple brands need to run from the same deployment on different domains:
 
