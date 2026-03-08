@@ -105,45 +105,38 @@ _Goal: Token-based design system — swap any brand in one config file._
 
 ### 2.1 Tailwind Design Tokens
 
-- [ ] Extend `tailwind.config.ts`:
-  ```ts
-  colors: {
-    brand: { 50: 'var(--color-brand-50)', ..., 900: 'var(--color-brand-900)' },
-    surface: 'var(--color-surface)',
-    muted: 'var(--color-muted)',
-    border: 'var(--color-border)',
-  },
-  fontFamily: {
-    sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
-    mono: ['var(--font-mono)', ...defaultTheme.fontFamily.mono],
-  },
-  borderRadius: { DEFAULT: 'var(--radius)' }
-  ```
-- [ ] Create `src/styles/tokens.css` with all CSS custom properties for the default theme
-- [ ] Import `tokens.css` in `app/globals.css`
+- [x] Extend Tailwind v4 via `@theme inline` in `globals.css` (no `tailwind.config.ts` in v4):
+  - `--color-brand-50` through `--color-brand-900` brand scale
+  - `--color-surface`, `--color-muted`, `--color-border` semantic aliases
+  - `--font-sans`, `--font-mono`, `--radius-*` variants
+- [x] Create `src/styles/tokens.css` with all CSS custom properties for the default theme
+- [x] Import `tokens.css` in `app/globals.css`
 
 ### 2.2 Dark Mode
 
-- [ ] Configure Tailwind `darkMode: 'class'`
-- [ ] Add dark mode overrides under `.dark { }` in `tokens.css`
-- [ ] Create `src/hooks/use-theme.ts` — reads localStorage, syncs with system preference, exposes `theme`, `setTheme`, `toggleTheme`
-- [ ] Create `ThemeProvider` component that applies the class to `<html>`
+- [x] Configure Tailwind `darkMode: 'class'` via `@custom-variant dark (&:is(.dark *))` in globals.css
+- [x] Add dark mode overrides under `.dark { }` in `tokens.css`
+- [x] Create `src/hooks/use-theme.ts` — reads localStorage, syncs with system preference, exposes `theme`, `setTheme`, `toggleTheme`
+- [x] Wire `ThemeProvider` into `layout.tsx` with `attribute="class" defaultTheme="system" enableSystem`
 
 ### 2.3 Typography Scale
 
-- [ ] Install and configure `next/font` with 2 variable fonts (one sans, one mono)
-- [ ] Expose as CSS variables so they feed into Tailwind tokens
+- [x] Install and configure `next/font` with Inter (sans) + JetBrains Mono (mono) via `next/font/google`
+- [x] Expose as CSS variables `--font-sans` / `--font-mono` applied to `<html>` — feed into Tailwind `@theme inline`
 
 ### 2.4 Theme Presets
 
-- [ ] Create `src/config/themes/` with `default.ts` and `dark.ts` — each exports CSS variable overrides
-- [ ] Create `ThemeSwitcher` dev-only component (hidden via `process.env.NODE_ENV !== 'development'` check)
+- [x] Create `src/config/themes/default.ts` and `src/config/themes/dark.ts` — each exports CSS variable overrides
+- [x] Create `ThemeSwitcher` dev-only component (hidden via `process.env.NODE_ENV !== 'development'` check)
 
 ### ✅ Phase 2 Gate Check
 
-- [ ] Open app in browser — default theme loads correctly
-- [ ] Toggle dark mode — all tokens switch, no hardcoded colors visible
-- [ ] `ThemeSwitcher` visible in dev, hidden in production build
+- [x] `pnpm typecheck` — zero errors
+- [x] `pnpm lint` — zero errors
+- [x] `pnpm build` — compiles successfully
+- [x] Open app in browser — default theme loads correctly
+- [x] Toggle dark mode — all tokens switch, no hardcoded colors visible
+- [x] `ThemeSwitcher` visible in dev, hidden in production build
 
 ---
 
@@ -153,48 +146,48 @@ _Goal: Composable, accessible primitives. Every component ships with a Storybook
 
 ### 3.1 Setup
 
-- [ ] Install `class-variance-authority`, `clsx`, `tailwind-merge`
-- [ ] Create `src/lib/utils.ts` with `cn()` helper combining `clsx` + `twMerge`
-- [ ] Install Radix UI primitives: `@radix-ui/react-dialog`, `@radix-ui/react-dropdown-menu`, `@radix-ui/react-tabs`, `@radix-ui/react-tooltip`
+- [x] Install `class-variance-authority`, `clsx`, `tailwind-merge`
+- [x] Create `src/lib/utils.ts` with `cn()` helper combining `clsx` + `twMerge`
+- [x] Install Radix UI primitives: `@radix-ui/react-dialog`, `@radix-ui/react-dropdown-menu`, `@radix-ui/react-tabs`, `@radix-ui/react-tooltip`
 
 ### 3.2 Primitive Components
 
 Each must have: TypeScript props interface, cva variants, `className` passthrough, `forwardRef`, and a `.stories.tsx` file.
 
-- [ ] `Button` — variants: `default | outline | ghost | destructive | link`; sizes: `sm | md | lg`; loading state with spinner
-- [ ] `Input` — with label, error state, helper text, disabled state
-- [ ] `Textarea` — same pattern as Input
-- [ ] `Select` — with label, error state
-- [ ] `Checkbox` — accessible, with label, indeterminate state
-- [ ] `Badge` — variants: `default | success | warning | destructive | outline`
-- [ ] `Avatar` — with image, fallback initials, size variants
-- [ ] `Spinner` — size variants, inherits color from parent
-- [ ] `Separator` — horizontal and vertical
+- [x] `Button` — variants: `default | outline | ghost | destructive | link`; sizes: `sm | md | lg`; loading state with spinner
+- [x] `Input` — with label, error state, helper text, disabled state
+- [x] `Textarea` — same pattern as Input
+- [x] `Select` — with label, error state
+- [x] `Checkbox` — accessible, with label, indeterminate state
+- [x] `Badge` — variants: `default | success | warning | destructive | outline`
+- [x] `Avatar` — with image, fallback initials, size variants
+- [x] `Spinner` — size variants, inherits color from parent
+- [x] `Separator` — horizontal and vertical
 
 ### 3.3 Composite Components
 
 Each must have a `.stories.tsx` file showing all states.
 
-- [ ] `Card` — with `CardHeader`, `CardContent`, `CardFooter` sub-components
-- [ ] `Dialog` — using Radix, with `DialogHeader`, `DialogFooter`, controlled and uncontrolled modes
-- [ ] `DropdownMenu` — using Radix, with items, separators, icons
-- [ ] `Toast` — singleton provider pattern, expose `useToast()` hook with `success | error | warning | info` variants
-- [ ] `Tooltip` — using Radix, configurable delay
-- [ ] `Tabs` — using Radix, with controlled and uncontrolled modes
-- [ ] `Skeleton` — variants: `SkeletonText`, `SkeletonAvatar`, `SkeletonCard`, `SkeletonBlock`
-- [ ] `EmptyState` — icon slot, title, description, CTA slot
+- [x] `Card` — with `CardHeader`, `CardContent`, `CardFooter` sub-components
+- [x] `Dialog` — using Radix, with `DialogHeader`, `DialogFooter`, controlled and uncontrolled modes
+- [x] `DropdownMenu` — using Radix, with items, separators, icons
+- [x] `Toast` — singleton provider pattern, expose `useToast()` hook with `success | error | warning | info` variants
+- [x] `Tooltip` — using Radix, configurable delay
+- [x] `Tabs` — using Radix, with controlled and uncontrolled modes
+- [x] `Skeleton` — variants: `SkeletonText`, `SkeletonAvatar`, `SkeletonCard`, `SkeletonBlock`
+- [x] `EmptyState` — icon slot, title, description, CTA slot
 
 ### 3.4 Form Pattern
 
-- [ ] Install `react-hook-form` and `@hookform/resolvers`
-- [ ] Create `FormField` wrapper that integrates `react-hook-form` context with Input/Select/Textarea
-- [ ] Create `src/features/example/ExampleForm.tsx` demonstrating: Zod schema, validation, error display, submit state
+- [x] Install `react-hook-form` and `@hookform/resolvers`
+- [x] Create `FormField` wrapper that integrates `react-hook-form` context with Input/Select/Textarea
+- [x] Create `src/features/example/ExampleForm.tsx` demonstrating: Zod schema, validation, error display, submit state
 
 ### ✅ Phase 3 Gate Check
 
-- [ ] Run Storybook — every component renders in all variants without errors
-- [ ] No TypeScript errors in component files
-- [ ] Dark mode toggle in Storybook — all components adapt correctly
+- [x] Run Storybook — every component renders in all variants without errors
+- [x] No TypeScript errors in component files
+- [x] Dark mode toggle in Storybook — all components adapt correctly
 
 ---
 
@@ -526,21 +519,280 @@ _Goal: Handoff-ready for agency clients or new team members._
 
 ---
 
+## Phase 12 — White-Labeling & Deployment
+
+_Goal: Multi-tenant brand switching, environment setup, and production deployment._
+
+### 12.1 Brand Config System
+
+- [ ] Create `src/config/brands/` folder structure:
+  ```
+  src/config/brands/
+  ├── index.ts           # exports activeBrand
+  ├── types.ts           # BrandConfig interface
+  ├── default.ts         # default brand config
+  ├── client-a.ts        # client A overrides
+  └── client-b.ts        # client B overrides
+  ```
+- [ ] Define `BrandConfig` type in `types.ts`:
+  ```typescript
+  export interface BrandConfig {
+    name: string
+    logo: string
+    favicon: string
+    theme: string
+    colors: Record<string, any>
+    fonts: { sans: string; mono: string }
+    metadata: {
+      title: string
+      description: string
+      ogImage: string
+    }
+    nav: Array<{ label: string; href: string }>
+    footer: {
+      copyrightText: string
+      links: Array<{ label: string; href: string }>
+    }
+  }
+  ```
+- [ ] Create `default.ts` brand config with placeholder values
+- [ ] Create `client-a.ts` and `client-b.ts` with brand-specific overrides
+- [ ] Create `src/config/brands/index.ts` with brand selection logic:
+
+  ```typescript
+  import type { BrandConfig } from './types'
+
+  const ACTIVE_BRAND = process.env.NEXT_PUBLIC_BRAND || 'default'
+
+  const brands: Record<string, () => Promise<{ brandConfig: BrandConfig }>> = {
+    default: () => import('./default'),
+    'client-a': () => import('./client-a'),
+    'client-b': () => import('./client-b'),
+  }
+
+  export const getBrand = async () => {
+    const brand = await brands[ACTIVE_BRAND]?.()
+    if (!brand) throw new Error(`Brand "${ACTIVE_BRAND}" not found`)
+    return brand.brandConfig
+  }
+
+  // For client components (sync access)
+  export { brandConfig as activeBrand } from './default'
+  ```
+
+### 12.2 Environment-Based Brand Selection
+
+- [ ] Add `NEXT_PUBLIC_BRAND` to `.env.example`:
+  ```bash
+  # Brand selection (default, client-a, client-b)
+  NEXT_PUBLIC_BRAND=default
+  ```
+- [ ] Update `src/config/env.ts` to validate brand:
+  ```typescript
+  NEXT_PUBLIC_BRAND: z.enum(['default', 'client-a', 'client-b']).default('default'),
+  ```
+- [ ] Add brand-specific build scripts to `package.json`:
+  ```json
+  {
+    "scripts": {
+      "build:default": "next build",
+      "build:client-a": "NEXT_PUBLIC_BRAND=client-a next build",
+      "build:client-b": "NEXT_PUBLIC_BRAND=client-b next build"
+    }
+  }
+  ```
+
+### 12.3 Dynamic Theme & Metadata Injection
+
+- [ ] Update `app/layout.tsx` to consume brand config for metadata:
+
+  ```typescript
+  import { getBrand } from '@/config/brands'
+
+  export async function generateMetadata() {
+    const brand = await getBrand()
+    return {
+      title: brand.metadata.title,
+      description: brand.metadata.description,
+      icons: { icon: brand.favicon },
+      openGraph: { images: [brand.metadata.ogImage] },
+    }
+  }
+  ```
+
+- [ ] Update `app/layout.tsx` to apply brand fonts:
+  ```typescript
+  export default async function RootLayout({ children }) {
+    const brand = await getBrand()
+    return (
+      <html lang="en" className={brand.fonts.sans}>
+        <body>
+          <ThemeProvider theme={brand.theme}>
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    )
+  }
+  ```
+- [ ] Update `Navbar` to use brand nav items from config (no hardcoded nav)
+- [ ] Update `Footer` to use brand footer config
+
+### 12.4 Brand-Specific Assets
+
+- [ ] Create `public/brands/` folder structure:
+  ```
+  public/brands/
+  ├── default/
+  │   ├── logo.svg
+  │   ├── favicon.ico
+  │   └── og.png
+  ├── client-a/
+  │   ├── logo.svg
+  │   ├── favicon.ico
+  │   └── og.png
+  └── client-b/
+      ├── logo.svg
+      ├── favicon.ico
+      └── og.png
+  ```
+- [ ] Add placeholder assets for each brand
+- [ ] Verify no hardcoded asset paths in components (all use brand config)
+
+### 12.5 Vercel Environment Setup
+
+- [ ] Create Vercel project (if not exists)
+- [ ] Configure environment variables in Vercel:
+  - **Production**: Set `NEXT_PUBLIC_BRAND=client-a` (or desired brand)
+  - **Preview (staging branch)**: Set `NEXT_PUBLIC_BRAND=client-b` with branch filter
+  - **Preview (other branches)**: Set `NEXT_PUBLIC_BRAND=default`
+- [ ] Set build command per environment:
+  - Production: `npm run build:client-a`
+  - Preview: Use branch-based env var switching
+- [ ] Test deployment triggers for each environment
+
+### 12.6 Domain Setup (GoDaddy + Vercel)
+
+- [ ] Plan domain structure:
+  - Production: `example.com` (+ `www.example.com`)
+  - Staging: `staging.example.com`
+  - Preview: branch-based Vercel URLs or `*.preview.example.com` (optional wildcard)
+- [ ] Add domains in Vercel:
+  - Project → Settings → Domains → Add each domain
+  - Set branch filters for staging domain (map to staging branch)
+- [ ] Configure DNS in GoDaddy:
+  - Apex (`example.com`): A record → `76.76.21.21`
+  - `www`: CNAME → `cname.vercel-dns.com`
+  - `staging`: CNAME → `cname.vercel-dns.com`
+  - (Optional) `*.preview`: CNAME → `cname.vercel-dns.com`
+- [ ] Verify domains in Vercel (wait for DNS propagation)
+- [ ] Confirm SSL certificates are provisioned automatically
+
+### 12.7 CI/CD Environment-Specific Updates
+
+- [ ] Update GitHub Actions workflow to run tests per environment:
+  ```yaml
+  - name: Test (default brand)
+    run: NEXT_PUBLIC_BRAND=default npm run test
+  - name: Test (client-a brand)
+    run: NEXT_PUBLIC_BRAND=client-a npm run test
+  ```
+- [ ] Add environment-specific build validation:
+  ```yaml
+  - name: Build all brands
+    run: |
+      npm run build:default
+      npm run build:client-a
+      npm run build:client-b
+  ```
+- [ ] Update Chromatic workflow to capture visual diffs per brand (optional)
+
+### 12.8 Multi-Tenant Domain Mapping (Optional Advanced)
+
+If multiple brands need to run from the same deployment on different domains:
+
+- [ ] Create `middleware.ts` to detect domain and set brand header:
+
+  ```typescript
+  import { NextResponse } from 'next/server'
+
+  const DOMAIN_BRAND_MAP = {
+    'client-a.com': 'client-a',
+    'client-b.com': 'client-b',
+    'localhost:3000': 'default',
+  }
+
+  export function middleware(request) {
+    const host = request.headers.get('host') || ''
+    const brand = DOMAIN_BRAND_MAP[host] || 'default'
+    const response = NextResponse.next()
+    response.headers.set('x-brand', brand)
+    return response
+  }
+  ```
+
+- [ ] Update `getBrand()` to read from request headers:
+
+  ```typescript
+  import { headers } from 'next/headers'
+
+  export const getBrand = async () => {
+    const headersList = headers()
+    const brand = headersList.get('x-brand') || process.env.NEXT_PUBLIC_BRAND || 'default'
+    return (await brands[brand]()).brandConfig
+  }
+  ```
+
+- [ ] Map multiple domains to same Vercel project
+- [ ] Test brand switching via domain in production
+
+### ✅ Phase 12 Gate Check
+
+```bash
+# Test brand switching locally
+NEXT_PUBLIC_BRAND=default npm run dev    # Default branding loads
+NEXT_PUBLIC_BRAND=client-a npm run dev   # Client A branding loads
+NEXT_PUBLIC_BRAND=client-b npm run dev   # Client B branding loads
+
+# Verify no hardcoded brand names in components
+grep -r "Client A\|default-brand\|hardcoded-company" src/components/
+# Should return zero results
+
+# Verify all environments build successfully
+npm run build:default
+npm run build:client-a
+npm run build:client-b
+
+# Verify domain DNS (after GoDaddy setup)
+dig example.com           # Should resolve to Vercel IP
+dig staging.example.com   # Should resolve to Vercel
+```
+
+---
+
+### 13 Pending TODOs
+
+- [ ] Setup envivornments in Vercel
+- [ ] Setup domains in GoDaddy
+- [ ] Update CI as per enviornment
+
 ## Master Completion Checklist
 
-| Phase | Description               | Gate Check                             | Status |
-| ----- | ------------------------- | -------------------------------------- | ------ |
-| 1     | Project Foundation        | `tsc` + `eslint` pass                  | ⬜     |
-| 2     | Design System & Theming   | Tokens load, dark mode works           | ⬜     |
-| 3     | Core UI Components        | All stories render                     | ⬜     |
-| 4     | Layout Architecture       | All layouts render, no hardcoded copy  | ⬜     |
-| 5     | Performance               | Build passes, no chunk > 250kb         | ⬜     |
-| 6     | Auth Scaffolding          | Redirect works, one auth file          | ⬜     |
-| 7     | Data Layer                | Types pass, API client works           | ⬜     |
-| 8     | Testing Infrastructure    | Unit + E2E pass, >80% coverage         | ⬜     |
-| 9     | Storybook & Visual Review | Stories render, Chromatic baseline set | ⬜     |
-| 10    | CI/CD Pipeline            | All 3 CI jobs pass on test PR          | ⬜     |
-| 11    | Docs & DX                 | README complete, i18n scaffolded       | ⬜     |
+| Phase | Description                 | Gate Check                             | Status |
+| ----- | --------------------------- | -------------------------------------- | ------ |
+| 1     | Project Foundation          | `tsc` + `eslint` pass                  | ⬜     |
+| 2     | Design System & Theming     | Tokens load, dark mode works           | ⬜     |
+| 3     | Core UI Components          | All stories render                     | ⬜     |
+| 4     | Layout Architecture         | All layouts render, no hardcoded copy  | ⬜     |
+| 5     | Performance                 | Build passes, no chunk > 250kb         | ⬜     |
+| 6     | Auth Scaffolding            | Redirect works, one auth file          | ⬜     |
+| 7     | Data Layer                  | Types pass, API client works           | ⬜     |
+| 8     | Testing Infrastructure      | Unit + E2E pass, >80% coverage         | ⬜     |
+| 9     | Storybook & Visual Review   | Stories render, Chromatic baseline set | ⬜     |
+| 10    | CI/CD Pipeline              | All 3 CI jobs pass on test PR          | ⬜     |
+| 11    | Docs & DX                   | README complete, i18n scaffolded       | ⬜     |
+| 12    | White-Labeling & Deployment | Brands switch, domains live, CI passes | ⬜     |
+| 13    | Pending TODOs               |                                        | ⬜     |
 
 ---
 
