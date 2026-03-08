@@ -105,45 +105,38 @@ _Goal: Token-based design system — swap any brand in one config file._
 
 ### 2.1 Tailwind Design Tokens
 
-- [ ] Extend `tailwind.config.ts`:
-  ```ts
-  colors: {
-    brand: { 50: 'var(--color-brand-50)', ..., 900: 'var(--color-brand-900)' },
-    surface: 'var(--color-surface)',
-    muted: 'var(--color-muted)',
-    border: 'var(--color-border)',
-  },
-  fontFamily: {
-    sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
-    mono: ['var(--font-mono)', ...defaultTheme.fontFamily.mono],
-  },
-  borderRadius: { DEFAULT: 'var(--radius)' }
-  ```
-- [ ] Create `src/styles/tokens.css` with all CSS custom properties for the default theme
-- [ ] Import `tokens.css` in `app/globals.css`
+- [x] Extend Tailwind v4 via `@theme inline` in `globals.css` (no `tailwind.config.ts` in v4):
+  - `--color-brand-50` through `--color-brand-900` brand scale
+  - `--color-surface`, `--color-muted`, `--color-border` semantic aliases
+  - `--font-sans`, `--font-mono`, `--radius-*` variants
+- [x] Create `src/styles/tokens.css` with all CSS custom properties for the default theme
+- [x] Import `tokens.css` in `app/globals.css`
 
 ### 2.2 Dark Mode
 
-- [ ] Configure Tailwind `darkMode: 'class'`
-- [ ] Add dark mode overrides under `.dark { }` in `tokens.css`
-- [ ] Create `src/hooks/use-theme.ts` — reads localStorage, syncs with system preference, exposes `theme`, `setTheme`, `toggleTheme`
-- [ ] Create `ThemeProvider` component that applies the class to `<html>`
+- [x] Configure Tailwind `darkMode: 'class'` via `@custom-variant dark (&:is(.dark *))` in globals.css
+- [x] Add dark mode overrides under `.dark { }` in `tokens.css`
+- [x] Create `src/hooks/use-theme.ts` — reads localStorage, syncs with system preference, exposes `theme`, `setTheme`, `toggleTheme`
+- [x] Wire `ThemeProvider` into `layout.tsx` with `attribute="class" defaultTheme="system" enableSystem`
 
 ### 2.3 Typography Scale
 
-- [ ] Install and configure `next/font` with 2 variable fonts (one sans, one mono)
-- [ ] Expose as CSS variables so they feed into Tailwind tokens
+- [x] Install and configure `next/font` with Inter (sans) + JetBrains Mono (mono) via `next/font/google`
+- [x] Expose as CSS variables `--font-sans` / `--font-mono` applied to `<html>` — feed into Tailwind `@theme inline`
 
 ### 2.4 Theme Presets
 
-- [ ] Create `src/config/themes/` with `default.ts` and `dark.ts` — each exports CSS variable overrides
-- [ ] Create `ThemeSwitcher` dev-only component (hidden via `process.env.NODE_ENV !== 'development'` check)
+- [x] Create `src/config/themes/default.ts` and `src/config/themes/dark.ts` — each exports CSS variable overrides
+- [x] Create `ThemeSwitcher` dev-only component (hidden via `process.env.NODE_ENV !== 'development'` check)
 
 ### ✅ Phase 2 Gate Check
 
-- [ ] Open app in browser — default theme loads correctly
-- [ ] Toggle dark mode — all tokens switch, no hardcoded colors visible
-- [ ] `ThemeSwitcher` visible in dev, hidden in production build
+- [x] `pnpm typecheck` — zero errors
+- [x] `pnpm lint` — zero errors
+- [x] `pnpm build` — compiles successfully
+- [x] Open app in browser — default theme loads correctly
+- [x] Toggle dark mode — all tokens switch, no hardcoded colors visible
+- [x] `ThemeSwitcher` visible in dev, hidden in production build
 
 ---
 
@@ -523,6 +516,12 @@ _Goal: Handoff-ready for agency clients or new team members._
 - [ ] Set up locale routing under `src/app/[locale]/`
 - [ ] Create `src/messages/en.json` as default locale
 - [ ] Document how to add a new locale in README
+
+### 12 Pending TODOs
+
+- [ ] Setup envivornments in Vercel
+- [ ] Setup domains in GoDaddy
+- [ ] Update CI as per enviornment
 
 ---
 

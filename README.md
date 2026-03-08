@@ -1,35 +1,151 @@
-# agent-forge
+# AgentForge
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+AI Agent Platform — built on Next.js 16, React 19, TypeScript, Tailwind CSS v4.
 
-## Built with v0
-
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
-
-[Continue working on v0 →](https://v0.app/chat/projects/prj_E1zcpDiH94L7ukk2VR4QuxlBbKQH)
-
-## Getting Started
-
-First, run the development server:
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local   # fill in NEXT_PUBLIC_APP_URL and NEXT_PUBLIC_APP_ENV
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command             | Description                        |
+| ------------------- | ---------------------------------- |
+| `pnpm dev`          | Start dev server at localhost:3000 |
+| `pnpm build`        | Production build                   |
+| `pnpm typecheck`    | TypeScript check                   |
+| `pnpm lint`         | ESLint                             |
+| `pnpm lint:fix`     | ESLint with auto-fix               |
+| `pnpm format`       | Prettier format all files          |
+| `pnpm format:check` | Check formatting                   |
 
-## Learn More
+---
 
-To learn more, take a look at the following resources:
+## Theming & Branding
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+The design system is **token-based** — swapping an entire brand requires changing one file.
 
-<a href="https://v0.app/chat/api/kiro/clone/bomatronix/agent-forge" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+### How it works
+
+All colors, radii, and font references are CSS custom properties defined in a single file:
+
+```
+src/styles/tokens.css   ← single source of truth for all CSS variables
+src/app/globals.css     ← imports tokens.css, maps vars to Tailwind utilities
+```
+
+`tokens.css` defines two blocks:
+
+```css
+:root {
+  /* light mode defaults */
+}
+.dark {
+  /* dark mode overrides  */
+}
+```
+
+`globals.css` maps those variables into Tailwind's `@theme inline` so utilities like `bg-brand-500`, `text-primary`, and `border-border` all resolve through the CSS var chain at runtime — no JS rebuild needed.
+
+### Applying a new brand in one file
+
+1. Open `src/styles/tokens.css`
+2. Change `--color-brand-*` under `:root` and `.dark` — adjust the oklch hue (the third number) to shift the entire palette:
+
+   ```css
+   /* Purple (default) → hue 280 */
+   --color-brand-500: oklch(0.57 0.17 280);
+
+   /* Blue → change hue to 230 */
+   --color-brand-500: oklch(0.57 0.17 230);
+
+   /* Green → change hue to 145 */
+   --color-brand-500: oklch(0.57 0.17 145);
+   ```
+
+3. Update `--primary` and `--ring` to reference your chosen brand shade
+4. Save — all components update instantly, no rebuild
+
+### Brand color scale
+
+The `--color-brand-*` scale runs 50–900 in [oklch](https://oklch.com) color space, giving perceptually uniform lightness. Available as Tailwind utilities:
+
+```
+bg-brand-50  bg-brand-100  ...  bg-brand-900
+text-brand-*   border-brand-*   ring-brand-*
+```
+
+### Dark mode
+
+Dark mode is driven by the `.dark` class on `<html>`, managed by [`next-themes`](https://github.com/pacocoursey/next-themes):
+
+```
+layout.tsx
+  └─ ThemeProvider (attribute="class", defaultTheme="system", enableSystem)
+       └─ reads localStorage / system preference
+       └─ toggles .dark on <html>
+       └─ tokens.css .dark { } overrides all CSS vars
+```
+
+To toggle theme in a component:
+
+```tsx
+'use client'
+import { useTheme } from '@/hooks/use-theme'
+
+export function MyButton() {
+  const { isDark, toggleTheme } = useTheme()
+  return <button onClick={toggleTheme}>{isDark ? '☀ Light' : '☾ Dark'}</button>
+}
+```
+
+### Typography
+
+Fonts are loaded via `next/font/google` in `layout.tsx` and exposed as CSS variables on `<html>`:
+
+| Variable      | Font           | Tailwind class |
+| ------------- | -------------- | -------------- |
+| `--font-sans` | Inter          | `font-sans`    |
+| `--font-mono` | JetBrains Mono | `font-mono`    |
+
+To swap fonts, replace the `next/font` imports in `src/app/layout.tsx`.
+
+### ThemeSwitcher (dev only)
+
+A floating widget in the bottom-right corner of every page during `pnpm dev`. It toggles between light and dark mode. It returns `null` in production — zero DOM output, zero bundle cost.
+
+### Theme presets
+
+`src/config/themes/` exports CSS variable override maps for each brand:
+
+```
+src/config/themes/
+├── default.ts   ← light mode brand vars
+└── dark.ts      ← dark mode brand vars
+```
+
+Use these to apply brand changes programmatically, e.g. for a white-label client swap.
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/              Next.js App Router pages and layouts
+├── components/
+│   ├── ui/           shadcn/ui primitives + custom components
+│   └── layout/       layout shells (nav, sidebar, footer)
+├── config/
+│   ├── env.ts        Zod-validated environment variables
+│   └── themes/       CSS variable preset objects per brand
+├── features/         feature modules (co-located components + actions)
+├── hooks/            shared React hooks (useTheme, useMobile, useToast)
+├── lib/              utilities (cn, api-client, content)
+├── styles/
+│   └── tokens.css    design tokens — the one file to change per brand
+└── types/            shared TypeScript types
+```
