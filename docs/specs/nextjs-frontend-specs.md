@@ -802,6 +802,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   ```
 
 - [ ] Update root layout to wrap app in TenantProvider:
+
   ```typescript
   export default async function RootLayout({ children }) {
     const brand = await getBrand()
@@ -824,6 +825,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
     )
   }
   ```
+
 - [ ] Update `BrandConfig` type to include features array:
   ```typescript
   export interface BrandConfig {
@@ -887,6 +889,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 ### 12.6 Tenant-Specific Lazy Loading
 
 - [ ] Implement dynamic brand config loading to reduce initial bundle:
+
   ```typescript
   // src/config/brands/index.ts
   export const getBrand = async () => {
@@ -898,6 +901,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
     return config
   }
   ```
+
 - [ ] Add dynamic theme CSS loading (optional):
 
   ```typescript
