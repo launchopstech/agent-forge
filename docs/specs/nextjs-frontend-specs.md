@@ -222,11 +222,48 @@ _Goal: Flexible multi-layout shells, all white-label ready._
 - [ ] `src/app/not-found.tsx` — polished 404
 - [ ] `src/app/error.tsx` — global error boundary UI
 
+### 4.5 Layout Storybook Stories
+
+- [ ] Create `src/components/layout/DashboardLayout.stories.tsx`:
+  - Set `parameters: { layout: 'fullscreen' }`
+  - Stories: Default, WithSidebar, WithoutSidebar
+  - Include mock content in children prop
+- [ ] Create `src/components/layout/MarketingLayout.stories.tsx`:
+  - Set `parameters: { layout: 'fullscreen' }`
+  - Stories: Default, WithFooter, WithoutFooter
+  - Include hero section mock content
+- [ ] Create `src/components/layout/AuthLayout.stories.tsx`:
+  - Set `parameters: { layout: 'fullscreen' }`
+  - Stories: Default, WithLogo, Centered
+  - Include login form mock content
+- [ ] Create stories for navigation components:
+  - `Navbar.stories.tsx` — mobile and desktop states
+  - `Sidebar.stories.tsx` — collapsed and expanded states
+  - `Footer.stories.tsx` — with various link configurations
+
 ### ✅ Phase 4 Gate Check
 
-- [ ] All three layouts render without errors
-- [ ] Navbar collapses correctly on mobile (test at 375px)
-- [ ] No hardcoded copy found anywhere in layout files (`grep -r "Copyright\|Home\|Dashboard" src/components/layout/` returns zero results)
+- [ ] Run Storybook: `npm run storybook`
+  - DashboardLayout story renders with sidebar toggle working
+  - MarketingLayout story renders with navbar and footer
+  - AuthLayout story renders with centered card
+  - Navbar story shows mobile hamburger state
+  - Sidebar story shows collapsed/expanded states
+- [ ] Run dev server: `npm run dev`
+  - Visit /dashboard — DashboardLayout renders correctly
+  - Visit / — MarketingLayout renders correctly
+  - Visit /login — AuthLayout renders correctly
+- [ ] Mobile responsive check (resize browser to 375px width):
+  - Navbar collapses to hamburger menu
+  - Sidebar is hidden on mobile or shows toggle button
+  - All layouts are mobile-friendly
+- [ ] No hardcoded copy anywhere in layout files:
+  ```bash
+  grep -r "Copyright\|Home\|Dashboard\|Login\|About\|Contact" src/components/layout/
+  # Should return zero results (all copy comes from config files)
+  ```
+- [ ] TypeScript check passes: `npx tsc --noEmit`
+- [ ] All layout components accept className prop and forward refs where needed
 
 ---
 
