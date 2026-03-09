@@ -168,6 +168,41 @@ Route (app)    Size     First Load JS
 
 ---
 
+## 5.7 — Performance Monitoring
+
+### Vercel Analytics vs Speed Insights
+
+Both are installed in `src/app/layout.tsx`. They do different things:
+
+| Package                  | Tracks                             |
+| ------------------------ | ---------------------------------- |
+| `@vercel/analytics`      | Page views, custom events, funnels |
+| `@vercel/speed-insights` | Real-user LCP, INP, CLS per page   |
+
+Speed Insights data appears in the Vercel dashboard under **Analytics → Web Vitals**.
+It shows per-page breakdowns — if one route is slow, you'll see it there first.
+
+### Lighthouse CI
+
+Every push and PR runs Lighthouse against all three routes via GitHub Actions
+(`.github/workflows/lighthouse.yml`). Thresholds are in `lighthouserc.json`.
+
+**Current thresholds** (all `warn` — alerts without blocking merges):
+
+| Metric              | Threshold |
+| ------------------- | --------- |
+| FCP                 | < 1500 ms |
+| LCP                 | < 2500 ms |
+| CLS                 | < 0.1     |
+| TBT                 | < 200 ms  |
+| Performance score   | ≥ 0.8     |
+| Accessibility score | ≥ 0.9     |
+
+**Escalating to `error`:** Once baselines are confirmed over a few PR cycles, change
+`"warn"` → `"error"` in `lighthouserc.json` to block merges that regress performance.
+
+---
+
 ## Core Web Vitals Targets
 
 | Metric                          | Target   |
