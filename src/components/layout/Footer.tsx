@@ -1,3 +1,4 @@
+import React from 'react'
 import { cn } from '@/lib/utils'
 import { siteConfig, footerNavColumns } from '@/config'
 import type { NavItem } from '@/types'
@@ -9,7 +10,7 @@ interface FooterProps {
   className?: string
 }
 
-export function Footer({
+export const Footer = React.memo(function Footer({
   columns = footerNavColumns,
   copyrightText,
   logoText,
@@ -53,4 +54,4 @@ export function Footer({
       </div>
     </footer>
   )
-}
+})
