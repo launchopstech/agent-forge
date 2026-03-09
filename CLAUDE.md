@@ -54,16 +54,35 @@ New routes go in `app/` following Next.js App Router conventions. Server Compone
 1. Check `memory/MEMORY.md` to confirm which sub-tasks are already done — never re-implement completed work.
 2. Read the relevant section of `docs/specs/nextjs-frontend-specs.md` to understand acceptance criteria.
 
-### Gate checks — run ALL four before every commit
+### Gate checks — run ALL five before every commit
 
 ```bash
 pnpm typecheck              # zero TS errors (ignoreBuildErrors masks them in build)
 pnpm lint                   # zero errors, zero warnings (no-console fires on console.*)
 pnpm build                  # production build must succeed
 pnpm exec storybook build   # all stories must compile
+pnpm analyze                # inspect bundle treemap (see bundle health checks below)
 ```
 
 Never skip or reorder these. A passing build alone is not sufficient.
+
+### Bundle health checks (after every `pnpm analyze`)
+
+Use `pnpm build 2>&1 | grep "First Load JS"` for a quick size summary without opening a browser.
+
+Budgets — **fail if exceeded:**
+
+- Main shared chunk: < 250 kb
+- Per-route bundle: < 150 kb
+
+Red flags to check in the treemap:
+
+- `recharts` appearing in any route bundle → wrap with `next/dynamic()` immediately
+- `date-fns` unexpectedly large → switch to named imports (`import { format } from 'date-fns'`)
+- Any library duplicated (two blocks with the same name) → audit package versions
+- Everything in one giant shared chunk → route-based splitting is broken
+
+Route isolation — each route (`/`, `/dashboard`, `/login`) must have its own small chunk separate from the shared bundle.
 
 ### Code rules
 
