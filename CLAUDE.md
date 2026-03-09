@@ -47,6 +47,58 @@ lib/
 
 New routes go in `app/` following Next.js App Router conventions. Server Components are the default; add `'use client'` only when needed (event handlers, hooks, browser APIs).
 
+## Environment Variables
+
+### Source of truth per environment
+
+| Environment                    | Source of truth                                               |
+| ------------------------------ | ------------------------------------------------------------- |
+| Local dev                      | `.env.local` (gitignored)                                     |
+| CI (GitHub Actions)            | GitHub → Settings → Secrets and Variables → Actions           |
+| Preview / Staging / Production | Vercel dashboard → Project → Settings → Environment Variables |
+
+### New developer setup
+
+```bash
+pnpm dlx vercel link          # link local repo to Vercel project (one-time)
+pnpm dlx vercel env pull      # pull all env vars into .env.local
+```
+
+### Adding a new environment variable
+
+1. Add it to `.env.example` with a placeholder value and comment (always commit this)
+2. Set real value in **Vercel dashboard** for each environment (Production / Preview / Development)
+3. Set in **GitHub → Settings → Secrets and Variables → Actions** if needed by CI:
+   - Non-sensitive → **Variables** tab: `gh variable set NAME --body "value"`
+   - Sensitive → **Secrets** tab: `gh secret set NAME`
+4. Add to `src/config/env.ts` schema if it must be validated at build time
+5. Run `pnpm dlx vercel env pull` locally to get the updated `.env.local`
+
+### Updating GitHub Actions variables via CLI
+
+```bash
+# List all variables
+gh variable list
+
+# Set / update a variable
+gh variable set NEXT_PUBLIC_APP_URL --body "https://myapp.com"
+gh variable set NEXT_PUBLIC_APP_ENV --body "production"
+
+# Set / update a secret (sensitive values)
+gh secret set DATABASE_URL
+
+# Pull from Vercel into GitHub Variables (manual sync — run when Vercel vars change)
+# Non-sensitive vars only:
+gh variable set NEXT_PUBLIC_APP_URL --body "$(vercel env pull --yes > /dev/null && grep NEXT_PUBLIC_APP_URL .env.local | cut -d= -f2)"
+```
+
+### Rules
+
+- **Never commit** `.env.local`, `.env*.local`, or any file containing real secrets
+- **Always commit** `.env.example` when adding a new variable
+- **Vercel is the source of truth** — do not manually edit `.env.local` for shared vars; pull from Vercel instead
+- CI workflows reference vars as `${{ vars.NAME }}` (non-sensitive) or `${{ secrets.NAME }}` (sensitive)
+
 ## Guardrails — always follow these
 
 ### Before starting any phase task

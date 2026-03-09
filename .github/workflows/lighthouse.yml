@@ -19,6 +19,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Set env defaults
+        run: |
+          echo "NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}" >> $GITHUB_ENV
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV }}
+
       - run: pnpm build
 
       - name: Start production server
