@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -25,7 +26,7 @@ interface AppSidebarProps {
   className?: string
 }
 
-export function AppSidebar({
+export const AppSidebar = React.memo(function AppSidebar({
   navGroups = dashboardNavGroups,
   footerItems = dashboardFooterNavItems,
   logoText,
@@ -93,4 +94,4 @@ export function AppSidebar({
       )}
     </Sidebar>
   )
-}
+})

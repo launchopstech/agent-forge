@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,7 @@ interface NavbarProps {
   className?: string
 }
 
-export function Navbar({
+export const Navbar = React.memo(function Navbar({
   navItems = marketingNavItems,
   logoText,
   logoHref = '/',
@@ -28,6 +28,7 @@ export function Navbar({
 }: NavbarProps) {
   const [open, setOpen] = useState(false)
   const name = logoText ?? siteConfig.name
+  const handleClose = useCallback(() => setOpen(false), [])
 
   return (
     <nav
@@ -80,11 +81,7 @@ export function Navbar({
           </SheetTrigger>
           <SheetContent side="left" className="w-72">
             <div className="flex flex-col gap-6 pt-6">
-              <Link
-                href={logoHref}
-                className="flex items-center gap-2"
-                onClick={() => setOpen(false)}
-              >
+              <Link href={logoHref} className="flex items-center gap-2" onClick={handleClose}>
                 <div className="h-8 w-8 rounded-lg bg-primary" />
                 <span className="text-xl font-bold text-foreground">{name}</span>
               </Link>
@@ -93,7 +90,7 @@ export function Navbar({
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setOpen(false)}
+                    onClick={handleClose}
                     className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                     {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   >
@@ -104,14 +101,14 @@ export function Navbar({
               <div className="flex flex-col gap-2">
                 {ctaSecondary && (
                   <Button variant="outline" asChild>
-                    <Link href={ctaSecondary.href} onClick={() => setOpen(false)}>
+                    <Link href={ctaSecondary.href} onClick={handleClose}>
                       {ctaSecondary.label}
                     </Link>
                   </Button>
                 )}
                 {ctaPrimary && (
                   <Button asChild>
-                    <Link href={ctaPrimary.href} onClick={() => setOpen(false)}>
+                    <Link href={ctaPrimary.href} onClick={handleClose}>
                       {ctaPrimary.label}
                     </Link>
                   </Button>
@@ -123,4 +120,4 @@ export function Navbar({
       </div>
     </nav>
   )
-}
+})

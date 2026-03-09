@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
@@ -9,15 +10,19 @@ interface TopbarProps {
   className?: string
 }
 
-function UserAvatarPlaceholder() {
+const UserAvatarPlaceholder = React.memo(function UserAvatarPlaceholder() {
   return (
     <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center">
       <span className="text-xs font-medium text-muted-foreground">U</span>
     </div>
   )
-}
+})
 
-export function Topbar({ showSidebarTrigger = true, rightSlot, className }: TopbarProps) {
+export const Topbar = React.memo(function Topbar({
+  showSidebarTrigger = true,
+  rightSlot,
+  className,
+}: TopbarProps) {
   return (
     <header
       className={cn(
@@ -29,4 +34,4 @@ export function Topbar({ showSidebarTrigger = true, rightSlot, className }: Topb
       <div className="flex items-center gap-3">{rightSlot ?? <UserAvatarPlaceholder />}</div>
     </header>
   )
-}
+})
