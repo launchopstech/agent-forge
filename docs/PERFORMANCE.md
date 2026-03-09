@@ -98,7 +98,6 @@ Always use `<ResponsiveImage>` from `src/components/ResponsiveImage.tsx` — nev
 
 ```tsx
 import { ResponsiveImage } from '@/components/ResponsiveImage'
-
 ;<ResponsiveImage
   src="/hero.jpg"
   alt="Hero illustration"
