@@ -391,27 +391,30 @@ _Goal: Plug-in-ready auth, not tied to any specific provider._
 
 ### 6.1 Auth Abstraction
 
-- [ ] Install `next-auth` or `@clerk/nextjs` (document the choice in README)
-- [ ] Create `src/lib/auth.ts` as single source of auth config
-- [ ] Expose: `getSession()`, `requireAuth()` server utilities, `useUser()` client hook
+- [x] Install `@clerk/nextjs` (Clerk chosen; agency model allows swapping via `NEXT_PUBLIC_AUTH_PROVIDER`)
+- [x] Create `src/lib/auth.ts` as public server API entry point (re-exports from registry)
+- [x] Expose: `getSession()`, `requireAuth()` server utilities, `useUser()` client hook
+- [x] Provider-agnostic contracts in `src/lib/auth/contracts.ts` (`AuthServerAdapter`, `AuthClientAdapter`, `AuthMiddlewareAdapter`, `AuthProviderComponent`, `MiddlewareFn`)
+- [x] Registry pattern: `server-registry.ts`, `client-registry.ts`, `auth-provider.tsx`, `middleware-registry.ts` — active provider driven by `NEXT_PUBLIC_AUTH_PROVIDER` in `src/config/properties.ts`
+- [x] Adapters: `adapters/clerk/` (full), `adapters/next-auth/` (stub), `adapters/okta/` (stub)
 
 ### 6.2 Route Protection
 
-- [ ] Create `middleware.ts` protecting `/dashboard/*`
-- [ ] Create `withAuth` HOC for client-side page protection
-- [ ] Auth route group: login, signup, forgot-password pages (UI shells, no logic yet)
+- [x] Create `src/proxy.ts` (Next.js 16 convention) protecting `/dashboard/*`
+- [x] Create `withAuth` HOC (`src/components/auth/withAuth.tsx`) for client-side page protection
+- [x] Auth route group: login `[[...rest]]`, signup `[[...rest]]`, forgot-password `[[...rest]]` (Clerk hosted UI)
 
 ### 6.3 User Context
 
-- [ ] `UserProvider` wraps root layout
-- [ ] `useUser()` hook exposes `user`, `isLoading`, `isAuthenticated`
-- [ ] User avatar + name rendered in Topbar from `useUser()`
+- [x] `<AuthProvider>` wraps root layout (delegates to active provider's wrapper)
+- [x] `useUser()` hook exposes `user`, `isLoading`, `isAuthenticated`
+- [x] `<UserButton />` rendered in Topbar via `topbarRightSlot` prop from dashboard route layout
 
 ### ✅ Phase 6 Gate Check
 
-- [ ] Visiting `/dashboard` unauthenticated redirects to `/login`
-- [ ] Visiting `/dashboard` authenticated renders correctly
-- [ ] `src/lib/auth.ts` is the only file referencing the auth provider package directly
+- [x] Visiting `/dashboard` unauthenticated redirects to `/login`
+- [x] Visiting `/dashboard` authenticated renders correctly
+- [x] `src/lib/auth.ts` is the only public entry point — all Clerk imports isolated to `adapters/clerk/`
 
 ---
 

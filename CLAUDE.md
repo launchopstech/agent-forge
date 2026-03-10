@@ -136,6 +136,26 @@ Red flags to check in the treemap:
 
 Route isolation — each route (`/`, `/dashboard`, `/login`) must have its own small chunk separate from the shared bundle.
 
+### Auth pluggability rules (Phase 6 — Agency Model)
+
+The active provider is selected by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|okta` (default: `clerk`).
+**To switch providers: change the env var + implement the 4 stub files.** Nothing else changes.
+
+**Import rules:**
+
+- `src/lib/auth/adapters/clerk/server.ts` — **only** file allowed to import from `@clerk/nextjs/server`
+- `src/lib/auth/adapters/clerk/client.ts` — **only** file allowed to import from `@clerk/nextjs` (hooks)
+- `src/lib/auth.ts` and `src/hooks/use-user.ts` — the two public API entry points (never changes)
+- All app code imports from `@/lib/auth` or `@/hooks/use-user` — **never** directly from `@clerk/nextjs`
+- Provider UI components (`<UserButton />`, `<SignIn />`, `<SignUp />`) allowed at **route/page level only**, marked `// PROVIDER-SPECIFIC` comment
+
+**Adding a new provider (4 steps):**
+
+1. Create `src/lib/auth/adapters/<provider>/` with `server.ts`, `client.ts`, `provider.tsx`, `middleware.ts`
+2. Add the new key to `AuthProviderKey` in `src/lib/auth/contracts.ts` — TypeScript will flag every registry switch missing the new case
+3. Add `import * as <provider>Adapter` + `case '<provider>': return <provider>Adapter` to each of the 4 registry files
+4. Set `NEXT_PUBLIC_AUTH_PROVIDER=<provider>` in `.env.local`, Vercel, and GitHub Variables
+
 ### Code rules
 
 - **Never edit** files in `src/components/ui/` — shadcn/ui primitives, add via `pnpm dlx shadcn@latest add <component>`
