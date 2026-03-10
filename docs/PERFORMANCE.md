@@ -201,6 +201,30 @@ Every push and PR runs Lighthouse against all three routes via GitHub Actions
 **Escalating to `error`:** Once baselines are confirmed over a few PR cycles, change
 `"warn"` → `"error"` in `lighthouserc.json` to block merges that regress performance.
 
+### Running Lighthouse locally
+
+```bash
+# 1. Build and start the production server
+pnpm build && pnpm start &
+
+# 2. Wait for server to be ready
+npx wait-on http://localhost:3000
+
+# 3. Run Lighthouse against each route (opens HTML report in browser)
+npx lighthouse http://localhost:3000 --view
+npx lighthouse http://localhost:3000/dashboard --view
+npx lighthouse http://localhost:3000/login --view
+
+# Kill the background server when done
+kill %1
+```
+
+**Where to find the CI report on a PR:**
+
+1. PR → **Checks** tab → `lighthouse` job → expand the action step for inline scores
+2. The action posts a **temporary public storage link** in the logs — click it for the full interactive report
+3. PR → **Checks** → **Artifacts** → download `lighthouse-results` for raw JSON
+
 ---
 
 ## Core Web Vitals Targets
