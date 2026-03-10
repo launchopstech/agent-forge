@@ -23,17 +23,29 @@ jobs:
         run: |
           echo "NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV:-production}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_AUTH_PROVIDER=${NEXT_PUBLIC_AUTH_PROVIDER:-clerk}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/dashboard" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/dashboard" >> $GITHUB_ENV
         env:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
           NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV }}
+          NEXT_PUBLIC_AUTH_PROVIDER: ${{ vars.NEXT_PUBLIC_AUTH_PROVIDER }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
       - run: pnpm build
+        env:
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
       - name: Start production server
         run: pnpm start &
+        env:
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
       - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 30000
+        run: npx wait-on http://localhost:3000 --timeout 60000
 
       - uses: treosh/lighthouse-ci-action@v11
         with:
