@@ -13,15 +13,15 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/lib/**', 'src/hooks/**'],
       exclude: [
-        'src/lib/auth/**',      // auth adapters are intentional NotImplementedError stubs
-        'src/lib/auth.ts',      // auth registry proxy — integration tested via E2E
-        'src/lib/content.ts',   // CMS stub (TODO: swap with Contentful/Sanity) — no real logic to test yet
-        'src/lib/index.ts',     // re-export barrel, no logic
-        'src/lib/metadata.ts',  // Next.js metadata config, no testable logic
+        'src/lib/auth/**', // auth adapters are intentional NotImplementedError stubs
+        'src/lib/auth.ts', // auth registry proxy — integration tested via E2E
+        'src/lib/content.ts', // CMS stub (TODO: swap with Contentful/Sanity) — no real logic to test yet
+        'src/lib/index.ts', // re-export barrel, no logic
+        'src/lib/metadata.ts', // Next.js metadata config, no testable logic
         'src/hooks/use-mobile.tsx', // wraps matchMedia — browser API, no unit-testable logic
-        'src/hooks/use-theme.ts',   // wraps next-themes useTheme — tested via E2E
-        'src/hooks/use-user.ts',    // wraps Clerk useUser — requires Clerk mock environment
-        'src/hooks/index.ts',       // re-export barrel, no logic
+        'src/hooks/use-theme.ts', // wraps next-themes useTheme — tested via E2E
+        'src/hooks/use-user.ts', // wraps Clerk useUser — requires Clerk mock environment
+        'src/hooks/index.ts', // re-export barrel, no logic
       ],
       reportsDirectory: './coverage',
       thresholds: {
