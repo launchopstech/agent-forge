@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Zap, Brain, Shield } from 'lucide-react'
+import { ArrowRight, Zap, Brain, Shield, MessageSquare, BarChart2, Code2, Database, GitBranch, Bell } from 'lucide-react'
 import { useUser } from '@/hooks/use-user'
 
 export default function HomePage() {
@@ -65,6 +65,59 @@ export default function HomePage() {
             <Shield className="h-6 w-6 text-primary" />
             <p className="mt-4 font-semibold text-foreground">Enterprise Security</p>
             <p className="mt-2 text-sm text-muted-foreground">SOC 2 compliant infrastructure</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Capabilities Section */}
+      <section id="capabilities" className="px-6 py-24 sm:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-foreground">What can you do?</h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              From customer support to data pipelines — AgentForge agents handle it all
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: MessageSquare,
+                title: 'Automate Support',
+                desc: 'Answer customer questions, triage tickets, and escalate edge cases — 24/7 without human intervention.',
+              },
+              {
+                icon: BarChart2,
+                title: 'Generate Reports',
+                desc: 'Pull data from any source, analyze trends, and deliver formatted reports to your inbox on any schedule.',
+              },
+              {
+                icon: Code2,
+                title: 'Run Code & Scripts',
+                desc: 'Execute scripts, call CLIs, and chain together code-based tasks as part of a larger automated workflow.',
+              },
+              {
+                icon: Database,
+                title: 'Process Data',
+                desc: 'Ingest, clean, transform, and route structured or unstructured data across your entire stack.',
+              },
+              {
+                icon: GitBranch,
+                title: 'Orchestrate Workflows',
+                desc: 'Design multi-step, branching workflows that adapt based on real-time inputs and outcomes.',
+              },
+              {
+                icon: Bell,
+                title: 'Monitor & Alert',
+                desc: 'Watch APIs, services, and metrics — trigger alerts or automated remediation when something goes wrong.',
+              },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="rounded-lg border border-border bg-card p-6">
+                <Icon className="h-6 w-6 text-primary" />
+                <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

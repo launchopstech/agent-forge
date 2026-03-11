@@ -1,6 +1,7 @@
 import type { NavGroup, NavItem } from '@/types'
 
 export const marketingNavItems: NavItem[] = [
+  { label: 'Capabilities', href: '#capabilities' },
   { label: 'Features', href: '#features' },
   { label: 'Benefits', href: '#benefits' },
   { label: 'Pricing', href: '#pricing' },
@@ -33,6 +34,7 @@ export const footerNavColumns: Array<{ heading: string; items: NavItem[] }> = [
   {
     heading: 'Product',
     items: [
+      { label: 'Capabilities', href: '#capabilities' },
       { label: 'Features', href: '#features' },
       { label: 'Pricing', href: '#pricing' },
       { label: 'Security', href: '#security' },
