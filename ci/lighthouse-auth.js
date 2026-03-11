@@ -46,24 +46,30 @@ module.exports = async (browser, context) => {
     await page.waitForSelector('input[name="identifier"]', { timeout: 20000 })
     console.log('[lighthouse-auth] Found email input')
 
-    // Enter email and continue
+    // Enter email and click continue (more reliable than keyboard.press('Enter') in Clerk's multi-step form)
     await page.type('input[name="identifier"]', email, { delay: 50 })
-    await page.keyboard.press('Enter')
+    await page.click('button[type="submit"]')
 
     console.log('[lighthouse-auth] Entered email, waiting for password field')
 
-    // Wait for password field
-    await page.waitForSelector('input[name="password"]', { timeout: 10000 })
+    // visible: true ensures the field is interactable, not just present in DOM
+    await page.waitForSelector('input[name="password"]', { visible: true, timeout: 20000 })
 
-    // Enter password — set up navigation promise BEFORE pressing Enter to avoid race condition
+    // Brief pause — Clerk's transition animation may still be running when the field appears
+    await new Promise((r) => setTimeout(r, 300))
+
+    // Enter password and submit
     await page.type('input[name="password"]', password, { delay: 50 })
-    const navigationPromise = page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 })
-    await page.keyboard.press('Enter')
+    await page.click('button[type="submit"]')
 
-    console.log('[lighthouse-auth] Entered password, waiting for navigation')
+    console.log('[lighthouse-auth] Submitted credentials, waiting for redirect')
 
-    // Wait for redirect to dashboard (auth complete)
-    await navigationPromise
+    // Clerk uses client-side (SPA) navigation after auth — waitForNavigation won't fire.
+    // Poll window.location.pathname instead; works for both HTTP and SPA routing.
+    await page.waitForFunction(() => !window.location.pathname.startsWith('/login'), {
+      timeout: 30000,
+      polling: 500,
+    })
 
     console.log('[lighthouse-auth] ✅ Signed in successfully, URL:', page.url())
 
