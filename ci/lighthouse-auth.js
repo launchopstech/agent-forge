@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * LHCI Puppeteer auth script.
  * Runs before each Lighthouse audit to authenticate via Clerk's SignIn UI,
