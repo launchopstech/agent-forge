@@ -1,6 +1,9 @@
 {
   "ci": {
-    "collect": { "numberOfRuns": 1 },
+    "collect": {
+      "numberOfRuns": 1,
+      "puppeteerScript": "./ci/lighthouse-auth.js"
+    },
     "assert": {
       "assertions": {
         "first-contentful-paint": ["warn", { "maxNumericValue": 1500 }],

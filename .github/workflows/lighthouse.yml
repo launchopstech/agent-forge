@@ -51,8 +51,11 @@ jobs:
         with:
           urls: |
             http://localhost:3000/
-            http://localhost:3000/dashboard
             http://localhost:3000/login
-          budgetPath: ./lighthouserc.json
+            http://localhost:3000/dashboard
+          configPath: ./lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
+        env:
+          LIGHTHOUSE_TEST_EMAIL: ${{ secrets.LIGHTHOUSE_TEST_EMAIL }}
+          LIGHTHOUSE_TEST_PASSWORD: ${{ secrets.LIGHTHOUSE_TEST_PASSWORD }}
