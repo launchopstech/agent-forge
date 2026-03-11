@@ -55,14 +55,15 @@ module.exports = async (browser, context) => {
     // Wait for password field
     await page.waitForSelector('input[name="password"]', { timeout: 10000 })
 
-    // Enter password
+    // Enter password — set up navigation promise BEFORE pressing Enter to avoid race condition
     await page.type('input[name="password"]', password, { delay: 50 })
+    const navigationPromise = page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 })
     await page.keyboard.press('Enter')
 
     console.log('[lighthouse-auth] Entered password, waiting for navigation')
 
     // Wait for redirect to dashboard (auth complete)
-    await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 })
+    await navigationPromise
 
     console.log('[lighthouse-auth] ✅ Signed in successfully, URL:', page.url())
 
