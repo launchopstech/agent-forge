@@ -112,11 +112,27 @@ gh variable set NEXT_PUBLIC_APP_URL --body "$(vercel env pull --yes > /dev/null 
 pnpm typecheck              # zero TS errors (ignoreBuildErrors masks them in build)
 pnpm lint                   # zero errors, zero warnings (no-console fires on console.*)
 pnpm build                  # production build must succeed
+pnpm test run               # all unit tests must pass (Vitest, ~2s)
 pnpm exec storybook build   # all stories must compile
 pnpm analyze                # inspect bundle treemap (see bundle health checks below)
 ```
 
 Never skip or reorder these. A passing build alone is not sufficient.
+
+### Coverage thresholds (enforced in `vitest.config.mts`)
+
+Thresholds are hardcoded — **if CI fails on coverage, fix it by writing more tests, never by lowering the threshold.**
+
+| Metric     | Minimum |
+| ---------- | ------- |
+| Lines      | 80%     |
+| Statements | 80%     |
+| Branches   | 80%     |
+| Functions  | 60%     |
+
+Scope: `src/lib/**` and `src/hooks/**` (auth adapters, re-exports, and browser-only hooks excluded).
+
+When adding new files to `src/lib/` or `src/hooks/`: write a colocated `*.test.ts(x)` in the same directory before committing. If the file is genuinely untestable (Clerk hooks, browser APIs), add it to the `coverage.exclude` list in `vitest.config.mts` with a comment explaining why.
 
 ### Bundle health checks (after every `pnpm analyze`)
 
