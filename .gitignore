@@ -10,6 +10,7 @@
 # production
 /build
 /storybook-static
+/coverage
 
 # debug
 npm-debug.log*
@@ -33,3 +34,5 @@ chrome_debug.log
 chromewebdata/
 chrome-profile-*/
 .local-chromium/
+# clerk configuration (can include secrets)
+/.clerk/
