@@ -1,9 +1,13 @@
 'use client'
 
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Zap, Brain, Shield } from 'lucide-react'
+import { useUser } from '@/hooks/use-user'
 
 export default function HomePage() {
+  const { isAuthenticated } = useUser()
+  const ctaHref = isAuthenticated ? '/dashboard' : '/signup'
   return (
     <div className="bg-background">
       {/* Announcement Banner */}
@@ -27,9 +31,15 @@ export default function HomePage() {
             workflows with enterprise-grade reliability.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              Start Building Free
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              asChild
+            >
+              <Link href={ctaHref}>
+                {isAuthenticated ? 'Go to Dashboard' : 'Start Building Free'}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button size="lg" variant="outline">
               Watch Demo
@@ -116,9 +126,11 @@ export default function HomePage() {
         <p className="mt-4 text-lg text-primary-foreground/80">
           Join hundreds of teams building intelligent automation.
         </p>
-        <Button size="lg" variant="secondary" className="mt-8">
-          Create Free Account
-          <ArrowRight className="ml-2 h-5 w-5" />
+        <Button size="lg" variant="secondary" className="mt-8" asChild>
+          <Link href={ctaHref}>
+            {isAuthenticated ? 'Go to Dashboard' : 'Create Free Account'}
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
         </Button>
       </section>
     </div>

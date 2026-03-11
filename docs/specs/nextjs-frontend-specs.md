@@ -273,21 +273,21 @@ _Goal: Core Web Vitals-ready out of the box._
 
 ### 5.1 React Performance Optimizations
 
-- [ ] Add `React.memo` to all layout components:
+- [x] Add `React.memo` to all layout components:
   - `Navbar` — prevents re-render on parent state changes
   - `Footer` — static component, should never re-render
   - `AppSidebar` — memoize to avoid re-renders when parent updates
   - `Topbar` — memoize unless user data changes
-- [ ] Add `useCallback` to event handlers in interactive components:
+- [x] Add `useCallback` to event handlers in interactive components:
   - Navbar mobile menu toggle
   - Sidebar collapse/expand handlers
   - Form submit handlers
   - Any callback passed to child components or in dependency arrays
-- [ ] Add `useMemo` for expensive computations:
+- [x] Add `useMemo` for expensive computations:
   - Filtered/sorted navigation arrays
   - Computed theme values
   - Derived state in complex components
-- [ ] Document pattern in `PERFORMANCE.md`:
+- [x] Document pattern in `PERFORMANCE.md`:
   ```typescript
   // Example: Memoized layout component
   export const Navbar = React.memo(function Navbar({ navItems, className }) {
@@ -299,7 +299,7 @@ _Goal: Core Web Vitals-ready out of the box._
 
 ### 5.2 Code Splitting & Dynamic Imports
 
-- [ ] Add dynamic imports for heavy components:
+- [x] Add dynamic imports for heavy components:
   ```typescript
   // Example: Lazy load dashboard widgets
   const HeavyChart = dynamic(() => import('@/components/HeavyChart'), {
@@ -307,25 +307,25 @@ _Goal: Core Web Vitals-ready out of the box._
     loading: () => <Skeleton />
   })
   ```
-- [ ] Identify candidates for code splitting:
+- [x] Identify candidates for code splitting:
   - Rich text editors
   - Chart libraries
   - Heavy icon sets (if not using individual imports)
   - Analytics dashboards
-- [ ] Verify Next.js automatic route-based code splitting in build output
-- [ ] Document code splitting strategy in `PERFORMANCE.md`
+- [x] Verify Next.js automatic route-based code splitting in build output
+- [x] Document code splitting strategy in `PERFORMANCE.md`
 
 ### 5.3 Image Optimization
 
-- [ ] Wrap `next/image` in a `ResponsiveImage` component with sensible `sizes` defaults and a `priority` prop
-- [ ] Add `remotePatterns` to `next.config.ts` for common CDN domains
+- [x] Wrap `next/image` in a `ResponsiveImage` component with sensible `sizes` defaults and a `priority` prop
+- [x] Add `remotePatterns` to `next.config.ts` for common CDN domains
 
 ### 5.4 Bundle Analysis
 
-- [ ] Install `@next/bundle-analyzer`
-- [ ] Add `"analyze": "ANALYZE=true next build"` npm script
-- [ ] Run analysis once, document baseline in `PERFORMANCE.md`
-- [ ] Set performance budgets (enforce in CI later):
+- [x] Install `@next/bundle-analyzer`
+- [x] Add `"analyze": "ANALYZE=true next build"` npm script
+- [x] Run analysis once, document baseline in `PERFORMANCE.md`
+- [x] Set performance budgets (enforce in CI later):
   - Main bundle: < 250kb
   - Per-route bundles: < 150kb
   - First Contentful Paint: < 1.5s
@@ -333,19 +333,19 @@ _Goal: Core Web Vitals-ready out of the box._
 
 ### 5.5 Loading States
 
-- [ ] Add `loading.tsx` to each major route group
-- [ ] All async components wrapped in Suspense with Skeleton fallbacks from Phase 3
+- [x] Add `loading.tsx` to each major route group
+- [x] All async components wrapped in Suspense with Skeleton fallbacks from Phase 3
 
 ### 5.6 Metadata & SEO
 
-- [ ] Create `src/config/site.ts` — site name, description, OG image URL, base URL
-- [ ] Create `generateMetadata()` utility merging page overrides with site defaults
-- [ ] Add `robots.ts` and `sitemap.ts` route handlers
-- [ ] Root layout includes OG and Twitter card tags driven by `site.ts`
+- [x] Create `src/config/site.ts` — site name, description, OG image URL, base URL
+- [x] Create `generateMetadata()` utility merging page overrides with site defaults
+- [x] Add `robots.ts` and `sitemap.ts` route handlers
+- [x] Root layout includes OG and Twitter card tags driven by `site.ts`
 
 ### 5.7 Performance Monitoring Setup
 
-- [ ] Add Vercel Analytics (or equivalent):
+- [x] Add Vercel Analytics (or equivalent):
 
   ```typescript
   // app/layout.tsx
@@ -363,8 +363,8 @@ _Goal: Core Web Vitals-ready out of the box._
   }
   ```
 
-- [ ] Document Core Web Vitals targets in `PERFORMANCE.md`
-- [ ] Set up performance regression alerts (optional: Lighthouse CI)
+- [x] Document Core Web Vitals targets in `PERFORMANCE.md`
+- [x] Set up performance regression alerts (optional: Lighthouse CI)
 
 ### ✅ Phase 5 Gate Check
 
@@ -376,12 +376,12 @@ npx tsc --noEmit          # Verify memo/callback types are correct
 
 **Performance Checklist:**
 
-- [ ] All layout components wrapped in React.memo
-- [ ] Event handlers use useCallback where appropriate
-- [ ] Expensive computations use useMemo
-- [ ] Heavy components lazy loaded with dynamic imports
-- [ ] Build output shows route-based code splitting
-- [ ] No bundle exceeds size budgets
+- [x] All layout components wrapped in React.memo
+- [x] Event handlers use useCallback where appropriate
+- [x] Expensive computations use useMemo
+- [x] Heavy components lazy loaded with dynamic imports
+- [x] Build output shows route-based code splitting
+- [x] No bundle exceeds size budgets
 
 ---
 
@@ -391,27 +391,30 @@ _Goal: Plug-in-ready auth, not tied to any specific provider._
 
 ### 6.1 Auth Abstraction
 
-- [ ] Install `next-auth` or `@clerk/nextjs` (document the choice in README)
-- [ ] Create `src/lib/auth.ts` as single source of auth config
-- [ ] Expose: `getSession()`, `requireAuth()` server utilities, `useUser()` client hook
+- [x] Install `@clerk/nextjs` (Clerk chosen; agency model allows swapping via `NEXT_PUBLIC_AUTH_PROVIDER`)
+- [x] Create `src/lib/auth.ts` as public server API entry point (re-exports from registry)
+- [x] Expose: `getSession()`, `requireAuth()` server utilities, `useUser()` client hook
+- [x] Provider-agnostic contracts in `src/lib/auth/contracts.ts` (`AuthServerAdapter`, `AuthClientAdapter`, `AuthMiddlewareAdapter`, `AuthProviderComponent`, `MiddlewareFn`)
+- [x] Registry pattern: `server-registry.ts`, `client-registry.ts`, `auth-provider.tsx`, `middleware-registry.ts` — active provider driven by `NEXT_PUBLIC_AUTH_PROVIDER` in `src/config/properties.ts`
+- [x] Adapters: `adapters/clerk/` (full), `adapters/next-auth/` (stub), `adapters/okta/` (stub)
 
 ### 6.2 Route Protection
 
-- [ ] Create `middleware.ts` protecting `/dashboard/*`
-- [ ] Create `withAuth` HOC for client-side page protection
-- [ ] Auth route group: login, signup, forgot-password pages (UI shells, no logic yet)
+- [x] Create `src/proxy.ts` (Next.js 16 convention) protecting `/dashboard/*`
+- [x] Create `withAuth` HOC (`src/components/auth/withAuth.tsx`) for client-side page protection
+- [x] Auth route group: login `[[...rest]]`, signup `[[...rest]]`, forgot-password `[[...rest]]` (Clerk hosted UI)
 
 ### 6.3 User Context
 
-- [ ] `UserProvider` wraps root layout
-- [ ] `useUser()` hook exposes `user`, `isLoading`, `isAuthenticated`
-- [ ] User avatar + name rendered in Topbar from `useUser()`
+- [x] `<AuthProvider>` wraps root layout (delegates to active provider's wrapper)
+- [x] `useUser()` hook exposes `user`, `isLoading`, `isAuthenticated`
+- [x] `<UserButton />` rendered in Topbar via `topbarRightSlot` prop from dashboard route layout
 
 ### ✅ Phase 6 Gate Check
 
-- [ ] Visiting `/dashboard` unauthenticated redirects to `/login`
-- [ ] Visiting `/dashboard` authenticated renders correctly
-- [ ] `src/lib/auth.ts` is the only file referencing the auth provider package directly
+- [x] Visiting `/dashboard` unauthenticated redirects to `/login`
+- [x] Visiting `/dashboard` authenticated renders correctly
+- [x] `src/lib/auth.ts` is the only public entry point — all Clerk imports isolated to `adapters/clerk/`
 
 ---
 
@@ -1040,11 +1043,20 @@ dig staging.example.com   # Should resolve to Vercel
 
 ---
 
-### 13 Pending TODOs
+### Phase 13 Pending TODOs
 
 - [ ] Setup envivornments in Vercel
 - [ ] Setup domains in GoDaddy
 - [ ] Update CI as per enviornment
+- [ ] Test `loading.tsx` on dashboard — add `await new Promise(r => setTimeout(r, 2000))` temporarily to `(dashboard)/dashboard/page.tsx`, navigate to `/dashboard`, confirm skeleton shows, then remove
+- [ ] Test `loading.tsx` on login — add `export const dynamic = 'force-dynamic'` + artificial delay to `(auth)/login/page.tsx`, confirm `AuthLoading` skeleton shows, then remove
+- [ ] Test OG/Twitter tags — run `pnpm build && pnpm start`, then `curl -s http://localhost:3000 | grep -E 'og:|twitter:'`
+- [ ] Test robots.txt — `curl http://localhost:3000/robots.txt`
+- [ ] Test sitemap.xml — `curl http://localhost:3000/sitemap.xml`
+- [ ] Test `generateMetadata()` — add `export const metadata = generateMetadata({ title: 'Dashboard' })` to dashboard page, verify `<title>` shows `Dashboard | AgentForge`
+- [ ] Verify loading stories in Storybook — run `pnpm storybook`, check Loading → MarketingLoading / DashboardLoading / AuthLoading all render skeletons
+- [ ] Escalate Lighthouse CI thresholds from `warn` to `error` in `lighthouserc.json` once baselines are confirmed over a few PR cycles
+- [ ] Add deployed Vercel URL to `NEXT_PUBLIC_APP_URL` env var so `sitemap.xml` uses production URL instead of `http://localhost:3000`
 
 ## Master Completion Checklist
 

@@ -168,6 +168,65 @@ Route (app)    Size     First Load JS
 
 ---
 
+## 5.7 — Performance Monitoring
+
+### Vercel Analytics vs Speed Insights
+
+Both are installed in `src/app/layout.tsx`. They do different things:
+
+| Package                  | Tracks                             |
+| ------------------------ | ---------------------------------- |
+| `@vercel/analytics`      | Page views, custom events, funnels |
+| `@vercel/speed-insights` | Real-user LCP, INP, CLS per page   |
+
+Speed Insights data appears in the Vercel dashboard under **Analytics → Web Vitals**.
+It shows per-page breakdowns — if one route is slow, you'll see it there first.
+
+### Lighthouse CI
+
+Every push and PR runs Lighthouse against all three routes via GitHub Actions
+(`.github/workflows/lighthouse.yml`). Thresholds are in `lighthouserc.json`.
+
+**Current thresholds** (all `warn` — alerts without blocking merges):
+
+| Metric              | Threshold |
+| ------------------- | --------- |
+| FCP                 | < 1500 ms |
+| LCP                 | < 2500 ms |
+| CLS                 | < 0.1     |
+| TBT                 | < 200 ms  |
+| Performance score   | ≥ 0.8     |
+| Accessibility score | ≥ 0.9     |
+
+**Escalating to `error`:** Once baselines are confirmed over a few PR cycles, change
+`"warn"` → `"error"` in `lighthouserc.json` to block merges that regress performance.
+
+### Running Lighthouse locally
+
+```bash
+# 1. Build and start the production server
+pnpm build && pnpm start &
+
+# 2. Wait for server to be ready
+npx wait-on http://localhost:3000
+
+# 3. Run Lighthouse against each route (opens HTML report in browser)
+npx lighthouse http://localhost:3000 --view
+npx lighthouse http://localhost:3000/dashboard --view
+npx lighthouse http://localhost:3000/login --view
+
+# Kill the background server when done
+kill %1
+```
+
+**Where to find the CI report on a PR:**
+
+1. PR → **Checks** tab → `lighthouse` job → expand the action step for inline scores
+2. The action posts a **temporary public storage link** in the logs — click it for the full interactive report
+3. PR → **Checks** → **Artifacts** → download `lighthouse-results` for raw JSON
+
+---
+
 ## Core Web Vitals Targets
 
 | Metric                          | Target   |

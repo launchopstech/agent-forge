@@ -47,6 +47,58 @@ lib/
 
 New routes go in `app/` following Next.js App Router conventions. Server Components are the default; add `'use client'` only when needed (event handlers, hooks, browser APIs).
 
+## Environment Variables
+
+### Source of truth per environment
+
+| Environment                    | Source of truth                                               |
+| ------------------------------ | ------------------------------------------------------------- |
+| Local dev                      | `.env.local` (gitignored)                                     |
+| CI (GitHub Actions)            | GitHub → Settings → Secrets and Variables → Actions           |
+| Preview / Staging / Production | Vercel dashboard → Project → Settings → Environment Variables |
+
+### New developer setup
+
+```bash
+pnpm dlx vercel link          # link local repo to Vercel project (one-time)
+pnpm dlx vercel env pull      # pull all env vars into .env.local
+```
+
+### Adding a new environment variable
+
+1. Add it to `.env.example` with a placeholder value and comment (always commit this)
+2. Set real value in **Vercel dashboard** for each environment (Production / Preview / Development)
+3. Set in **GitHub → Settings → Secrets and Variables → Actions** if needed by CI:
+   - Non-sensitive → **Variables** tab: `gh variable set NAME --body "value"`
+   - Sensitive → **Secrets** tab: `gh secret set NAME`
+4. Add to `src/config/env.ts` schema if it must be validated at build time
+5. Run `pnpm dlx vercel env pull` locally to get the updated `.env.local`
+
+### Updating GitHub Actions variables via CLI
+
+```bash
+# List all variables
+gh variable list
+
+# Set / update a variable
+gh variable set NEXT_PUBLIC_APP_URL --body "https://myapp.com"
+gh variable set NEXT_PUBLIC_APP_ENV --body "production"
+
+# Set / update a secret (sensitive values)
+gh secret set DATABASE_URL
+
+# Pull from Vercel into GitHub Variables (manual sync — run when Vercel vars change)
+# Non-sensitive vars only:
+gh variable set NEXT_PUBLIC_APP_URL --body "$(vercel env pull --yes > /dev/null && grep NEXT_PUBLIC_APP_URL .env.local | cut -d= -f2)"
+```
+
+### Rules
+
+- **Never commit** `.env.local`, `.env*.local`, or any file containing real secrets
+- **Always commit** `.env.example` when adding a new variable
+- **Vercel is the source of truth** — do not manually edit `.env.local` for shared vars; pull from Vercel instead
+- CI workflows reference vars as `${{ vars.NAME }}` (non-sensitive) or `${{ secrets.NAME }}` (sensitive)
+
 ## Guardrails — always follow these
 
 ### Before starting any phase task
@@ -83,6 +135,26 @@ Red flags to check in the treemap:
 - Everything in one giant shared chunk → route-based splitting is broken
 
 Route isolation — each route (`/`, `/dashboard`, `/login`) must have its own small chunk separate from the shared bundle.
+
+### Auth pluggability rules (Phase 6 — Agency Model)
+
+The active provider is selected by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|okta` (default: `clerk`).
+**To switch providers: change the env var + implement the 4 stub files.** Nothing else changes.
+
+**Import rules:**
+
+- `src/lib/auth/adapters/clerk/server.ts` — **only** file allowed to import from `@clerk/nextjs/server`
+- `src/lib/auth/adapters/clerk/client.ts` — **only** file allowed to import from `@clerk/nextjs` (hooks)
+- `src/lib/auth.ts` and `src/hooks/use-user.ts` — the two public API entry points (never changes)
+- All app code imports from `@/lib/auth` or `@/hooks/use-user` — **never** directly from `@clerk/nextjs`
+- Provider UI components (`<UserButton />`, `<SignIn />`, `<SignUp />`) allowed at **route/page level only**, marked `// PROVIDER-SPECIFIC` comment
+
+**Adding a new provider (4 steps):**
+
+1. Create `src/lib/auth/adapters/<provider>/` with `server.ts`, `client.ts`, `provider.tsx`, `middleware.ts`
+2. Add the new key to `AuthProviderKey` in `src/lib/auth/contracts.ts` — TypeScript will flag every registry switch missing the new case
+3. Add `import * as <provider>Adapter` + `case '<provider>': return <provider>Adapter` to each of the 4 registry files
+4. Set `NEXT_PUBLIC_AUTH_PROVIDER=<provider>` in `.env.local`, Vercel, and GitHub Variables
 
 ### Code rules
 
