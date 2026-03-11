@@ -25,6 +25,11 @@ module.exports = async (browser, context) => {
   }
 
   console.log('[lighthouse-auth] Starting authentication for:', context.url)
+  console.log(
+    '[lighthouse-auth] Email provided:',
+    email ? `${email.substring(0, 3)}***` : 'MISSING'
+  )
+  console.log('[lighthouse-auth] Password provided:', password ? 'YES (hidden)' : 'MISSING')
 
   const page = await browser.newPage()
 
@@ -97,6 +102,22 @@ module.exports = async (browser, context) => {
         els.map((e) => ({ name: e.name, type: e.type, id: e.id }))
       )
       console.log('[lighthouse-auth] Debug - Inputs:', JSON.stringify(inputs))
+
+      // Check for Clerk error messages
+      const errorText = await page
+        .$$eval('.cl-formFieldErrorText, [data-localization-key*="error"], .cl-alert', (els) =>
+          els.map((e) => e.textContent?.trim()).filter(Boolean)
+        )
+        .catch(() => [])
+      if (errorText.length > 0) {
+        console.log('[lighthouse-auth] Debug - Clerk errors:', errorText)
+      }
+
+      // Show page text for context
+      const pageText = await page
+        .evaluate(() => document.body.innerText.substring(0, 800))
+        .catch(() => '')
+      console.log('[lighthouse-auth] Debug - Page text:', pageText)
     } catch {
       // Ignore
     }
