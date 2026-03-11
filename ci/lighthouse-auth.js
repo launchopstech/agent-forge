@@ -43,12 +43,18 @@ module.exports = async (browser, context) => {
     console.log('[lighthouse-auth] Navigated to login page')
 
     // Wait for Clerk's SignIn form to render
-    await page.waitForSelector('input[name="identifier"]', { timeout: 20000 })
+    await page.waitForSelector('input[name="identifier"]', { visible: true, timeout: 20000 })
     console.log('[lighthouse-auth] Found email input')
 
-    // Enter email and click continue (more reliable than keyboard.press('Enter') in Clerk's multi-step form)
+    // Enter email
     await page.type('input[name="identifier"]', email, { delay: 50 })
-    await page.click('button[type="submit"]')
+
+    // Wait for and click the continue button (Clerk uses various button selectors)
+    const continueBtn = await page.waitForSelector(
+      'button.cl-formButtonPrimary, button[data-localization-key="formButtonPrimary"], form button[type="submit"]',
+      { visible: true, timeout: 5000 }
+    )
+    await continueBtn.click()
 
     console.log('[lighthouse-auth] Entered email, waiting for password field')
 
@@ -56,11 +62,19 @@ module.exports = async (browser, context) => {
     await page.waitForSelector('input[name="password"]', { visible: true, timeout: 20000 })
 
     // Brief pause — Clerk's transition animation may still be running when the field appears
-    await new Promise((r) => setTimeout(r, 300))
+    await new Promise((r) => setTimeout(r, 500))
 
-    // Enter password and submit
+    console.log('[lighthouse-auth] Found password field')
+
+    // Enter password
     await page.type('input[name="password"]', password, { delay: 50 })
-    await page.click('button[type="submit"]')
+
+    // Wait for and click the sign in button
+    const signInBtn = await page.waitForSelector(
+      'button.cl-formButtonPrimary, button[data-localization-key="formButtonPrimary"], form button[type="submit"]',
+      { visible: true, timeout: 5000 }
+    )
+    await signInBtn.click()
 
     console.log('[lighthouse-auth] Submitted credentials, waiting for redirect')
 
