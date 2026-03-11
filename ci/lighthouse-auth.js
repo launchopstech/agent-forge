@@ -15,8 +15,11 @@
 
 'use strict'
 
-/** @param {{ page: import('puppeteer').Page }} context */
-module.exports = async ({ page }) => {
+/**
+ * @param {import('puppeteer').Browser} browser
+ * @param {{url: string}} context
+ */
+module.exports = async (browser, context) => {
   const email = process.env.LIGHTHOUSE_TEST_EMAIL
   const password = process.env.LIGHTHOUSE_TEST_PASSWORD
 
@@ -25,22 +28,49 @@ module.exports = async ({ page }) => {
     return
   }
 
-  await page.goto('http://localhost:3000/login', { waitUntil: 'networkidle0', timeout: 30000 })
+  console.log('[lighthouse-auth] Starting authentication for:', context.url)
 
-  // Wait for Clerk's SignIn form to render
-  await page.waitForSelector('input[name="identifier"]', { timeout: 20000 })
+  // Create a new page from the browser instance
+  const page = await browser.newPage()
 
-  // Enter email and continue
-  await page.type('input[name="identifier"]', email, { delay: 50 })
-  await page.keyboard.press('Enter')
+  try {
+    // Navigate to login page
+    await page.goto('http://localhost:3000/login', {
+      waitUntil: 'networkidle0',
+      timeout: 30000,
+    })
 
-  // Wait for password field
-  await page.waitForSelector('input[name="password"]', { timeout: 10000 })
-  await page.type('input[name="password"]', password, { delay: 50 })
-  await page.keyboard.press('Enter')
+    console.log('[lighthouse-auth] Navigated to login page')
 
-  // Wait for redirect to dashboard (auth complete)
-  await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 })
+    // Wait for Clerk's SignIn form to render
+    await page.waitForSelector('input[name="identifier"]', { timeout: 20000 })
+    console.log('[lighthouse-auth] Found email input')
 
-  console.log('[lighthouse-auth] Signed in, current URL:', page.url())
+    // Enter email and continue
+    await page.type('input[name="identifier"]', email, { delay: 50 })
+    await page.keyboard.press('Enter')
+
+    console.log('[lighthouse-auth] Entered email, waiting for password field')
+
+    // Wait for password field
+    await page.waitForSelector('input[name="password"]', { timeout: 10000 })
+
+    // Enter password
+    await page.type('input[name="password"]', password, { delay: 50 })
+    await page.keyboard.press('Enter')
+
+    console.log('[lighthouse-auth] Entered password, waiting for navigation')
+
+    // Wait for redirect to dashboard (auth complete)
+    await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 })
+
+    console.log('[lighthouse-auth] ✅ Signed in successfully, URL:', page.url())
+
+    // Close the page (cookies persist in the browser context)
+    await page.close()
+  } catch (error) {
+    console.error('[lighthouse-auth] ❌ Authentication failed:', error.message)
+    await page.close()
+    throw error
+  }
 }
