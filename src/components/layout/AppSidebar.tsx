@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   Sidebar,
   SidebarContent,
@@ -34,6 +35,7 @@ export const AppSidebar = React.memo(function AppSidebar({
   className,
 }: AppSidebarProps) {
   const pathname = usePathname()
+  const t = useTranslations('sidebar')
   const name = logoText ?? siteConfig.name
 
   return (
@@ -54,14 +56,26 @@ export const AppSidebar = React.memo(function AppSidebar({
       <SidebarContent>
         {navGroups.map((group, i) => (
           <SidebarGroup key={i}>
-            {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+            {group.label && (
+              <SidebarGroupLabel>
+                {group.labelKey ? t(group.labelKey as Parameters<typeof t>[0]) : group.label}
+              </SidebarGroupLabel>
+            )}
             <SidebarMenu>
               {group.items.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={
+                      item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label
+                    }
+                  >
                     <Link href={item.href} className={cn(pathname === item.href && 'font-medium')}>
                       {item.icon && <item.icon className="h-4 w-4" />}
-                      <span>{item.label}</span>
+                      <span>
+                        {item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label}
+                      </span>
                       {item.badge && (
                         <span className="ml-auto text-xs font-medium text-muted-foreground">
                           {item.badge}
@@ -81,10 +95,15 @@ export const AppSidebar = React.memo(function AppSidebar({
           <SidebarMenu>
             {footerItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton asChild tooltip={item.label}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label}
+                >
                   <Link href={item.href}>
                     {item.icon && <item.icon className="h-4 w-4" />}
-                    <span>{item.label}</span>
+                    <span>
+                      {item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

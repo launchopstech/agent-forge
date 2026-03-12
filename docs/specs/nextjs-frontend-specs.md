@@ -502,67 +502,67 @@ _Goal: Human-in-the-loop component review with automated visual regression._
 
 ### 9.1 Storybook Setup
 
-- [ ] Install `@storybook/nextjs`, `@storybook/addon-essentials`, `@storybook/addon-a11y`, `@storybook/addon-themes`
-- [ ] Configure `.storybook/main.ts`:
+- [x] Install `@storybook/nextjs`, `@storybook/addon-essentials`, `@storybook/addon-a11y`, `@storybook/addon-themes`
+- [x] Configure `.storybook/main.ts`:
   - Enable Next.js framework
   - Add path aliases matching `tsconfig.json`
   - Import `globals.css` and `tokens.css`
-- [ ] Configure `.storybook/preview.ts`:
+- [x] Configure `.storybook/preview.ts`:
   - Wrap all stories in `ThemeProvider`
   - Add theme toggle toolbar button (light / dark)
   - Set default viewport to desktop
-- [ ] Add npm scripts:
+- [x] Add npm scripts:
   - `"storybook": "storybook dev -p 6006"`
   - `"storybook:build": "storybook build"`
-- [ ] Deploy Storybook to Vercel as a separate project (or subdirectory) so it's always accessible at a URL
+- [x] Deploy Storybook to Vercel as a separate project (or subdirectory) so it's always accessible at a URL
 
 ### 9.2 Story Files
 
 Each story file must cover: default state, all variants, all sizes, error/disabled states, dark mode.
 
-- [ ] `Button.stories.tsx` — all variants × sizes, loading state, disabled state, icon button
-- [ ] `Input.stories.tsx` — default, with label, error state, disabled, with helper text
-- [ ] `Badge.stories.tsx` — all variants
-- [ ] `Card.stories.tsx` — empty, with header/footer, loading skeleton version
-- [ ] `Dialog.stories.tsx` — open/closed, with form inside
-- [ ] `Toast.stories.tsx` — all 4 variants triggered via button
-- [ ] `Skeleton.stories.tsx` — all skeleton types, animated
-- [ ] `EmptyState.stories.tsx` — with/without CTA
-- [ ] `Navbar.stories.tsx` — desktop and mobile viewport
-- [ ] `Sidebar.stories.tsx` — expanded and collapsed
-- [ ] `ExampleForm.stories.tsx` — idle, validation errors, submitting, success
+- [x] `Button.stories.tsx` — all variants × sizes, loading state, disabled state, icon button
+- [x] `Input.stories.tsx` — default, with label, error state, disabled, with helper text
+- [x] `Badge.stories.tsx` — all variants
+- [x] `Card.stories.tsx` — empty, with header/footer, loading skeleton version
+- [x] `Dialog.stories.tsx` — open/closed, with form inside
+- [x] `Toast.stories.tsx` — all 4 variants triggered via button
+- [x] `Skeleton.stories.tsx` — all skeleton types, animated
+- [x] `EmptyState.stories.tsx` — with/without CTA
+- [x] `Navbar.stories.tsx` — desktop and mobile viewport
+- [x] `Sidebar.stories.tsx` — expanded and collapsed
+- [x] `ExampleForm.stories.tsx` — idle, validation errors, submitting, success
 
 ### 9.3 Visual Regression with Chromatic
 
-- [ ] Create Chromatic account and connect to the GitHub repo
-- [ ] Install `chromatic` package
-- [ ] Add npm script: `"chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"`
-- [ ] Add `CHROMATIC_PROJECT_TOKEN` to Vercel and GitHub Actions secrets
-- [ ] Chromatic runs on every PR and blocks merge until visual changes are approved
+- [x] Create Chromatic account and connect to the GitHub repo
+- [x] Install `chromatic` package
+- [x] Add npm script: `"chromatic": "chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"`
+- [x] Add `CHROMATIC_PROJECT_TOKEN` to Vercel and GitHub Actions secrets
+- [x] Chromatic runs on every PR and blocks merge until visual changes are approved
 
 ### 9.4 Human-in-the-Loop Preview Page
 
-- [ ] Create `src/app/_dev/preview/page.tsx` (only accessible in development — add a middleware guard that returns 404 in production)
-- [ ] Page renders a full component catalog:
+- [x] Create `src/app/_dev/preview/page.tsx` (only accessible in development — add a middleware guard that returns 404 in production)
+- [x] Page renders a full component catalog:
   - Section per component group (Primitives, Composite, Layout, Forms)
   - Every component shown in all variants side by side
   - Live theme switcher at the top to preview token changes instantly
   - Dark/light toggle
-- [ ] Page renders a **QA Checklist** sidebar with checkboxes for:
-  - [ ] Renders in light mode
-  - [ ] Renders in dark mode
-  - [ ] Mobile responsive (test at 375px)
-  - [ ] Keyboard navigable
-  - [ ] No console errors
-  - [ ] Accessible (run axe)
-- [ ] Checklist state persists in `localStorage` so you can track progress per session
-- [ ] Add a link to the preview page in the README under "Development"
+- [x] Page renders a **QA Checklist** sidebar with checkboxes for:
+  - [x] Renders in light mode
+  - [x] Renders in dark mode
+  - [x] Mobile responsive (test at 375px)
+  - [x] Keyboard navigable
+  - [x] No console errors
+  - [x] Accessible (run axe)
+- [x] Checklist state persists in `localStorage` so you can track progress per session
+- [x] Add a link to the preview page in the README under "Development"
 
 ### ✅ Phase 9 Gate Check
 
-- [ ] `npm run storybook` — opens without errors, all stories render in both light and dark mode
-- [ ] `npm run chromatic` — runs successfully and registers baseline screenshots
-- [ ] `/_dev/preview` — renders all components, theme switcher works, checklist state saves
+- [x] `npm run storybook` — opens without errors, all stories render in both light and dark mode
+- [x] `npm run chromatic` — runs successfully and registers baseline screenshots
+- [x] `/_dev/preview` — renders all components, theme switcher works, checklist state saves
 
 ---
 
@@ -572,7 +572,7 @@ _Goal: Every PR runs all quality gates automatically. Nothing merges without pas
 
 ### 10.1 GitHub Actions CI
 
-- [ ] Create `.github/workflows/ci.yml`:
+- [x] Create `.github/workflows/ci.yml`:
   ```yaml
   on: [push, pull_request]
   jobs:
@@ -593,19 +593,19 @@ _Goal: Every PR runs all quality gates automatically. Nothing merges without pas
         - npm ci
         - npm run chromatic
   ```
-- [ ] Set branch protection rules on `main`: require all 3 jobs to pass before merge
+- [x] Set branch protection rules on `main`: require all 3 jobs to pass before merge
 
 ### 10.2 PR Workflow
 
-- [ ] Vercel preview deployments enabled — every PR gets a preview URL
-- [ ] Add Storybook build to Vercel — deployed at `storybook.yourproject.vercel.app`
-- [ ] Add PR comment bot that posts: preview URL, Storybook URL, Chromatic review link
+- [x] Vercel preview deployments enabled — every PR gets a preview URL
+- [x] Add Storybook build to Vercel — deployed at `storybook.yourproject.vercel.app`
+- [x] Add PR comment bot that posts: preview URL, Storybook URL, Chromatic review link
 
 ### ✅ Phase 10 Gate Check
 
-- [ ] Open a test PR — all 3 CI jobs run and pass
-- [ ] Chromatic posts a review link in the PR
-- [ ] Vercel posts a preview deployment link in the PR
+- [x] Open a test PR — all 3 CI jobs run and pass
+- [x] Chromatic posts a review link in the PR
+- [x] Vercel posts a preview deployment link in the PR
 
 ---
 
@@ -615,27 +615,27 @@ _Goal: Handoff-ready for agency clients or new team members._
 
 ### 11.1 README
 
-- [ ] Project overview and tech stack
-- [ ] Setup: clone → install → `.env` → run
-- [ ] Folder structure explanation
-- [ ] How to add a new feature module
-- [ ] How to apply a new brand/theme (the one-file swap)
-- [ ] How to run tests (unit, E2E, Storybook, Chromatic)
-- [ ] Link to live Storybook
-- [ ] Link to `/_dev/preview`
+- [x] Project overview and tech stack
+- [x] Setup: clone → install → `.env` → run
+- [x] Folder structure explanation
+- [x] How to add a new feature module
+- [x] How to apply a new brand/theme (the one-file swap)
+- [x] How to run tests (unit, E2E, Storybook, Chromatic)
+- [x] Link to live Storybook
+- [x] Link to `/_dev/preview`
 
 ### 11.2 Additional Docs
 
-- [ ] `CONTRIBUTING.md` — code style, PR process, conventional commits
-- [ ] `PERFORMANCE.md` — baseline bundle sizes, Lighthouse scores
-- [ ] `THEMING.md` — how to create a new theme preset, token reference
+- [x] `CONTRIBUTING.md` — code style, PR process, conventional commits
+- [x] `PERFORMANCE.md` — baseline bundle sizes, Lighthouse scores
+- [x] `THEMING.md` — how to create a new theme preset, token reference
 
 ### 11.3 i18n Scaffolding
 
-- [ ] Install `next-intl`
+- [x] Install `next-intl`
 - [ ] Set up locale routing under `src/app/[locale]/`
-- [ ] Create `src/messages/en.json` as default locale
-- [ ] Document how to add a new locale in README
+- [x] Create `src/messages/en.json` as default locale
+- [x] Document how to add a new locale in README
 
 ---
 

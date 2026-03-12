@@ -1,8 +1,12 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations('errors')
+  const c = await getTranslations('common')
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="flex items-center border-b border-border bg-card px-6 py-4">
@@ -13,12 +17,10 @@ export default function NotFound() {
       </header>
       <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
         <p className="text-8xl font-bold text-muted-foreground/30">404</p>
-        <h1 className="mt-4 text-2xl font-bold text-foreground">Page not found</h1>
-        <p className="mt-2 text-muted-foreground">
-          The page you are looking for does not exist or has been moved.
-        </p>
+        <h1 className="mt-4 text-2xl font-bold text-foreground">{t('notFound')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('notFoundDescription')}</p>
         <Button asChild className="mt-8">
-          <Link href="/">Go home</Link>
+          <Link href="/">{c('goHome')}</Link>
         </Button>
       </main>
     </div>

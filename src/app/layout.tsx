@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import { AuthProvider } from '@/lib/auth/auth-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeSwitcher } from '@/components/ui/theme-switcher'
@@ -62,29 +64,34 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${fontSans.variable} ${fontMono.variable}`}
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
-        <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <ThemeSwitcher />
-          </ThemeProvider>
-        </AuthProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <AuthProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <ThemeSwitcher />
+            </ThemeProvider>
+          </AuthProvider>
+        </NextIntlClientProvider>
         <Analytics />
         <SpeedInsights />
       </body>
