@@ -394,7 +394,83 @@ src/
 ├── features/         feature modules (co-located components + actions)
 ├── hooks/            shared React hooks (useTheme, useMobile, useToast)
 ├── lib/              utilities (cn, api-client, content)
+├── messages/         i18n translation files (en.json, etc.)
 ├── styles/
 │   └── tokens.css    design tokens — the one file to change per brand
 └── types/            shared TypeScript types
 ```
+
+---
+
+## 🧩 Adding a New Feature Module
+
+Feature modules live in `src/features/<name>/` and co-locate all related files:
+
+```
+src/features/billing/
+├── index.ts                  # re-exports public API
+├── BillingForm.tsx           # client component
+├── BillingForm.stories.tsx   # Storybook story
+├── BillingForm.test.tsx      # Vitest unit test
+├── actions.ts                # 'use server' Server Actions
+└── useBilling.ts             # custom hook (if needed)
+```
+
+**Steps:**
+
+1. Create `src/features/<name>/` directory
+2. Add a Server Action in `actions.ts` using `ActionResult<T>` from `src/features/example/actions.ts` as a template
+3. Build your component — keep it a Server Component unless it needs state/effects
+4. Add `'use client'` only at the leaf boundary
+5. Write a colocated `*.test.tsx` for any logic in `lib/` or `hooks/`
+6. Add a `.stories.tsx` file so the component appears in Storybook
+
+---
+
+## 🧪 Testing
+
+```bash
+# Unit tests (Vitest — no server needed, ~2s)
+pnpm test run
+
+# Unit tests with coverage report
+pnpm test:coverage
+
+# E2E tests (Playwright — requires built app on :3000)
+pnpm build && pnpm start &
+pnpm test:e2e
+
+# Visual regression (Chromatic — requires CHROMATIC_PROJECT_TOKEN)
+pnpm chromatic
+```
+
+Coverage thresholds (enforced): Lines 80%, Statements 80%, Branches 80%, Functions 60%.
+
+---
+
+## 🌍 Internationalisation (i18n)
+
+i18n is scaffolded with [next-intl](https://next-intl.dev). English is the default locale.
+
+**Translation files** live in `src/messages/`:
+
+```
+src/messages/
+└── en.json   ← default locale (English)
+```
+
+**Adding a new locale** (e.g. French):
+
+1. Create `src/messages/fr.json` mirroring the keys in `en.json`
+2. Add `'fr'` to the `locales` array in `src/i18n/routing.ts`
+3. Set `NEXT_PUBLIC_DEFAULT_LOCALE=fr` in `.env.local` to change the default
+
+---
+
+## 🛠️ Development
+
+| Resource          | URL                                            |
+| ----------------- | ---------------------------------------------- |
+| Dev server        | http://localhost:3000                          |
+| Storybook         | http://localhost:6006 (`pnpm storybook`)       |
+| Component preview | http://localhost:3000/\_dev/preview (dev only) |
