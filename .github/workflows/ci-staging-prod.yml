@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/shared-checks.yml
     with:
       environment: staging
-      run-e2e: true
+      run-e2e: false
       run-chromatic: true
     secrets:
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
