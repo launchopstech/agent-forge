@@ -1,0 +1,25 @@
+name: CI — Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: production
+      run-e2e: true
+      run-chromatic: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+  # deploy:
+  #   name: Deploy to Production
+  #   needs: [checks]
+  #   environment: production
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Deploy
+  #       run: echo "TODO: add deploy command"
