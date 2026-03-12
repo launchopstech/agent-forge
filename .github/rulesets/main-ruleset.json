@@ -39,12 +39,5 @@
     {
       "type": "deletion"
     }
-  ],
-  "bypass_actors": [
-    {
-      "actor_id": 1,
-      "actor_type": "RepositoryRole",
-      "bypass_mode": "always"
-    }
   ]
 }
