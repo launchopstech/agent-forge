@@ -1,6 +1,10 @@
 name: Lighthouse CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [qa]
+  pull_request:
+    branches: [qa]
 
 jobs:
   lighthouse:
