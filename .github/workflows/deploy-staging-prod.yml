@@ -84,7 +84,7 @@ jobs:
     name: Awaiting Production Approval
     runs-on: ubuntu-latest
     needs: [e2e-staging]
-    environment: production  # GitHub Environment with required reviewers
+    environment: production # GitHub Environment with required reviewers
     steps:
       - name: Approval received
         run: echo "Production deployment approved"
