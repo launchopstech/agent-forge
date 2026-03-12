@@ -1,10 +1,11 @@
-name: CI — Staging
+name: CI — Staging & Production
+
+# Runs CI checks on PRs to main (pre-merge gate)
+# Actual deployment is handled by deploy-staging-prod.yml after merge
 
 on:
-  push:
-    branches: [staging]
   pull_request:
-    branches: [staging]
+    branches: [main]
 
 jobs:
   checks:
