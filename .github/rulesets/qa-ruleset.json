@@ -1,10 +1,10 @@
 {
-  "name": "staging-branch-protection",
+  "name": "qa-branch-protection",
   "target": "branch",
   "enforcement": "active",
   "conditions": {
     "ref_name": {
-      "include": ["refs/heads/staging"],
+      "include": ["refs/heads/qa"],
       "exclude": []
     }
   },
@@ -24,11 +24,12 @@
       "parameters": {
         "strict_required_status_checks_policy": true,
         "required_status_checks": [
-          { "context": "lint" },
-          { "context": "typecheck" },
-          { "context": "test" },
-          { "context": "build" },
-          { "context": "Vercel" }
+          { "context": "checks / typecheck" },
+          { "context": "checks / lint" },
+          { "context": "checks / test" },
+          { "context": "checks / build" },
+          { "context": "checks / e2e" },
+          { "context": "checks / storybook" }
         ]
       }
     },
@@ -42,7 +43,7 @@
   "bypass_actors": [
     {
       "actor_id": 1,
-      "actor_type": "OrganizationAdmin",
+      "actor_type": "RepositoryRole",
       "bypass_mode": "always"
     }
   ]
