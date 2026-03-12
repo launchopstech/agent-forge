@@ -12,6 +12,14 @@ on:
       environment:
         type: string
         required: true
+      e2e-test-path:
+        type: string
+        default: ''
+        description: 'Specific test file to run (e.g., e2e/smoke.spec.ts). Empty runs all tests.'
+      wait-for-deployment:
+        type: boolean
+        default: false
+        description: 'Wait 30s for deployment to be ready before running tests'
     secrets:
       CLERK_SECRET_KEY:
         required: false
@@ -112,7 +120,12 @@ jobs:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
           NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
+      - name: Wait for deployment to be ready
+        if: ${{ inputs.wait-for-deployment }}
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+      - run: pnpm test:e2e ${{ inputs.e2e-test-path }}
         env:
           PLAYWRIGHT_BASE_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
