@@ -1,0 +1,163 @@
+name: Shared Checks (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      run-e2e:
+        type: boolean
+        default: false
+      run-chromatic:
+        type: boolean
+        default: false
+      environment:
+        type: string
+        required: true
+      e2e-test-path:
+        type: string
+        default: ''
+        description: 'Specific test file to run (e.g., e2e/smoke.spec.ts). Empty runs all tests.'
+      wait-for-deployment:
+        type: boolean
+        default: false
+        description: 'Wait 30s for deployment to be ready before running tests'
+    secrets:
+      CLERK_SECRET_KEY:
+        required: false
+      CHROMATIC_PROJECT_TOKEN:
+        required: false
+
+jobs:
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:coverage
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ inputs.run-e2e }}
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Wait for deployment to be ready
+        if: ${{ inputs.wait-for-deployment }}
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
+      - run: pnpm test:e2e ${{ inputs.e2e-test-path }}
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+          NEXT_PUBLIC_AUTH_PROVIDER: ${{ vars.NEXT_PUBLIC_AUTH_PROVIDER || 'clerk' }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+
+  storybook:
+    name: storybook
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint]
+    if: ${{ inputs.run-chromatic }}
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build Storybook
+        run: pnpm storybook:build
+        env:
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+      - name: Run Chromatic
+        run: pnpm chromatic --exit-zero-on-changes --build-script-name=storybook:build
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
