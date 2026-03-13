@@ -9,24 +9,25 @@ export const marketingNavItems: NavItem[] = [
 export const dashboardNavGroups: NavGroup[] = [
   {
     items: [
-      { label: 'Overview', href: '/dashboard' },
-      { label: 'Agents', href: '/dashboard/agents' },
-      { label: 'Workflows', href: '/dashboard/workflows' },
+      { label: 'Overview', labelKey: 'overview', href: '/dashboard' },
+      { label: 'Agents', labelKey: 'agents', href: '/dashboard/agents' },
+      { label: 'Workflows', labelKey: 'workflows', href: '/dashboard/workflows' },
     ],
   },
   {
     label: 'Manage',
+    labelKey: 'manage',
     items: [
-      { label: 'Analytics', href: '/dashboard/analytics' },
-      { label: 'Integrations', href: '/dashboard/integrations' },
-      { label: 'Team', href: '/dashboard/team' },
+      { label: 'Analytics', labelKey: 'analytics', href: '/dashboard/analytics' },
+      { label: 'Integrations', labelKey: 'integrations', href: '/dashboard/integrations' },
+      { label: 'Team', labelKey: 'team', href: '/dashboard/team' },
     ],
   },
 ]
 
 export const dashboardFooterNavItems: NavItem[] = [
-  { label: 'Settings', href: '/dashboard/settings' },
-  { label: 'Help', href: '/dashboard/help' },
+  { label: 'Settings', labelKey: 'settings', href: '/dashboard/settings' },
+  { label: 'Help', labelKey: 'help', href: '/dashboard/help' },
 ]
 
 export const footerNavColumns: Array<{ heading: string; items: NavItem[] }> = [

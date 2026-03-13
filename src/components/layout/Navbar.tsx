@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
@@ -27,6 +28,7 @@ export const Navbar = React.memo(function Navbar({
   className,
 }: NavbarProps) {
   const [open, setOpen] = useState(false)
+  const t = useTranslations('nav')
   const name = logoText ?? siteConfig.name
   const handleClose = useCallback(() => setOpen(false), [])
 
@@ -75,7 +77,7 @@ export const Navbar = React.memo(function Navbar({
       <div className="flex md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Open menu">
+            <Button variant="ghost" size="icon" aria-label={t('openMenu')}>
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>

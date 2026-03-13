@@ -181,6 +181,19 @@ The active provider is selected by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|ok
 - Use `cn()` from `lib/utils.ts` for all conditional className composition — never string concatenation
 - Use `pnpm` — never `npm` or `yarn`
 
+### i18n rules — every UI component and feature MUST follow these
+
+- **No hardcoded user-visible strings in JSX** — ESLint rule `i18next/no-literal-string` enforces this at lint time (warns on violations in `src/**/*.tsx`)
+- **Server Components** use `const t = await getTranslations('namespace')` from `next-intl/server`
+- **Client Components** use `const t = useTranslations('namespace')` from `next-intl`
+- **New translation namespace**: add keys to `src/messages/en.json` first, then mirror exact same keys in every other locale file (`fr.json`, etc.)
+- **Nav items** — add `labelKey: 'keyName'` alongside `label` in `src/config/nav.ts`; the key must exist in the `sidebar` namespace in all message files
+- **Adding a new locale**: (1) create `src/messages/<locale>.json`, (2) add the locale to `routing.locales` in `src/i18n/routing.ts`, (3) add to the `messageLoaders` map in `src/i18n/request.ts`, (4) add to the `localeFiles` map in `src/i18n/i18n.test.ts`
+- **Vitest guardrails** (`src/i18n/i18n.test.ts`) — run `pnpm test run src/i18n/i18n.test.ts` after any message file change:
+  - Key parity: all locale files must have identical keys to `en.json`
+  - No empty values: no translation key may have an empty string
+  - Locale coverage: `routing.locales` must match files on disk
+
 ### Performance rules
 
 - **React.memo** — wrap all `'use client'` layout components (Navbar, AppSidebar, Topbar) and any component that receives stable props from a frequently-updating parent

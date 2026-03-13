@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import { notFound } from 'next/navigation'
 import {
   Bell,
@@ -15,6 +15,8 @@ import {
 } from 'lucide-react'
 
 import { useTheme } from '@/hooks/use-theme'
+import { getBrand } from '@/config/brands'
+import { brandCssVars } from '@/lib/brand-utils'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -30,11 +32,55 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton, SkeletonAvatar, SkeletonBlock, SkeletonText } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 
 const QA_STORAGE_KEY = 'qa-checklist'
+const BRAND_STORAGE_KEY = 'preview-brand'
+
+const BRAND_OPTIONS = [
+  { key: 'default', label: 'Default (Purple)' },
+  { key: 'client-a', label: 'Client A (Blue)' },
+  { key: 'client-b', label: 'Client B (Green)' },
+] as const
+
+// ---------------------------------------------------------------------------
+// Brand external store (useSyncExternalStore pattern — same as checklist)
+// ---------------------------------------------------------------------------
+let brandListeners: Array<() => void> = []
+
+function subscribeBrand(callback: () => void) {
+  brandListeners.push(callback)
+  return () => {
+    brandListeners = brandListeners.filter((l) => l !== callback)
+  }
+}
+
+function getBrandSnapshot(): string {
+  if (typeof window === 'undefined') return 'default'
+  return window.localStorage.getItem(BRAND_STORAGE_KEY) ?? 'default'
+}
+
+function getBrandServerSnapshot(): string {
+  return 'default'
+}
+
+function writeBrand(key: string) {
+  try {
+    window.localStorage.setItem(BRAND_STORAGE_KEY, key)
+  } catch {
+    // ignore
+  }
+  for (const listener of brandListeners) listener()
+}
 
 const CHECKLIST_COMPONENTS = [
   'Button',
@@ -108,6 +154,19 @@ export default function PreviewPage() {
     getChecklistSnapshot,
     getChecklistServerSnapshot
   )
+  const brandKey = useSyncExternalStore(subscribeBrand, getBrandSnapshot, getBrandServerSnapshot)
+
+  useEffect(() => {
+    const brand = getBrand(brandKey)
+    const css = brandCssVars(brand)
+    let el = document.getElementById('preview-brand-vars')
+    if (!el) {
+      el = document.createElement('style')
+      el.id = 'preview-brand-vars'
+      document.head.appendChild(el)
+    }
+    el.textContent = css
+  }, [brandKey])
 
   const toggle = useCallback((component: string, criterion: string) => {
     const current = getChecklistSnapshot()
@@ -135,17 +194,31 @@ export default function PreviewPage() {
             </span>
             <span className="font-semibold text-sm">Component Preview</span>
           </div>
-          <Button variant="outline" size="sm" onClick={toggleTheme} className="gap-2">
-            {resolvedTheme === 'dark' ? (
-              <>
-                <Sun className="size-4" /> Light
-              </>
-            ) : (
-              <>
-                <Moon className="size-4" /> Dark
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Select value={brandKey} onValueChange={writeBrand}>
+              <SelectTrigger className="h-8 w-40 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {BRAND_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.key} value={opt.key} className="text-xs">
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={toggleTheme} className="gap-2">
+              {resolvedTheme === 'dark' ? (
+                <>
+                  <Sun className="size-4" /> Light
+                </>
+              ) : (
+                <>
+                  <Moon className="size-4" /> Dark
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 

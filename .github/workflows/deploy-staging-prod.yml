@@ -1,0 +1,112 @@
+name: Deploy — Staging & Production
+
+# Deployment pipeline:
+# 1. Run CI checks (lint, test, build) - e2e skipped, runs post-deploy
+# 2. Deploy to staging
+# 3. Run E2E against staging (post-deploy via shared-checks)
+# 4. Wait for manual approval
+# 5. Deploy to production
+# 6. Run smoke tests against production (via shared-checks)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # ============================================================
+  # Phase 1: CI Checks (e2e runs post-deploy instead)
+  # ============================================================
+  checks:
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: staging
+      run-e2e: false
+      run-chromatic: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+  # ============================================================
+  # Phase 2: Deploy to Staging
+  # ============================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [checks]
+    environment: staging
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Trigger Vercel staging deployment
+        id: deploy
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK secret not set, skipping deployment"
+            echo "url=${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
+          echo "url=${{ vars.NEXT_PUBLIC_APP_URL }}" >> $GITHUB_OUTPUT
+
+  # ============================================================
+  # Phase 3: Post-deploy E2E on Staging
+  # ============================================================
+  e2e-staging:
+    needs: [deploy-staging]
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: staging
+      run-e2e: true
+      run-chromatic: false
+      wait-for-deployment: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+
+  # ============================================================
+  # Phase 4: Manual Approval Gate
+  # ============================================================
+  approval:
+    name: Awaiting Production Approval
+    runs-on: ubuntu-latest
+    needs: [e2e-staging]
+    environment: production # GitHub Environment with required reviewers
+    steps:
+      - name: Approval received
+        run: echo "Production deployment approved"
+
+  # ============================================================
+  # Phase 5: Deploy to Production
+  # ============================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [approval]
+    environment: production
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Trigger Vercel production deployment
+        id: deploy
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK secret not set, skipping deployment"
+            echo "url=${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
+          echo "url=${{ vars.NEXT_PUBLIC_APP_URL }}" >> $GITHUB_OUTPUT
+
+  # ============================================================
+  # Phase 6: Post-deploy Smoke Tests on Production
+  # ============================================================
+  smoke-production:
+    needs: [deploy-production]
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: production
+      run-e2e: true
+      run-chromatic: false
+      e2e-test-path: e2e/smoke.spec.ts
+      wait-for-deployment: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
