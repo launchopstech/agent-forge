@@ -1,21 +1,43 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Zap, Brain, Shield } from 'lucide-react'
 import { useUser } from '@/hooks/use-user'
 
 export default function HomePage() {
   const { isAuthenticated } = useUser()
+  const t = useTranslations('marketing')
   const ctaHref = isAuthenticated ? '/dashboard' : '/signup'
+
+  const heroCards = [
+    { icon: Zap, title: t('feature1Title'), desc: t('feature1Description') },
+    { icon: Brain, title: t('feature2Title'), desc: t('feature2Description') },
+    { icon: Shield, title: t('feature3Title'), desc: t('feature3Description') },
+  ]
+
+  const features = [
+    { title: t('featureApiTitle'), desc: t('featureApiDesc') },
+    { title: t('featureMonitorTitle'), desc: t('featureMonitorDesc') },
+    { title: t('featureWorkflowTitle'), desc: t('featureWorkflowDesc') },
+    { title: t('featureVersionTitle'), desc: t('featureVersionDesc') },
+  ]
+
+  const stats = [
+    { value: t('stat1Value'), label: t('stat1Label') },
+    { value: t('stat2Value'), label: t('stat2Label') },
+    { value: t('stat3Value'), label: t('stat3Label') },
+  ]
+
   return (
     <div className="bg-background">
       {/* Announcement Banner */}
       <div className="border-b border-border bg-muted/50 px-6 py-3 text-center">
         <p className="text-sm text-muted-foreground">
-          New: Enterprise features now available.{' '}
+          {t('announcement')}{' '}
           <a href="#" className="font-semibold text-primary hover:underline">
-            Learn more →
+            {t('announcementLink')}
           </a>
         </p>
       </div>
@@ -24,12 +46,9 @@ export default function HomePage() {
       <section className="flex flex-col items-center justify-center px-6 py-24 sm:px-8 sm:py-32">
         <div className="text-center">
           <h1 className="text-balance text-5xl font-bold tracking-tight text-foreground sm:text-6xl">
-            Build intelligent agents that work for you
+            {t('heroHeading')}
           </h1>
-          <p className="mt-6 text-balance text-xl text-muted-foreground">
-            The complete platform for building, deploying, and managing AI agents. Automate complex
-            workflows with enterprise-grade reliability.
-          </p>
+          <p className="mt-6 text-balance text-xl text-muted-foreground">{t('heroSubtitle')}</p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Button
               size="lg"
@@ -37,35 +56,25 @@ export default function HomePage() {
               asChild
             >
               <Link href={ctaHref}>
-                {isAuthenticated ? 'Go to Dashboard' : 'Start Building Free'}
+                {isAuthenticated ? t('heroPrimaryAuth') : t('heroPrimary')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline">
-              Watch Demo
+              {t('heroSecondary')}
             </Button>
           </div>
         </div>
 
         {/* Feature Cards in Hero */}
         <div className="mt-16 grid w-full max-w-5xl gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-border bg-card p-6">
-            <Zap className="h-6 w-6 text-primary" />
-            <p className="mt-4 font-semibold text-foreground">Fast Deployment</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Deploy agents in minutes, not weeks
-            </p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <Brain className="h-6 w-6 text-primary" />
-            <p className="mt-4 font-semibold text-foreground">AI-Powered</p>
-            <p className="mt-2 text-sm text-muted-foreground">Leverage latest LLM models</p>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-6">
-            <Shield className="h-6 w-6 text-primary" />
-            <p className="mt-4 font-semibold text-foreground">Enterprise Security</p>
-            <p className="mt-2 text-sm text-muted-foreground">SOC 2 compliant infrastructure</p>
-          </div>
+          {heroCards.map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="rounded-lg border border-border bg-card p-6">
+              <Icon className="h-6 w-6 text-primary" />
+              <p className="mt-4 font-semibold text-foreground">{title}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -73,23 +82,12 @@ export default function HomePage() {
       <section id="features" className="border-t border-border bg-muted/30 px-6 py-24 sm:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
-            <h2 className="text-4xl font-bold text-foreground">Powerful features</h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Everything you need to build sophisticated AI agents
-            </p>
+            <h2 className="text-4xl font-bold text-foreground">{t('featuresTitle')}</h2>
+            <p className="mt-4 text-lg text-muted-foreground">{t('featuresSubtitle')}</p>
           </div>
-
           <div className="mt-16 grid gap-8 sm:grid-cols-2">
-            {[
-              { title: 'API Integration', desc: 'Connect to any API or service seamlessly' },
-              {
-                title: 'Real-time Monitoring',
-                desc: 'Track agent performance with live dashboards',
-              },
-              { title: 'Custom Workflows', desc: 'Design complex multi-step agent behaviors' },
-              { title: 'Version Control', desc: 'Manage agent versions and rollbacks easily' },
-            ].map((feature, i) => (
-              <div key={i} className="rounded-lg border border-border bg-card p-8">
+            {features.map((feature) => (
+              <div key={feature.title} className="rounded-lg border border-border bg-card p-8">
                 <h3 className="text-xl font-semibold text-foreground">{feature.title}</h3>
                 <p className="mt-3 text-muted-foreground">{feature.desc}</p>
               </div>
@@ -101,16 +99,12 @@ export default function HomePage() {
       {/* Benefits Section */}
       <section id="benefits" className="px-6 py-24 sm:px-8">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-4xl font-bold text-foreground">Why teams choose us</h2>
+          <h2 className="text-4xl font-bold text-foreground">{t('statsTitle')}</h2>
           <div className="mt-12 grid gap-8 sm:grid-cols-3">
-            {[
-              { label: '10x faster', detail: 'Time to production' },
-              { label: '99.9%', detail: 'Uptime SLA' },
-              { label: '24/7', detail: 'Priority support' },
-            ].map((item, i) => (
-              <div key={i} className="text-center">
-                <p className="text-4xl font-bold text-primary">{item.label}</p>
-                <p className="mt-2 text-muted-foreground">{item.detail}</p>
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-4xl font-bold text-primary">{stat.value}</p>
+                <p className="mt-2 text-muted-foreground">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -122,13 +116,11 @@ export default function HomePage() {
         id="pricing"
         className="border-t border-border bg-primary px-6 py-24 text-center sm:px-8"
       >
-        <h2 className="text-4xl font-bold text-primary-foreground">Ready to get started?</h2>
-        <p className="mt-4 text-lg text-primary-foreground/80">
-          Join hundreds of teams building intelligent automation.
-        </p>
+        <h2 className="text-4xl font-bold text-primary-foreground">{t('ctaTitle')}</h2>
+        <p className="mt-4 text-lg text-primary-foreground/80">{t('ctaSubtitle')}</p>
         <Button size="lg" variant="secondary" className="mt-8" asChild>
           <Link href={ctaHref}>
-            {isAuthenticated ? 'Go to Dashboard' : 'Create Free Account'}
+            {isAuthenticated ? t('heroPrimaryAuth') : t('ctaButton')}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </Button>

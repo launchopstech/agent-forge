@@ -2,6 +2,7 @@
 
 export interface NavItem {
   label: string
+  labelKey?: string
   href: string
   icon?: React.ComponentType<{ className?: string }>
   badge?: string
@@ -11,6 +12,7 @@ export interface NavItem {
 
 export interface NavGroup {
   label?: string
+  labelKey?: string
   items: NavItem[]
 }
 
