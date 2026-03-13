@@ -5,11 +5,13 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_ENV: z.enum(['development', 'staging', 'production'], {
     message: 'NEXT_PUBLIC_APP_ENV must be one of: development, staging, production',
   }),
+  NEXT_PUBLIC_BRAND: z.string().optional().default('default'),
 })
 
 const parsed = envSchema.safeParse({
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+  NEXT_PUBLIC_BRAND: process.env.NEXT_PUBLIC_BRAND,
 })
 
 if (!parsed.success) {

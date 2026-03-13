@@ -633,7 +633,7 @@ _Goal: Handoff-ready for agency clients or new team members._
 ### 11.3 i18n Scaffolding
 
 - [x] Install `next-intl`
-- [ ] Set up locale routing under `src/app/[locale]/`
+- [x] Set up locale routing under `src/app/[locale]/` _(cookie-based locale detection via `src/i18n/request.ts`; `[locale]/layout.tsx` scaffold in place)_
 - [x] Create `src/messages/en.json` as default locale
 - [x] Document how to add a new locale in README
 
@@ -1057,6 +1057,10 @@ dig staging.example.com   # Should resolve to Vercel
 - [ ] Add deployed Vercel URL to `NEXT_PUBLIC_APP_URL` env var so `sitemap.xml` uses production URL instead of `http://localhost:3000`
 - [ ] Increase the test coverage to cove all the code
 - [ ] Split into monorepo
+
+### 13.1 CMS driven rendering for agency
+
+- [ ] Load app via metadata - CMS system initially keep the jsons in frontend but eventually will be driven by CMS
 
 ## Master Completion Checklist
 
