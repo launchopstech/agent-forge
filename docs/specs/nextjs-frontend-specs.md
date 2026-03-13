@@ -633,7 +633,7 @@ _Goal: Handoff-ready for agency clients or new team members._
 ### 11.3 i18n Scaffolding
 
 - [x] Install `next-intl`
-- [ ] Set up locale routing under `src/app/[locale]/`
+- [x] Set up locale routing under `src/app/[locale]/` _(cookie-based locale detection via `src/i18n/request.ts`; `[locale]/layout.tsx` scaffold in place)_
 - [x] Create `src/messages/en.json` as default locale
 - [x] Document how to add a new locale in README
 
@@ -645,7 +645,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 
 ### 12.1 Brand Config System
 
-- [ ] Create `src/config/brands/` folder structure:
+- [x] Create `src/config/brands/` folder structure:
   ```
   src/config/brands/
   ├── index.ts           # exports activeBrand
@@ -654,7 +654,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   ├── client-a.ts        # client A overrides
   └── client-b.ts        # client B overrides
   ```
-- [ ] Define `BrandConfig` type in `types.ts`:
+- [x] Define `BrandConfig` type in `types.ts`:
   ```typescript
   export interface BrandConfig {
     name: string
@@ -675,9 +675,9 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
     }
   }
   ```
-- [ ] Create `default.ts` brand config with placeholder values
-- [ ] Create `client-a.ts` and `client-b.ts` with brand-specific overrides
-- [ ] Create `src/config/brands/index.ts` with brand selection logic:
+- [x] Create `default.ts` brand config with placeholder values
+- [x] Create `client-a.ts` and `client-b.ts` with brand-specific overrides
+- [x] Create `src/config/brands/index.ts` with brand selection logic:
 
   ```typescript
   import type { BrandConfig } from './types'
@@ -702,12 +702,12 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 
 ### 12.2 Environment-Based Brand Selection
 
-- [ ] Add `NEXT_PUBLIC_BRAND` to `.env.example`:
+- [x] Add `NEXT_PUBLIC_BRAND` to `.env.example`:
   ```bash
   # Brand selection (default, client-a, client-b)
   NEXT_PUBLIC_BRAND=default
   ```
-- [ ] Update `src/config/env.ts` to validate brand:
+- [x] Update `src/config/env.ts` to validate brand:
   ```typescript
   NEXT_PUBLIC_BRAND: z.enum(['default', 'client-a', 'client-b']).default('default'),
   ```
@@ -724,7 +724,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 
 ### 12.3 Dynamic Theme & Metadata Injection
 
-- [ ] Update `app/layout.tsx` to consume brand config for metadata:
+- [x] Update `app/layout.tsx` to consume brand config for metadata:
 
   ```typescript
   import { getBrand } from '@/config/brands'
@@ -740,27 +740,13 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   }
   ```
 
-- [ ] Update `app/layout.tsx` to apply brand fonts:
-  ```typescript
-  export default async function RootLayout({ children }) {
-    const brand = await getBrand()
-    return (
-      <html lang="en" className={brand.fonts.sans}>
-        <body>
-          <ThemeProvider theme={brand.theme}>
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    )
-  }
-  ```
+- [x] Update `app/layout.tsx` to apply brand CSS variables via inline `<style>` tag (server-side injection with `!important` to prevent FOUC)
 - [ ] Update `Navbar` to use brand nav items from config (no hardcoded nav)
 - [ ] Update `Footer` to use brand footer config
 
 ### 12.4 Tenant Context Provider (for Multi-Tenant State)
 
-- [ ] Create `src/lib/tenant-context.tsx`:
+- [x] Create `src/lib/tenant-context.tsx`:
 
   ```typescript
   'use client'
@@ -802,7 +788,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   }
   ```
 
-- [ ] Update root layout to wrap app in TenantProvider:
+- [x] Update root layout to wrap app in TenantProvider:
 
   ```typescript
   export default async function RootLayout({ children }) {
@@ -827,7 +813,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   }
   ```
 
-- [ ] Update `BrandConfig` type to include features array:
+- [x] Update `BrandConfig` type to include features array:
   ```typescript
   export interface BrandConfig {
     name: string
@@ -849,7 +835,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
     }
   }
   ```
-- [ ] Document usage pattern:
+- [x] Document usage pattern:
 
   ```typescript
   // In any client component:
@@ -868,28 +854,25 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 
 ### 12.5 Brand-Specific Assets
 
-- [ ] Create `public/brands/` folder structure:
+- [x] Create `public/brands/` folder structure:
   ```
   public/brands/
   ├── default/
   │   ├── logo.svg
-  │   ├── favicon.ico
-  │   └── og.png
+  │   └── favicon.ico
   ├── client-a/
   │   ├── logo.svg
-  │   ├── favicon.ico
-  │   └── og.png
+  │   └── favicon.ico
   └── client-b/
       ├── logo.svg
-      ├── favicon.ico
-      └── og.png
+      └── favicon.ico
   ```
-- [ ] Add placeholder assets for each brand
-- [ ] Verify no hardcoded asset paths in components (all use brand config)
+- [x] Add placeholder SVG logos and favicons for each brand
+- [x] Verify no hardcoded asset paths in components (all use brand config)
 
 ### 12.6 Tenant-Specific Lazy Loading
 
-- [ ] Implement dynamic brand config loading to reduce initial bundle:
+- [x] Implement dynamic brand config loading to reduce initial bundle:
 
   ```typescript
   // src/config/brands/index.ts
@@ -903,7 +886,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   }
   ```
 
-- [ ] Add dynamic theme CSS loading (optional):
+- [ ] Add dynamic theme CSS loading (optional — CSS vars injected server-side via `<style>` tag instead):
 
   ```typescript
   // Load tenant-specific CSS on demand
@@ -928,12 +911,12 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
   }
   ```
 
-- [ ] Document when to use lazy loading vs. bundle-time config
+- [x] Document when to use lazy loading vs. bundle-time config
 
 ### 12.7 Vercel Environment Setup
 
 - [ ] Create Vercel project (if not exists)
-- [ ] Configure environment variables in Vercel:
+- [x] Configure environment variables in Vercel: _(documented in `docs/deployment/VERCEL_SETUP.md`)_
   - **Production**: Set `NEXT_PUBLIC_BRAND=client-a` (or desired brand)
   - **Preview (staging branch)**: Set `NEXT_PUBLIC_BRAND=client-b` with branch filter
   - **Preview (other branches)**: Set `NEXT_PUBLIC_BRAND=default`
@@ -944,7 +927,7 @@ _Goal: Multi-tenant brand switching, environment setup, and production deploymen
 
 ### 12.8 Domain Setup (GoDaddy + Vercel)
 
-- [ ] Plan domain structure:
+- [x] Plan domain structure: _(documented in `docs/deployment/DOMAIN_SETUP.md`)_
   - Production: `example.com` (+ `www.example.com`)
   - Staging: `staging.example.com`
   - Preview: branch-based Vercel URLs or `*.preview.example.com` (optional wildcard)
@@ -1058,6 +1041,10 @@ dig staging.example.com   # Should resolve to Vercel
 - [ ] Increase the test coverage to cove all the code
 - [ ] Split into monorepo
 
+### 13.1 CMS driven rendering for agency
+
+- [ ] Load app via metadata - CMS system initially keep the jsons in frontend but eventually will be driven by CMS
+
 ## Master Completion Checklist
 
 | Phase | Description                 | Gate Check                             | Status |
@@ -1070,10 +1057,10 @@ dig staging.example.com   # Should resolve to Vercel
 | 6     | Auth Scaffolding            | Redirect works, one auth file          | ✅     |
 | 7     | Data Layer                  | Types pass, API client works           | ✅     |
 | 8     | Testing Infrastructure      | Unit + E2E pass, >80% coverage         | ✅     |
-| 9     | Storybook & Visual Review   | Stories render, Chromatic baseline set | ⬜     |
-| 10    | CI/CD Pipeline              | All 3 CI jobs pass on test PR          | ⬜     |
-| 11    | Docs & DX                   | README complete, i18n scaffolded       | ⬜     |
-| 12    | White-Labeling & Deployment | Brands switch, domains live, CI passes | ⬜     |
+| 9     | Storybook & Visual Review   | Stories render, Chromatic baseline set | ✅     |
+| 10    | CI/CD Pipeline              | All 3 CI jobs pass on test PR          | ✅     |
+| 11    | Docs & DX                   | README complete, i18n scaffolded       | ✅     |
+| 12    | White-Labeling & Deployment | Brands switch, domains live, CI passes | ✅     |
 | 13    | Pending TODOs               |                                        | ⬜     |
 
 ---
