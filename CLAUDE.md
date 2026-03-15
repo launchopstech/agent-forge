@@ -174,7 +174,7 @@ The active provider is selected by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|ok
 
 ### Code rules
 
-- **Never edit** files in `src/components/ui/` — shadcn/ui primitives, add via `pnpm dlx shadcn@latest add <component>`
+- **`packages/ui/src/` components are owned and editable** — shadcn/ui's philosophy is that components are copied into your repo for you to own. Edit them freely to fix bugs or adjust behavior. Add new components with `pnpm dlx shadcn@latest add <component>` (outputs to `packages/ui/src/` via `components.json`). Keep them generic — no app-specific imports (`@/config`, `@forge/brand`, `@forge/i18n`, etc.). App-specific logic belongs in `apps/web/src/components/`.
 - **Never hardcode copy** in layout components — all text comes from `src/config/` or props
 - **Never add `'use client'`** to Server Components (`MarketingLayout`, `DashboardLayout`, `AuthLayout`, `Footer`) unless the spec explicitly requires it
 - **Never commit** build artifacts: `.next/`, `storybook-static/`, `out/`

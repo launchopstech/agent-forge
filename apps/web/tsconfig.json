@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@forge/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./src/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/config/*": ["./src/config/*"],
+      "@forge/config": ["../../packages/config/src/index.ts"],
+      "@forge/config/src/*": ["../../packages/config/src/*"],
+      "@forge/api-client": ["../../packages/api-client/src/index.ts"],
+      "@forge/api-client/src/*": ["../../packages/api-client/src/*"],
+      "@forge/brand": ["../../packages/brand/src/index.ts"],
+      "@forge/brand/src/*": ["../../packages/brand/src/*"],
+      "@forge/i18n": ["../../packages/i18n/src/index.ts"],
+      "@forge/i18n/src/*": ["../../packages/i18n/src/*"],
+      "@forge/i18n/messages/*": ["../../packages/i18n/messages/*"],
+      "@forge/i18n/request": ["../../packages/i18n/src/request.ts"],
+      "@forge/i18n/routing": ["../../packages/i18n/src/routing.ts"],
+      "@forge/i18n/navigation": ["../../packages/i18n/src/navigation.ts"],
+      "@forge/i18n/actions": ["../../packages/i18n/src/actions.ts"],
+      "@forge/auth": ["../../packages/auth/src/index.ts"],
+      "@forge/auth/src/*": ["../../packages/auth/src/*"],
+      "@forge/auth/server": ["../../packages/auth/src/auth.ts"],
+      "@forge/auth/middleware": ["../../packages/auth/src/middleware-registry.ts"],
+      "@forge/auth/provider": ["../../packages/auth/src/auth-provider.tsx"],
+      "@forge/auth/contracts": ["../../packages/auth/src/contracts.ts"],
+      "@forge/auth/adapters/clerk/server": ["../../packages/auth/src/adapters/clerk/server.ts"],
+      "@forge/auth/adapters/clerk/middleware": [
+        "../../packages/auth/src/adapters/clerk/middleware.ts"
+      ],
+      "@forge/ui": ["../../packages/ui/src/index.ts"],
+      "@forge/ui/src/*": ["../../packages/ui/src/*"],
+      "@forge/ai-ui": ["../../packages/ai-ui/src/index.ts"],
+      "@forge/ai-ui/src/*": ["../../packages/ai-ui/src/*"]
+    },
+    "tsBuildInfoFile": ".next/cache/typescript/tsbuildinfo"
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", ".next", "coverage", "storybook-static", "e2e"]
+}
