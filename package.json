@@ -27,6 +27,9 @@
     ],
     "*.{ts,tsx,js,jsx,json,css,md,yml,yaml}": [
       "prettier --write"
+    ],
+    "apps/web/src/**/*.{ts,tsx}": [
+      "pnpm --filter=@forge/web exec vitest related --run"
     ]
   },
   "devDependencies": {
