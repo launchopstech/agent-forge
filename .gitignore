@@ -33,6 +33,9 @@ next-env.d.ts
 # lighthouse
 .lighthouseci/
 
+# playwright
+test-results/
+
 # macOS
 .DS_Store
 
