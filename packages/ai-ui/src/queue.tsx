@@ -245,7 +245,7 @@ export default function QueueDemo() {
   ]
 
   return (
-    <div className="w-full max-w-md p-6">
+    <div className="w-full max-w-md">
       <Queue>
         <QueueSection defaultOpen>
           <QueueSectionTrigger>

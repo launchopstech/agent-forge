@@ -174,7 +174,7 @@ ReasoningContent.displayName = 'ReasoningContent'
 /** Demo component for preview */
 export default function ReasoningDemo() {
   return (
-    <div className="w-full max-w-2xl p-6">
+    <div className="w-full max-w-2xl">
       <Reasoning defaultOpen={true} duration={12}>
         <ReasoningTrigger />
         <ReasoningContent>

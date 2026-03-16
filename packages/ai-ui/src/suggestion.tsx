@@ -56,7 +56,7 @@ export default function SuggestionDemo() {
   ]
 
   return (
-    <div className="p-6">
+    <div className="">
       <Suggestions>
         {suggestions.map((suggestion) => (
           <Suggestion

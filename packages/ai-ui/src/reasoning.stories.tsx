@@ -4,7 +4,7 @@ import Demo from './reasoning'
 
 const meta: Meta = {
   title: 'AI/Reasoning',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

@@ -4,7 +4,7 @@ import Demo from './confirmation'
 
 const meta: Meta = {
   title: 'AI/Confirmation',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

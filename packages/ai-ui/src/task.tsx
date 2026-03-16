@@ -66,7 +66,7 @@ export const TaskContent = ({ children, className, ...props }: TaskContentProps)
 /** Demo component for preview */
 export default function TaskDemo() {
   return (
-    <div className="p-6" style={{ height: '200px' }}>
+    <div className="" style={{ height: '200px' }}>
       <Task className="w-full">
         <TaskTrigger title="Found project files" />
         <TaskContent>

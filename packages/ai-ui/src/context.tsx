@@ -356,7 +356,7 @@ const TokensWithCost = ({ tokens, costText }: { tokens?: number; costText?: stri
 /** Demo component for preview */
 export default function ContextDemo() {
   return (
-    <div className="flex items-center justify-center p-8">
+    <div className="w-full">
       <Context
         maxTokens={128_000}
         modelId="openai:gpt-5"

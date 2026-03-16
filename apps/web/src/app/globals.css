@@ -6,6 +6,7 @@
 @source '../../../../packages/ui/src/**/*.tsx';
 @source '../../../../packages/brand/src/**/*.tsx';
 @source '../../../../packages/auth/src/**/*.tsx';
+@source '../../../../packages/ai-ui/src/**/*.tsx';
 
 @custom-variant dark (&:is(.dark *));
 

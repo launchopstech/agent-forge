@@ -4,7 +4,7 @@ import Demo from './model-selector'
 
 const meta: Meta = {
   title: 'AI/ModelSelector',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

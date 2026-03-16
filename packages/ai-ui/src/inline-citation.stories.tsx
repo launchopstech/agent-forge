@@ -4,7 +4,7 @@ import Demo from './inline-citation'
 
 const meta: Meta = {
   title: 'AI/InlineCitation',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

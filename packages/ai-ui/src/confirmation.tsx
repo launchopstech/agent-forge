@@ -150,7 +150,7 @@ export const ConfirmationAction = (props: ConfirmationActionProps) => (
 /** Demo component for preview */
 export default function ConfirmationDemo() {
   return (
-    <div className="w-full max-w-2xl p-6">
+    <div className="w-full max-w-2xl">
       <Confirmation approval={{ id: 'demo-1' }} state="approval-requested">
         <ConfirmationTitle>
           <ConfirmationRequest>

@@ -4,7 +4,7 @@ import Demo from './suggestion'
 
 const meta: Meta = {
   title: 'AI/Suggestion',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

@@ -4,7 +4,7 @@ import Demo from './queue'
 
 const meta: Meta = {
   title: 'AI/Queue',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

@@ -4,7 +4,7 @@ import Demo from './image'
 
 const meta: Meta = {
   title: 'AI/Image',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

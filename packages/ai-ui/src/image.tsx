@@ -20,7 +20,7 @@ export const Image = ({ base64, uint8Array, mediaType, ...props }: ImageProps) =
 /** Demo component for preview */
 export default function ImageDemo() {
   return (
-    <div className="flex items-center justify-center p-8">
+    <div className="flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className="relative h-[200px] w-[200px] overflow-hidden rounded-md border bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400">
           <div className="absolute inset-0 flex items-center justify-center">

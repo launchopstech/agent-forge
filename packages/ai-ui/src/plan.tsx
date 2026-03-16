@@ -125,7 +125,7 @@ export const PlanTrigger = ({ className, ...props }: PlanTriggerProps) => (
 /** Demo component for preview */
 export default function PlanDemo() {
   return (
-    <div className="w-full max-w-2xl p-6">
+    <div className="w-full max-w-2xl">
       <Plan defaultOpen={true}>
         <PlanHeader>
           <div>

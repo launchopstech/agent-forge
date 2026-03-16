@@ -4,7 +4,7 @@ import Demo from './code-block'
 
 const meta: Meta = {
   title: 'AI/CodeBlock',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

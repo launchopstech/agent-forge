@@ -4,7 +4,7 @@ import Demo from './actions'
 
 const meta: Meta = {
   title: 'AI/Actions',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

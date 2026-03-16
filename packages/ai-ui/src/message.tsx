@@ -370,7 +370,7 @@ export const MessageToolbar = ({ className, children, ...props }: MessageToolbar
 export default function MessageDemo() {
   return (
     <TooltipProvider>
-      <div className="flex w-full max-w-2xl flex-col gap-4 p-6">
+      <div className="flex w-full max-w-2xl flex-col gap-4">
         <Message from="user">
           <MessageContent>
             <p>Can you explain how React hooks work?</p>

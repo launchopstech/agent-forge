@@ -61,7 +61,7 @@ export default function SourcesDemo() {
   ]
 
   return (
-    <div className="p-6" style={{ height: '150px' }}>
+    <div className="" style={{ height: '150px' }}>
       <Sources>
         <SourcesTrigger count={sources.length} />
         <SourcesContent>

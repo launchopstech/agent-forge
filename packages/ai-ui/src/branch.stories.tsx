@@ -4,7 +4,7 @@ import Demo from './branch'
 
 const meta: Meta = {
   title: 'AI/Branch',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

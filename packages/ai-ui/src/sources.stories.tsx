@@ -4,7 +4,7 @@ import Demo from './sources'
 
 const meta: Meta = {
   title: 'AI/Sources',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

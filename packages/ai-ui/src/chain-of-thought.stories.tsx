@@ -4,7 +4,7 @@ import Demo from './chain-of-thought'
 
 const meta: Meta = {
   title: 'AI/ChainOfThought',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

@@ -4,7 +4,7 @@ import Demo from './tool'
 
 const meta: Meta = {
   title: 'AI/Tool',
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'padded' },
 }
 export default meta
 type Story = StoryObj

@@ -61,7 +61,7 @@ export const Action = ({
 /** Demo component for preview */
 export default function ActionsDemo() {
   return (
-    <div className="flex w-full flex-col gap-4 p-6">
+    <div className="flex w-full flex-col gap-4">
       <Message from="assistant">
         <MessageContent>
           Here's a quick example of how to use React hooks. The useState hook lets you add state to

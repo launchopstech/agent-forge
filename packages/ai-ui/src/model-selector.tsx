@@ -213,7 +213,7 @@ export default function ModelSelectorDemo() {
   const chefs = Array.from(new Set(models.map((model) => model.chef)))
 
   return (
-    <div className="flex size-full items-center justify-center p-8">
+    <div className="w-full">
       <ModelSelector onOpenChange={setOpen} open={open}>
         <ModelSelectorTrigger asChild>
           <Button className="w-[200px] justify-between" variant="outline">

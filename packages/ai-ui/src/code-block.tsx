@@ -183,7 +183,7 @@ export default function CodeBlockDemo() {
 }`
 
   return (
-    <div className="w-full max-w-2xl p-6">
+    <div className="w-full max-w-2xl">
       <CodeBlock code={code} language="jsx">
         <CodeBlockCopyButton
           onCopy={() => console.log('Copied code to clipboard')}
