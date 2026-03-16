@@ -120,3 +120,21 @@ describe('network errors', () => {
     await expect(apiClient.get('/api/test')).rejects.toThrow('Failed to fetch')
   })
 })
+
+describe('ApiError with non-JSON error body', () => {
+  it('sets data to undefined when error response body is not JSON', async () => {
+    vi.stubGlobal('fetch', () =>
+      Promise.resolve({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: () => Promise.reject(new SyntaxError('not json')),
+        text: () => Promise.resolve('Internal Server Error'),
+      } as Response)
+    )
+    const err = await apiClient.get('/api/broken').catch((e: unknown) => e)
+    expect(err).toBeInstanceOf(ApiError)
+    expect((err as ApiError).status).toBe(500)
+    expect((err as ApiError).data).toBeUndefined()
+  })
+})

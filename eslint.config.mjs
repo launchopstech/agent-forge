@@ -5,7 +5,16 @@ import jsxA11yPlugin from 'eslint-plugin-jsx-a11y'
 import i18next from 'eslint-plugin-i18next'
 
 const eslintConfig = [
-  { ignores: ['**/node_modules/**', '**/.next/**', '**/dist/**', '**/storybook-static/**', '**/coverage/**', '**/.storybook/**'] },
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/.next/**',
+      '**/dist/**',
+      '**/storybook-static/**',
+      '**/coverage/**',
+      '**/.storybook/**',
+    ],
+  },
   // ── React ─────────────────────────────────────────────────────────────────
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -53,10 +62,27 @@ const eslintConfig = [
         {
           markupOnly: true,
           ignoreAttribute: [
-            'className', 'class', 'href', 'src', 'alt', 'type', 'id', 'key',
-            'name', 'value', 'style', 'variant', 'size', 'side', 'align',
-            'asChild', 'suppressHydrationWarning', 'data-testid',
-            'aria-labelledby', 'aria-describedby', 'tabIndex',
+            'className',
+            'class',
+            'href',
+            'src',
+            'alt',
+            'type',
+            'id',
+            'key',
+            'name',
+            'value',
+            'style',
+            'variant',
+            'size',
+            'side',
+            'align',
+            'asChild',
+            'suppressHydrationWarning',
+            'data-testid',
+            'aria-labelledby',
+            'aria-describedby',
+            'tabIndex',
           ],
           i18nFunctionNames: ['t', 'useTranslations', 'getTranslations'],
         },
