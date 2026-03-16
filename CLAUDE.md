@@ -106,13 +106,14 @@ gh variable set NEXT_PUBLIC_APP_URL --body "$(vercel env pull --yes > /dev/null 
 1. Check `memory/MEMORY.md` to confirm which sub-tasks are already done — never re-implement completed work.
 2. Read the relevant section of `docs/specs/nextjs-frontend-specs.md` to understand acceptance criteria.
 
-### Gate checks — run ALL five before every commit
+### Gate checks — run ALL before every commit
 
 ```bash
 pnpm typecheck              # zero TS errors (ignoreBuildErrors masks them in build)
 pnpm lint                   # zero errors, zero warnings (no-console fires on console.*)
+pnpm format:check           # zero prettier violations (CI runs this; pre-commit hook only auto-fixes)
 pnpm build                  # production build must succeed
-pnpm test run               # all unit tests must pass (Vitest, ~2s)
+pnpm test:coverage          # all unit tests must pass AND coverage thresholds must be met
 pnpm exec storybook build   # all stories must compile
 pnpm analyze                # inspect bundle treemap (see bundle health checks below)
 ```
@@ -174,7 +175,7 @@ The active provider is selected by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|ok
 
 ### Code rules
 
-- **Never edit** files in `src/components/ui/` — shadcn/ui primitives, add via `pnpm dlx shadcn@latest add <component>`
+- **`packages/ui/src/` components are owned and editable** — shadcn/ui's philosophy is that components are copied into your repo for you to own. Edit them freely to fix bugs or adjust behavior. Add new components with `pnpm dlx shadcn@latest add <component>` (outputs to `packages/ui/src/` via `components.json`). Keep them generic — no app-specific imports (`@/config`, `@forge/brand`, `@forge/i18n`, etc.). App-specific logic belongs in `apps/web/src/components/`.
 - **Never hardcode copy** in layout components — all text comes from `src/config/` or props
 - **Never add `'use client'`** to Server Components (`MarketingLayout`, `DashboardLayout`, `AuthLayout`, `Footer`) unless the spec explicitly requires it
 - **Never commit** build artifacts: `.next/`, `storybook-static/`, `out/`
