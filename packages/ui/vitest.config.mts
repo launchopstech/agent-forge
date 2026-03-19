@@ -12,7 +12,11 @@ export default defineConfig({
       provider: 'v8',
       // Only cover utility logic — shadcn/ui components are primitives
       // (never edited directly per project rules) and are validated via Storybook/E2E
-      include: ['src/utils.ts'],
+      include: [
+        'src/utils.ts',
+        'src/theme-editor/color-utils.ts',
+        'src/theme-editor/ThemeEditor.tsx',
+      ],
       exclude: [],
       thresholds: {
         lines: 80,

@@ -19,6 +19,7 @@ export default defineConfig({
         'src/config/client-b.ts', // static brand config data — no logic to test
         'src/config/client-a.ts', // static brand config data — no logic to test
         'src/config/default.ts', // static brand config data — no logic to test
+        'src/persistence/types.ts', // pure TypeScript interface — no runtime code to cover
       ],
       thresholds: {
         lines: 80,

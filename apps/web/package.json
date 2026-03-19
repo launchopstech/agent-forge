@@ -99,6 +99,7 @@
     "@playwright/test": "catalog:",
     "@storybook/addon-a11y": "catalog:",
     "@storybook/addon-essentials": "catalog:",
+    "@storybook/manager-api": "catalog:",
     "@storybook/addon-themes": "catalog:",
     "@storybook/nextjs": "catalog:",
     "@storybook/react": "catalog:",

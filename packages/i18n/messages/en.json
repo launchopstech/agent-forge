@@ -19,7 +19,8 @@
     "login": "Log in",
     "signup": "Sign up",
     "logout": "Log out",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "adminTheme": "Theme Editor"
   },
   "auth": {
     "loginTitle": "Welcome back",
@@ -52,7 +53,9 @@
     "integrations": "Integrations",
     "team": "Team",
     "settings": "Settings",
-    "help": "Help"
+    "help": "Help",
+    "theme": "Theme",
+    "adminTheme": "Theme Editor"
   },
   "ui": {
     "close": "Close",
@@ -65,6 +68,14 @@
     "breadcrumbNav": "breadcrumb",
     "goToPreviousPage": "Go to previous page",
     "goToNextPage": "Go to next page"
+  },
+  "adminTheme": {
+    "title": "Theme Editor",
+    "save": "Save theme",
+    "reset": "Reset to defaults",
+    "export": "Export CSS",
+    "saved": "Theme saved",
+    "brandSelector": "Editing brand"
   },
   "marketing": {
     "announcement": "New: Enterprise features now available.",
