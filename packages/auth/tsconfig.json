@@ -1,0 +1,12 @@
+{
+  "extends": "@forge/tsconfig/react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@forge/config": ["../../packages/config/src/index.ts"],
+      "@forge/config/src/*": ["../../packages/config/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "coverage"]
+}

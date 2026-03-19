@@ -1,0 +1,32 @@
+{
+  "name": "@forge/auth",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/auth.ts",
+    "./middleware": "./src/middleware-registry.ts",
+    "./provider": "./src/auth-provider.tsx",
+    "./contracts": "./src/contracts.ts",
+    "./adapters/clerk/server": "./src/adapters/clerk/server.ts",
+    "./adapters/clerk/middleware": "./src/adapters/clerk/middleware.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@forge/config": "workspace:*",
+    "@forge/tsconfig": "workspace:*",
+    "@clerk/nextjs": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@types/node": "catalog:"
+  }
+}
