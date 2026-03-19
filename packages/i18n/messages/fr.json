@@ -36,7 +36,19 @@
     "overview": "Vue d'ensemble",
     "activeAgents": "Agents actifs",
     "workflows": "Flux de travail",
-    "runsToday": "Exécutions aujourd'hui"
+    "runsToday": "Exécutions aujourd'hui",
+    "totalRuns": "Exécutions totales",
+    "totalRunsChange": "+20,1 % par rapport au mois dernier",
+    "activeAgentsChange": "+2 par rapport au mois dernier",
+    "activeWorkflows": "Flux de travail actifs",
+    "activeWorkflowsChange": "+4 depuis hier",
+    "successRate": "Taux de réussite",
+    "successRateChange": "+1,2 % par rapport au mois dernier",
+    "monthlyOverview": "Vue mensuelle",
+    "monthlyOverviewDesc": "Exécutions d'agents par mois",
+    "recentActivity": "Activité récente",
+    "recentActivityDesc": "5 dernières exécutions d'agents ce mois-ci",
+    "downloadReport": "Télécharger le rapport"
   },
   "errors": {
     "notFound": "Page introuvable",

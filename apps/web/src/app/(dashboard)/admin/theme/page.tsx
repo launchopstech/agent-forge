@@ -9,7 +9,7 @@ import { ThemeEditor } from '@forge/ui/src/theme-editor/ThemeEditor'
 import { DEFAULT_LIGHT_VARS, DEFAULT_DARK_VARS } from '@forge/ui/src/theme-editor/constants'
 import { getBrand, themeStore } from '@forge/brand'
 
-const BRAND_KEYS = ['default', 'client-a', 'client-b']
+const BRAND_KEYS = ['default', 'client-a', 'client-b', 'mindrithm']
 
 export default function AgencyThemePage() {
   const t = useTranslations('adminTheme')

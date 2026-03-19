@@ -44,6 +44,7 @@ const preview: Preview = {
           { value: 'default', title: 'Default (Purple)' },
           { value: 'client-a', title: 'Client A (Blue)' },
           { value: 'client-b', title: 'Client B (Green)' },
+          { value: 'mindrithm', title: 'MindRithm (Indigo)' },
         ],
         showName: true,
         dynamicTitle: true,

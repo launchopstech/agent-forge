@@ -1,17 +1,19 @@
 import { defaultBrand } from './default'
 import { clientABrand } from './client-a'
 import { clientBBrand } from './client-b'
+import { mindRithmBrand } from './mindrithm'
 import type { BrandConfig } from './types'
 
 export type { BrandConfig } from './types'
 export type { BrandColors, BrandAssets, BrandSiteConfig } from './types'
 
-export type BrandKey = 'default' | 'client-a' | 'client-b'
+export type BrandKey = 'default' | 'client-a' | 'client-b' | 'mindrithm'
 
 const brandRegistry: Record<BrandKey, BrandConfig> = {
   default: defaultBrand,
   'client-a': clientABrand,
   'client-b': clientBBrand,
+  mindrithm: mindRithmBrand,
 }
 
 export function getBrand(key: string): BrandConfig {
@@ -25,4 +27,4 @@ export function getBrand(key: string): BrandConfig {
  */
 export const activeBrand: BrandConfig = getBrand(process.env.NEXT_PUBLIC_BRAND ?? 'default')
 
-export { defaultBrand, clientABrand, clientBBrand }
+export { defaultBrand, clientABrand, clientBBrand, mindRithmBrand }

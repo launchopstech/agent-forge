@@ -36,7 +36,19 @@
     "overview": "Overview",
     "activeAgents": "Active Agents",
     "workflows": "Workflows",
-    "runsToday": "Runs Today"
+    "runsToday": "Runs Today",
+    "totalRuns": "Total Runs",
+    "totalRunsChange": "+20.1% from last month",
+    "activeAgentsChange": "+2 from last month",
+    "activeWorkflows": "Active Workflows",
+    "activeWorkflowsChange": "+4 since yesterday",
+    "successRate": "Success Rate",
+    "successRateChange": "+1.2% from last month",
+    "monthlyOverview": "Monthly Overview",
+    "monthlyOverviewDesc": "Agent runs per month",
+    "recentActivity": "Recent Activity",
+    "recentActivityDesc": "Last 5 agent runs this month",
+    "downloadReport": "Download Report"
   },
   "errors": {
     "notFound": "Page not found",
