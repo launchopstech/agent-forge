@@ -44,11 +44,12 @@ Push to `main` — Vercel auto-deploys. Each Vercel project independently builds
 
 ## Brand values
 
-| `NEXT_PUBLIC_BRAND` | Description                       |
-| ------------------- | --------------------------------- |
-| `default`           | AgentForge purple brand (hue 280) |
-| `client-a`          | Blue brand (hue 220)              |
-| `client-b`          | Green brand (hue 150)             |
+| `NEXT_PUBLIC_BRAND` | Description                          |
+| ------------------- | ------------------------------------ |
+| `default`           | AgentForge purple brand (hue 280)    |
+| `mindrithm`         | MindRithm indigo/slate (Clean Slate) |
+| `client-a`          | Blue brand (hue 220)                 |
+| `client-b`          | Green brand (hue 150)                |
 
 ## Adding a new brand
 

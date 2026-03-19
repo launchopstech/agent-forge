@@ -1,3 +1,4 @@
+import { Paintbrush } from 'lucide-react'
 import type { NavGroup, NavItem } from './types'
 
 export const marketingNavItems: NavItem[] = [
@@ -23,6 +24,16 @@ export const dashboardNavGroups: NavGroup[] = [
       { label: 'Team', labelKey: 'team', href: '/dashboard/team' },
     ],
   },
+]
+
+// Agency-only: edit any client brand (protected by forge_role === 'agency')
+export const dashboardAdminNavItems: NavItem[] = [
+  { label: 'Theme Editor', labelKey: 'adminTheme', href: '/admin/theme', icon: Paintbrush },
+]
+
+// Client admin: edit only their own brand instance
+export const dashboardClientNavItems: NavItem[] = [
+  { label: 'Theme', labelKey: 'theme', href: '/dashboard/theme', icon: Paintbrush },
 ]
 
 export const dashboardFooterNavItems: NavItem[] = [
