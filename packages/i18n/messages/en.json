@@ -67,7 +67,8 @@
     "settings": "Settings",
     "help": "Help",
     "theme": "Theme",
-    "adminTheme": "Theme Editor"
+    "adminTheme": "Theme Editor",
+    "workspaceLabel": "Workspace"
   },
   "ui": {
     "close": "Close",
@@ -88,6 +89,123 @@
     "export": "Export CSS",
     "saved": "Theme saved",
     "brandSelector": "Editing brand"
+  },
+  "agentHub": {
+    "dashboard": {
+      "title": "Agent Hub",
+      "newAgent": "New Agent",
+      "yourAgents": "Your Agents",
+      "insights": "Insights",
+      "totalConversations": "Total Conversations",
+      "resolutionRate": "Resolution Rate",
+      "handoffRate": "Handoff Rate",
+      "avgResponseTime": "Avg. Response Time",
+      "fromLastMonth": "from last month",
+      "noChange": "No change",
+      "last7Days": "Last 7 days",
+      "unresolvedIntents": "Unresolved Intents",
+      "agentName": "Agent Name",
+      "channels": "Channels",
+      "conversations": "Conversations",
+      "resolution": "Resolution",
+      "csat": "CSAT",
+      "status": "Status",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "templates": {
+      "title": "Choose a template",
+      "subtitle": "Start with a pre-built template or build from scratch",
+      "previewActions": "Actions",
+      "previewKnowledge": "Knowledge",
+      "previewChannels": "Channels",
+      "none": "None",
+      "useTemplate": "Use template",
+      "selectToPreview": "Select a template to preview details"
+    },
+    "builder": {
+      "progress": "Progress",
+      "untitled": "Untitled Agent",
+      "buildingAgent": "Building agent",
+      "next": "Next",
+      "back": "Back",
+      "sections": {
+        "identity": "Identity",
+        "behaviour": "Behaviour",
+        "actions": "Actions",
+        "knowledge": "Knowledge",
+        "channels": "Channels"
+      },
+      "identity": {
+        "title": "Agent Identity",
+        "subtitle": "Define how your agent presents itself to users",
+        "nameLabel": "Agent name",
+        "namePlaceholder": "e.g. Support Assistant",
+        "welcomeMessageLabel": "Welcome message",
+        "welcomeMessagePlaceholder": "Hi! How can I help you today?",
+        "toneLabel": "Tone",
+        "toneProfessional": "Professional",
+        "toneFriendly": "Friendly",
+        "toneFormal": "Formal",
+        "toneCasual": "Casual",
+        "languageLabel": "Language",
+        "langEnUS": "English (US)",
+        "langEnGB": "English (UK)",
+        "langFrFR": "Français",
+        "langEsES": "Español",
+        "langDeDe": "Deutsch"
+      },
+      "behaviour": {
+        "title": "Agent Behaviour",
+        "subtitle": "Define how your agent responds and handles edge cases",
+        "systemPromptLabel": "System prompt",
+        "systemPromptTip": "Describe your agent's role, goals, and any specific instructions. Be clear and specific.",
+        "systemPromptPlaceholder": "You are a helpful assistant that...",
+        "responseStyleLabel": "Response style",
+        "styleConcise": "Concise",
+        "styleDetailed": "Detailed",
+        "responseStyleValue": "Style: {value}/100",
+        "fallbackLabel": "Fallback action",
+        "fallbackHandoff": "Handoff to human agent",
+        "fallbackTicket": "Create support ticket",
+        "fallbackEmail": "Send email notification",
+        "fallbackHint": "What happens when the agent cannot resolve a query"
+      },
+      "actions": {
+        "title": "Agent Actions",
+        "subtitle": "Select what actions your agent can perform",
+        "selectedCount": "{count} actions selected"
+      },
+      "knowledge": {
+        "title": "Knowledge Base",
+        "subtitle": "Choose which knowledge sources your agent can access",
+        "selectedCount": "{count} sources selected"
+      },
+      "channels": {
+        "title": "Deployment Channels",
+        "subtitle": "Choose where to deploy your agent",
+        "channelWeb": "Web Widget",
+        "channelWhatsApp": "WhatsApp",
+        "channelEmail": "Email",
+        "channelSlack": "Slack",
+        "embedCode": "Embed Code",
+        "embedCodeHint": "Add this snippet to your website to activate the web widget",
+        "active": "Active",
+        "copy": "Copy code",
+        "finish": "Finish & Save"
+      }
+    },
+    "testChat": {
+      "title": "Test Chat",
+      "agentName": "Agent",
+      "clear": "Clear chat",
+      "emptyState": "Send a message to test your agent",
+      "inputPlaceholder": "Type a message…",
+      "send": "Send",
+      "defaultReply": "I'm here to help! (This is a simulated response)",
+      "confidence": "{value}% confidence"
+    }
   },
   "marketing": {
     "announcement": "New: Enterprise features now available.",

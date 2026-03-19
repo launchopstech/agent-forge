@@ -11,6 +11,7 @@ interface DashboardLayoutProps {
   footerItems?: NavItem[]
   showSidebar?: boolean
   showTopbar?: boolean
+  workspaceName?: string
   topbarRightSlot?: React.ReactNode
   className?: string
 }
@@ -21,13 +22,20 @@ export function DashboardLayout({
   footerItems,
   showSidebar = true,
   showTopbar = true,
+  workspaceName,
   topbarRightSlot,
   className,
 }: DashboardLayoutProps) {
   if (!showSidebar) {
     return (
       <div className={cn('min-h-screen bg-background flex flex-col', className)}>
-        {showTopbar && <Topbar showSidebarTrigger={false} rightSlot={topbarRightSlot} />}
+        {showTopbar && (
+          <Topbar
+            showSidebarTrigger={false}
+            workspaceName={workspaceName}
+            rightSlot={topbarRightSlot}
+          />
+        )}
         <main className="flex-1 p-6">{children}</main>
       </div>
     )
@@ -37,7 +45,7 @@ export function DashboardLayout({
     <SidebarProvider className={className}>
       <AppSidebar navGroups={navGroups} footerItems={footerItems} />
       <SidebarInset className="min-w-0">
-        {showTopbar && <Topbar rightSlot={topbarRightSlot} />}
+        {showTopbar && <Topbar workspaceName={workspaceName} rightSlot={topbarRightSlot} />}
         <div className="flex-1 p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>

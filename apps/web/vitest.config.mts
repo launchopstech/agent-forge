@@ -14,7 +14,12 @@ export default defineConfig({
     setupFiles: ['./src/test-setup.ts'],
     coverage: {
       provider: 'v8',
-      include: ['src/lib/**', 'src/hooks/**'],
+      include: [
+        'src/lib/**',
+        'src/hooks/**',
+        'src/features/agents/api/**',
+        'src/features/agents/store/**',
+      ],
       exclude: [
         'src/lib/auth/**', // auth adapters are intentional NotImplementedError stubs
         'src/lib/auth.ts', // auth registry proxy — integration tested via E2E

@@ -67,7 +67,8 @@
     "settings": "Paramètres",
     "help": "Aide",
     "theme": "Thème",
-    "adminTheme": "Éditeur de thème"
+    "adminTheme": "Éditeur de thème",
+    "workspaceLabel": "Espace de travail"
   },
   "ui": {
     "close": "Fermer",
@@ -88,6 +89,123 @@
     "export": "Exporter CSS",
     "saved": "Thème enregistré",
     "brandSelector": "Marque en cours d'édition"
+  },
+  "agentHub": {
+    "dashboard": {
+      "title": "Hub des agents",
+      "newAgent": "Nouvel agent",
+      "yourAgents": "Vos agents",
+      "insights": "Statistiques",
+      "totalConversations": "Conversations totales",
+      "resolutionRate": "Taux de résolution",
+      "handoffRate": "Taux de transfert",
+      "avgResponseTime": "Temps de réponse moyen",
+      "fromLastMonth": "par rapport au mois dernier",
+      "noChange": "Aucun changement",
+      "last7Days": "7 derniers jours",
+      "unresolvedIntents": "Intentions non résolues",
+      "agentName": "Nom de l'agent",
+      "channels": "Canaux",
+      "conversations": "Conversations",
+      "resolution": "Résolution",
+      "csat": "CSAT",
+      "status": "Statut",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "templates": {
+      "title": "Choisir un modèle",
+      "subtitle": "Démarrez avec un modèle préconfiguré ou créez depuis zéro",
+      "previewActions": "Actions",
+      "previewKnowledge": "Connaissances",
+      "previewChannels": "Canaux",
+      "none": "Aucun",
+      "useTemplate": "Utiliser ce modèle",
+      "selectToPreview": "Sélectionnez un modèle pour voir les détails"
+    },
+    "builder": {
+      "progress": "Progression",
+      "untitled": "Agent sans titre",
+      "buildingAgent": "Construction de l'agent",
+      "next": "Suivant",
+      "back": "Retour",
+      "sections": {
+        "identity": "Identité",
+        "behaviour": "Comportement",
+        "actions": "Actions",
+        "knowledge": "Connaissances",
+        "channels": "Canaux"
+      },
+      "identity": {
+        "title": "Identité de l'agent",
+        "subtitle": "Définissez comment votre agent se présente aux utilisateurs",
+        "nameLabel": "Nom de l'agent",
+        "namePlaceholder": "ex. : Assistant support",
+        "welcomeMessageLabel": "Message de bienvenue",
+        "welcomeMessagePlaceholder": "Bonjour ! Comment puis-je vous aider ?",
+        "toneLabel": "Ton",
+        "toneProfessional": "Professionnel",
+        "toneFriendly": "Amical",
+        "toneFormal": "Formel",
+        "toneCasual": "Décontracté",
+        "languageLabel": "Langue",
+        "langEnUS": "Anglais (US)",
+        "langEnGB": "Anglais (UK)",
+        "langFrFR": "Français",
+        "langEsES": "Espagnol",
+        "langDeDe": "Allemand"
+      },
+      "behaviour": {
+        "title": "Comportement de l'agent",
+        "subtitle": "Définissez comment votre agent répond et gère les cas limites",
+        "systemPromptLabel": "Prompt système",
+        "systemPromptTip": "Décrivez le rôle, les objectifs et les instructions spécifiques de votre agent.",
+        "systemPromptPlaceholder": "Vous êtes un assistant utile qui...",
+        "responseStyleLabel": "Style de réponse",
+        "styleConcise": "Concis",
+        "styleDetailed": "Détaillé",
+        "responseStyleValue": "Style : {value}/100",
+        "fallbackLabel": "Action de repli",
+        "fallbackHandoff": "Transférer à un agent humain",
+        "fallbackTicket": "Créer un ticket de support",
+        "fallbackEmail": "Envoyer une notification par e-mail",
+        "fallbackHint": "Ce qui se passe quand l'agent ne peut pas résoudre une demande"
+      },
+      "actions": {
+        "title": "Actions de l'agent",
+        "subtitle": "Sélectionnez les actions que votre agent peut effectuer",
+        "selectedCount": "{count} action(s) sélectionnée(s)"
+      },
+      "knowledge": {
+        "title": "Base de connaissances",
+        "subtitle": "Choisissez les sources de connaissances accessibles à votre agent",
+        "selectedCount": "{count} source(s) sélectionnée(s)"
+      },
+      "channels": {
+        "title": "Canaux de déploiement",
+        "subtitle": "Choisissez où déployer votre agent",
+        "channelWeb": "Widget web",
+        "channelWhatsApp": "WhatsApp",
+        "channelEmail": "E-mail",
+        "channelSlack": "Slack",
+        "embedCode": "Code d'intégration",
+        "embedCodeHint": "Ajoutez ce code sur votre site pour activer le widget web",
+        "active": "Actif",
+        "copy": "Copier le code",
+        "finish": "Terminer et enregistrer"
+      }
+    },
+    "testChat": {
+      "title": "Chat de test",
+      "agentName": "Agent",
+      "clear": "Effacer le chat",
+      "emptyState": "Envoyez un message pour tester votre agent",
+      "inputPlaceholder": "Saisir un message…",
+      "send": "Envoyer",
+      "defaultReply": "Je suis là pour vous aider ! (Réponse simulée)",
+      "confidence": "{value}% de confiance"
+    }
   },
   "marketing": {
     "announcement": "Nouveau : Les fonctionnalités Enterprise sont disponibles.",

@@ -1,7 +1,7 @@
 import { buildMiddleware } from '@forge/auth/middleware'
 
 export default buildMiddleware(
-  ['/dashboard(.*)', '/admin(.*)'], // protected routes — require auth
+  ['/dashboard(.*)', '/admin(.*)', '/agents(.*)'], // protected routes — require auth
   ['/login(.*)', '/signup(.*)', '/forgot-password(.*)'] // auth routes — redirect away if authed
 )
 
