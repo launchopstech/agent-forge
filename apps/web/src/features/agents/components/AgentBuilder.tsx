@@ -69,10 +69,10 @@ export const AgentBuilder = React.memo(function AgentBuilder({
   }, [agentId, storedAgentId, hydrateFromAgent])
 
   return (
-    <div className="grid grid-cols-[168px_1fr_300px] max-md:grid-cols-1 max-md:grid-rows-[auto_1fr_auto] max-md:h-auto h-[calc(100vh-3.5rem)] overflow-hidden">
-      {/* Left nav */}
-      <aside className="border-r bg-muted/30 flex flex-col overflow-y-auto">
-        <div className="px-4 py-4 shrink-0">
+    <div className="flex flex-col md:grid md:grid-cols-[168px_1fr_300px] h-[calc(100vh-3.5rem)] md:overflow-hidden">
+      {/* Left nav — horizontal scroll on mobile, fixed sidebar on desktop */}
+      <aside className="md:border-r bg-muted/30 flex flex-col shrink-0 md:overflow-y-auto border-b md:border-b-0">
+        <div className="px-4 py-3 shrink-0">
           <div className="font-semibold text-sm truncate">
             {draftAgent.identity.name || t('untitled')}
           </div>
@@ -82,12 +82,12 @@ export const AgentBuilder = React.memo(function AgentBuilder({
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto p-6">
+      <main className="flex-1 overflow-y-auto p-4 md:p-6">
         <SectionContent section={section} />
       </main>
 
-      {/* Right: test chat */}
-      <aside className="border-l flex flex-col overflow-hidden">
+      {/* Right: test chat — full width on mobile, fixed column on desktop */}
+      <aside className="md:border-l flex flex-col border-t md:border-t-0 h-[360px] md:h-auto md:overflow-hidden">
         <TestChatPanel />
       </aside>
     </div>

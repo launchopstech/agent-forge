@@ -36,23 +36,23 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
   return (
     <div className="space-y-6">
       {/* Secondary header — brand + workspace + action */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-bold tracking-tight text-sm select-none">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="font-bold tracking-tight text-sm select-none shrink-0">
             <span className="text-foreground">{prefix}</span>
             {accent && <span className="text-primary">{accent}</span>}
           </span>
           {ws && (
             <>
-              <span className="h-4 w-px bg-border mx-1" aria-hidden="true" />
-              <span className="text-sm text-muted-foreground">
+              <span className="h-4 w-px bg-border mx-1 shrink-0" aria-hidden="true" />
+              <span className="text-sm text-muted-foreground truncate">
                 {tSidebar('workspaceLabel')}:{' '}
                 <span className="font-medium text-foreground">{ws}</span>
               </span>
             </>
           )}
         </div>
-        <Button asChild size="sm">
+        <Button asChild size="sm" className="shrink-0">
           <Link href="/agents/new">
             <Plus className="mr-1.5 size-3.5" />
             {t('newAgent')}
@@ -61,7 +61,7 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
       </div>
 
       {isLoading || !metrics ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-xl" />
           ))}
@@ -70,7 +70,7 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
         <MetricsGrid metrics={metrics} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3 items-start">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3 items-start">
         <div className="lg:col-span-2">
           {isLoading ? (
             <Skeleton className="h-64 rounded-xl" />
