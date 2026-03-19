@@ -5,12 +5,20 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Plus } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@forge/ui/src/card'
 import { Skeleton } from '@forge/ui/src/skeleton'
+import { siteConfig } from '@/config'
 import { useAgentListStore } from '../store/agent-list.store'
 import { MetricsGrid } from './MetricsGrid'
 import { AgentTable } from './AgentTable'
 import { UnresolvedIntents } from './UnresolvedIntents'
+
+/** Split a name into [prefix, accent] for two-tone rendering */
+function splitName(name: string, accent?: string): [string, string] {
+  if (!accent) return [name.toLowerCase(), '']
+  const lower = name.toLowerCase()
+  const idx = lower.lastIndexOf(accent.toLowerCase())
+  return idx === -1 ? [lower, ''] : [lower.slice(0, idx), lower.slice(idx)]
+}
 
 export const AgentDashboard = React.memo(function AgentDashboard() {
   const t = useTranslations('agentHub.dashboard')
@@ -21,13 +29,32 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
     void loadAll()
   }, [loadAll])
 
+  const tSidebar = useTranslations('sidebar')
+  const [prefix, accent] = splitName(siteConfig.name, siteConfig.nameAccent)
+  const ws = siteConfig.workspaceName
+
   return (
     <div className="space-y-6">
+      {/* Secondary header — brand + workspace + action */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-        <Button asChild>
+        <div className="flex items-center gap-2">
+          <span className="font-bold tracking-tight text-sm select-none">
+            <span className="text-foreground">{prefix}</span>
+            {accent && <span className="text-primary">{accent}</span>}
+          </span>
+          {ws && (
+            <>
+              <span className="h-4 w-px bg-border mx-1" aria-hidden="true" />
+              <span className="text-sm text-muted-foreground">
+                {tSidebar('workspaceLabel')}:{' '}
+                <span className="font-medium text-foreground">{ws}</span>
+              </span>
+            </>
+          )}
+        </div>
+        <Button asChild size="sm">
           <Link href="/agents/new">
-            <Plus className="mr-2 size-4" />
+            <Plus className="mr-1.5 size-3.5" />
             {t('newAgent')}
           </Link>
         </Button>
@@ -43,34 +70,26 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
         <MetricsGrid metrics={metrics} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">{t('yourAgents')}</h2>
-          </div>
+      <div className="grid gap-6 lg:grid-cols-3 items-start">
+        <div className="lg:col-span-2">
           {isLoading ? (
             <Skeleton className="h-64 rounded-xl" />
           ) : (
-            <AgentTable agents={agents} onDelete={removeAgent} />
+            <AgentTable agents={agents} onDelete={removeAgent} title={t('yourAgents')} />
           )}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">{t('insights')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 rounded" />
-                ))}
-              </div>
-            ) : (
-              <UnresolvedIntents intents={unresolvedIntents} recommendation={recommendation} />
-            )}
-          </CardContent>
-        </Card>
+        <div className="space-y-1">
+          {isLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 rounded-xl" />
+              ))}
+            </div>
+          ) : (
+            <UnresolvedIntents intents={unresolvedIntents} recommendation={recommendation} />
+          )}
+        </div>
       </div>
     </div>
   )

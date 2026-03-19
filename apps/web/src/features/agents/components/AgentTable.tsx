@@ -17,6 +17,7 @@ import type { Agent, AgentStatus } from '../types'
 interface AgentTableProps {
   agents: Agent[]
   onDelete?: (id: string) => Promise<void> | void
+  title?: string
 }
 
 function statusVariant(status: AgentStatus): 'default' | 'secondary' | 'destructive' {
@@ -30,13 +31,20 @@ function statusVariant(status: AgentStatus): 'default' | 'secondary' | 'destruct
   }
 }
 
-export function AgentTable({ agents, onDelete }: AgentTableProps) {
+export function AgentTable({ agents, onDelete, title }: AgentTableProps) {
   const t = useTranslations('agentHub.dashboard')
 
   return (
     <div className="overflow-x-auto rounded-xl border">
       <Table>
         <TableHeader>
+          {title && (
+            <TableRow className="hover:bg-transparent border-b-0">
+              <TableHead colSpan={7} className="px-3 pt-4 pb-2">
+                <span className="text-base font-semibold text-foreground">{title}</span>
+              </TableHead>
+            </TableRow>
+          )}
           <TableRow>
             <TableHead className="px-3">{t('agentName')}</TableHead>
             <TableHead className="px-3">{t('channels')}</TableHead>

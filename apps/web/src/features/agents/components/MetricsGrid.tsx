@@ -68,6 +68,7 @@ interface FlipCardProps {
   value: string
   change: string
   positive: boolean | null
+  colorValue: boolean
   Icon: React.ElementType
   fromLastMonth: string
   chartLabel: string
@@ -78,6 +79,7 @@ function FlipCard({
   value,
   change,
   positive,
+  colorValue,
   Icon,
   fromLastMonth,
   chartLabel,
@@ -116,7 +118,18 @@ function FlipCard({
               <Icon className="size-3.5" />
             </span>
           </div>
-          <div className="text-2xl font-bold tracking-tight leading-none">{value}</div>
+          <div
+            className={cn(
+              'text-2xl font-bold tracking-tight leading-none',
+              !colorValue || positive === null
+                ? 'text-foreground'
+                : positive
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-amber-600 dark:text-amber-400'
+            )}
+          >
+            {value}
+          </div>
           <div className="flex items-center gap-1.5">
             <TrendChip change={change} positive={positive} />
             <span className="text-[10px] text-muted-foreground">{fromLastMonth}</span>
@@ -154,6 +167,7 @@ export function MetricsGrid({ metrics }: MetricsGridProps) {
           ? `+${metrics.totalConversationsChange}%`
           : `${metrics.totalConversationsChange}%`,
       positive: metrics.totalConversationsChange >= 0,
+      colorValue: false,
       Icon: MessageCircle,
     },
     {
@@ -165,6 +179,7 @@ export function MetricsGrid({ metrics }: MetricsGridProps) {
           ? `+${metrics.resolutionRateChange}%`
           : `${metrics.resolutionRateChange}%`,
       positive: metrics.resolutionRateChange >= 0,
+      colorValue: true,
       Icon: CheckCircle,
     },
     {
@@ -176,6 +191,7 @@ export function MetricsGrid({ metrics }: MetricsGridProps) {
           ? `+${metrics.handoffRateChange}%`
           : `${metrics.handoffRateChange}%`,
       positive: metrics.handoffRateChange <= 0,
+      colorValue: true,
       Icon: ArrowRightLeft,
     },
     {
@@ -185,19 +201,21 @@ export function MetricsGrid({ metrics }: MetricsGridProps) {
       change:
         metrics.avgResponseTimeChange === 0 ? t('noChange') : `${metrics.avgResponseTimeChange}%`,
       positive: metrics.avgResponseTimeChange === 0 ? null : metrics.avgResponseTimeChange <= 0,
+      colorValue: false,
       Icon: Clock,
     },
   ]
 
   return (
     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-      {cards.map(({ key, label, value, change, positive, Icon }) => (
+      {cards.map(({ key, label, value, change, positive, colorValue, Icon }) => (
         <FlipCard
           key={key}
           label={label}
           value={value}
           change={change}
           positive={positive}
+          colorValue={colorValue}
           Icon={Icon}
           fromLastMonth={t('fromLastMonth')}
           chartLabel={t('last7Days')}
