@@ -5,7 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', '.storybook/**/*.test.{ts,tsx}'],
     exclude: [
       'src/i18n/i18n.test.ts', // i18n tests live in @forge/i18n package
     ],

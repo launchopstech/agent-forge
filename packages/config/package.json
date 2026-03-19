@@ -14,18 +14,19 @@
   },
   "dependencies": {
     "@forge/tsconfig": "workspace:*",
+    "lucide-react": "^0.577.0",
     "zod": "catalog:"
   },
   "peerDependencies": {
     "react": "catalog:"
   },
   "devDependencies": {
-    "typescript": "catalog:",
-    "vitest": "catalog:",
+    "@types/react": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "vite-tsconfig-paths": "catalog:",
     "happy-dom": "catalog:",
-    "@types/react": "catalog:"
+    "typescript": "catalog:",
+    "vite-tsconfig-paths": "catalog:",
+    "vitest": "catalog:"
   }
 }

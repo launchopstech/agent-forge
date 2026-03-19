@@ -170,18 +170,24 @@ pnpm storybook
 
 ## ✨ Features
 
-### 🎨 **One-File Brand Swapping**
+### 🎨 **Visual Theme Editor**
 
-Change your entire color scheme by editing **one CSS file**:
+Edit every CSS variable **live** — no code required. Three surfaces:
+
+| Surface                    | Who uses it     | How                             |
+| -------------------------- | --------------- | ------------------------------- |
+| Storybook `🎨 Theme` panel | Designers, devs | `pnpm storybook` → addons panel |
+| `/admin/theme`             | Tenant admins   | Sidebar → Theme Editor          |
+| `/admin/theme/[brandKey]`  | Agency admins   | Manage any client brand         |
+
+Or edit the raw tokens file directly:
 
 ```css
-/* src/styles/tokens.css */
+/* apps/web/src/styles/tokens.css */
 --color-brand-500: oklch(0.57 0.17 280); /* Purple */
 --color-brand-500: oklch(0.57 0.17 230); /* → Blue */
 --color-brand-500: oklch(0.57 0.17 145); /* → Green */
 ```
-
-All components update instantly. No rebuild required.
 
 ### 📦 **Component Library**
 
@@ -340,6 +346,119 @@ src/app/globals.css     ← Imports tokens, maps to Tailwind utilities
 
 Full scale: `brand-50`, `brand-100`, ..., `brand-900`  
 Available as: `bg-brand-*`, `text-brand-*`, `border-brand-*`, `ring-brand-*`
+
+---
+
+## 🖌️ Visual Theme Editor
+
+The theme editor lets you change every CSS variable **live**, with no code edits required. Changes persist to localStorage and can be exported as ready-to-paste CSS.
+
+There are two surfaces: the **Storybook panel** (for designers / component review) and the **admin pages** (for tenant/agency admins in the deployed app).
+
+---
+
+### Storybook panel
+
+Launch Storybook and open the **🎨 Theme** tab in the addons panel at the bottom.
+
+```bash
+pnpm storybook
+# → http://localhost:6006
+```
+
+| Action                  | What it does                                                 |
+| ----------------------- | ------------------------------------------------------------ |
+| Change a color swatch   | Updates the canvas live via `FORGE_THEME_UPDATE` channel     |
+| Toggle Light / Dark     | Switches which variable set you are editing                  |
+| **Reset**               | Reverts to `DEFAULT_LIGHT_VARS` / `DEFAULT_DARK_VARS`        |
+| **Export CSS**          | Copies the full `:root { }` + `.dark { }` block to clipboard |
+| Switch brand in toolbar | Loads that brand's saved vars from localStorage              |
+
+Changes made in the panel are **auto-saved to localStorage per brand key** (`forge_theme_<brandKey>`), so they survive page reloads during a design session. They do **not** affect production — use Export CSS to hand off to a developer.
+
+---
+
+### Tenant admin page — `/admin/theme`
+
+Logged-in tenant admins can edit their brand's theme without touching code.
+
+1. Sign in and navigate to `/admin/theme` (also linked from the sidebar under **Theme Editor**)
+2. Expand any group (Core, Surfaces, Interactive, Shape, Sidebar, Charts)
+3. Use the color picker or type a raw `oklch(…)` value directly
+4. The page applies each change to the document root **instantly** (live preview)
+5. Click **Save theme** — persists to localStorage for that brand key
+6. Click **Reset to defaults** — removes the saved theme and re-applies the default tokens
+7. Click **Export CSS** — copies the full CSS block to clipboard for handoff
+
+> **Note:** `themeStore` currently uses localStorage. To persist themes across devices/sessions, swap the adapter in `packages/brand/src/persistence/index.ts` — see [CMS Swap](#cms-swap) below.
+
+---
+
+### Agency admin page — `/admin/theme/[brandKey]`
+
+Agency admins (users with the `forge_role: agency` Clerk claim) can edit any registered brand's theme.
+
+1. Navigate to `/admin/theme/client-a` (or any valid brand key)
+2. Use the **Editing brand** selector at the top to switch between brands without changing the URL
+3. Each brand's theme is stored independently under `forge_theme_<brandKey>`
+4. Non-agency users hitting this route are redirected to `/dashboard`
+
+Registered brand keys: `default`, `client-a`, `client-b` (defined in `packages/brand/src/config/index.ts`).
+
+---
+
+### Theme groups
+
+| Group           | Variables                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Core**        | `--background` `--foreground` `--primary` `--primary-foreground` `--ring`                                           |
+| **Surfaces**    | `--card` `--card-foreground` `--popover` `--popover-foreground` `--muted` `--muted-foreground` `--border` `--input` |
+| **Interactive** | `--secondary` `--secondary-foreground` `--accent` `--accent-foreground` `--destructive`                             |
+| **Shape**       | `--radius` (slider, 0 – 2 rem)                                                                                      |
+| **Sidebar**     | `--sidebar` `--sidebar-foreground` `--sidebar-primary` `--sidebar-accent` `--sidebar-border`                        |
+| **Charts**      | `--chart-1` … `--chart-5`                                                                                           |
+
+---
+
+### Color format — OKLCH
+
+All stored values use **OKLCH** (`oklch(L C H)`), a perceptually uniform color space:
+
+- **L** — lightness (0 = black, 1 = white)
+- **C** — chroma / saturation (0 = grey, ~0.2 = vivid)
+- **H** — hue angle (0–360°, e.g. 280 = purple, 230 = blue, 145 = green)
+
+The editor converts OKLCH ↔ hex automatically so the browser color picker works. You can always type raw OKLCH values in the text field.
+
+```
+oklch(0.35 0.15 280)   ← deep purple  (default primary, light mode)
+oklch(0.65 0.15 280)   ← medium purple (default primary, dark mode)
+oklch(0.35 0.15 230)   ← deep blue
+oklch(0.35 0.15 145)   ← deep green
+```
+
+---
+
+### Export → commit workflow
+
+1. Tweak colors in Storybook or `/admin/theme`
+2. Click **Export CSS** — copies the full block to clipboard
+3. Paste into `apps/web/src/styles/tokens.css` (replace `:root { }` and `.dark { }`)
+4. Run the gate checks and commit
+
+---
+
+### CMS swap
+
+The persistence layer is designed to be swapped. Replace localStorage with an API or CMS in one file:
+
+```ts
+// packages/brand/src/persistence/index.ts
+// SWAP POINT: replace with SanityThemeStore / ApiThemeStore when CMS is ready
+export const themeStore: ThemeStore = new LocalStorageThemeStore()
+```
+
+Implement `ThemeStore` from `packages/brand/src/persistence/types.ts` (`load`, `save`, `reset` methods) and swap the export — no changes needed in `ThemeEditor`, the Storybook panel, or admin pages.
 
 ---
 
