@@ -19,6 +19,10 @@ export interface NavGroup {
 
 export interface SiteConfig {
   name: string
+  /** Suffix of the name to render in the primary accent colour, e.g. 'Hub' for 'AgentHub' */
+  nameAccent?: string
+  /** Tenant / workspace display name shown in the topbar */
+  workspaceName?: string
   description: string
   url: string
   ogImage?: string

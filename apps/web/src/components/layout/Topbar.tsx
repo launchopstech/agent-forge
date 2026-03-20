@@ -31,6 +31,7 @@ export const Topbar = React.memo(function Topbar({
       )}
     >
       <div className="flex items-center gap-2">{showSidebarTrigger && <SidebarTrigger />}</div>
+
       <div className="flex items-center gap-3">{rightSlot ?? <UserAvatarPlaceholder />}</div>
     </header>
   )

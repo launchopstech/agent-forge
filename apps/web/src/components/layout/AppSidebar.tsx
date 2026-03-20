@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -14,6 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@forge/ui/src/sidebar'
 import { cn } from '@/lib/utils'
 import { siteConfig, dashboardNavGroups, dashboardFooterNavItems } from '@/config'
@@ -27,6 +28,16 @@ interface AppSidebarProps {
   className?: string
 }
 
+/** Split a name into [prefix, accent] parts for two-tone rendering */
+function splitName(name: string, accent?: string): [string, string] {
+  if (!accent) return [name.toLowerCase(), '']
+  const lower = name.toLowerCase()
+  const accentLower = accent.toLowerCase()
+  const idx = lower.lastIndexOf(accentLower)
+  if (idx === -1) return [lower, '']
+  return [lower.slice(0, idx), lower.slice(idx)]
+}
+
 export const AppSidebar = React.memo(function AppSidebar({
   navGroups = dashboardNavGroups,
   footerItems = dashboardFooterNavItems,
@@ -36,17 +47,73 @@ export const AppSidebar = React.memo(function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname()
   const t = useTranslations('sidebar')
-  const name = logoText ?? siteConfig.name
+  const { setOpen, state, isMobile } = useSidebar()
+
+  const rawName = logoText ?? siteConfig.name
+  const [prefix, accent] = splitName(rawName, logoText ? undefined : siteConfig.nameAccent)
+
+  const onAgentsRoute = pathname.startsWith('/agents')
+
+  // Tracks whether the current open state was triggered by hover (not by the SidebarTrigger).
+  // Only hover-opened sessions should collapse on mouse-leave.
+  // SidebarTrigger clicks never set this flag, so they stay permanently open/closed.
+  const hoverOpened = useRef(false)
+
+  // Track the previous route so we only collapse on TRANSITION into /agents,
+  // not on every re-render while already there.
+  // (shadcn's setOpen is re-created whenever `open` changes, so including it in
+  // deps would re-run this effect after every hover/trigger open and fight them.)
+  const prevOnAgentsRoute = useRef(false)
+
+  useEffect(() => {
+    const entering = onAgentsRoute && !prevOnAgentsRoute.current
+    prevOnAgentsRoute.current = onAgentsRoute
+
+    if (entering && !isMobile) {
+      hoverOpened.current = false
+      setOpen(false)
+    }
+  }, [onAgentsRoute, isMobile, setOpen])
+
+  // Hover-to-peek: expand while mouse is inside, collapse when it leaves —
+  // but only if WE opened it via hover (not the user via SidebarTrigger).
+  const handleMouseEnter = useCallback(() => {
+    if (state === 'collapsed' && !isMobile) {
+      hoverOpened.current = true
+      setOpen(true)
+    }
+  }, [state, setOpen, isMobile])
+
+  const handleMouseLeave = useCallback(() => {
+    if (hoverOpened.current && !isMobile) {
+      hoverOpened.current = false
+      setOpen(false)
+    }
+  }, [isMobile, setOpen])
 
   return (
-    <Sidebar collapsible="icon" className={cn(className)}>
+    <Sidebar
+      collapsible="icon"
+      className={cn(className)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
               <Link href={logoHref}>
-                <div className="h-8 w-8 rounded-lg bg-primary shrink-0" />
-                <span className="font-bold text-foreground">{name}</span>
+                {/* Icon mark — visible both expanded and icon-only */}
+                <div className="h-8 w-8 rounded-lg bg-primary shrink-0 flex items-center justify-center">
+                  <span className="text-sm font-bold text-primary-foreground select-none">
+                    {rawName.slice(0, 1).toUpperCase()}
+                  </span>
+                </div>
+                {/* Two-tone brand name — hidden when sidebar collapses to icon */}
+                <span className="font-bold tracking-tight">
+                  <span className="text-foreground">{prefix}</span>
+                  {accent && <span className="text-primary">{accent}</span>}
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -62,29 +129,33 @@ export const AppSidebar = React.memo(function AppSidebar({
               </SidebarGroupLabel>
             )}
             <SidebarMenu>
-              {group.items.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={
-                      item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label
-                    }
-                  >
-                    <Link href={item.href} className={cn(pathname === item.href && 'font-medium')}>
-                      {item.icon && <item.icon className="h-4 w-4" />}
-                      <span>
-                        {item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label}
-                      </span>
-                      {item.badge && (
-                        <span className="ml-auto text-xs font-medium text-muted-foreground">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {group.items.map((item) => {
+                const label = item.labelKey
+                  ? t(item.labelKey as Parameters<typeof t>[0])
+                  : item.label
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href || pathname.startsWith(item.href + '/')}
+                      tooltip={label}
+                    >
+                      <Link
+                        href={item.href}
+                        className={cn(pathname === item.href && 'font-medium')}
+                      >
+                        {item.icon && <item.icon className="h-4 w-4 shrink-0" />}
+                        <span>{label}</span>
+                        {item.badge && (
+                          <span className="ml-auto text-xs font-medium text-muted-foreground">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroup>
         ))}
@@ -93,21 +164,19 @@ export const AppSidebar = React.memo(function AppSidebar({
       {footerItems && footerItems.length > 0 && (
         <SidebarFooter>
           <SidebarMenu>
-            {footerItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  tooltip={item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label}
-                >
-                  <Link href={item.href}>
-                    {item.icon && <item.icon className="h-4 w-4" />}
-                    <span>
-                      {item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label}
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {footerItems.map((item) => {
+              const label = item.labelKey ? t(item.labelKey as Parameters<typeof t>[0]) : item.label
+              return (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild tooltip={label}>
+                    <Link href={item.href}>
+                      {item.icon && <item.icon className="h-4 w-4 shrink-0" />}
+                      <span>{label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
           </SidebarMenu>
         </SidebarFooter>
       )}

@@ -1,0 +1,31 @@
+{
+  "agents": [
+    {
+      "id": "1",
+      "name": "Customer Support Bot",
+      "channels": ["Web", "WhatsApp"],
+      "conversations": 9420,
+      "resolution": 82,
+      "csat": 4.6,
+      "status": "live"
+    },
+    {
+      "id": "2",
+      "name": "Lead Qualifier",
+      "channels": ["Web"],
+      "conversations": 2104,
+      "resolution": 71,
+      "csat": 4.2,
+      "status": "live"
+    },
+    {
+      "id": "3",
+      "name": "Order Assistant",
+      "channels": [],
+      "conversations": 0,
+      "resolution": null,
+      "csat": null,
+      "status": "draft"
+    }
+  ]
+}
