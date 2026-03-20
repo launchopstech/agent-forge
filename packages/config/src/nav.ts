@@ -1,4 +1,14 @@
-import { Paintbrush } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Bot,
+  GitBranch,
+  BarChart3,
+  Plug,
+  Users,
+  Settings,
+  HelpCircle,
+  Paintbrush,
+} from 'lucide-react'
 import type { NavGroup, NavItem } from './types'
 
 export const marketingNavItems: NavItem[] = [
@@ -10,18 +20,23 @@ export const marketingNavItems: NavItem[] = [
 export const dashboardNavGroups: NavGroup[] = [
   {
     items: [
-      { label: 'Overview', labelKey: 'overview', href: '/dashboard' },
-      { label: 'Agents', labelKey: 'agents', href: '/dashboard/agents' },
-      { label: 'Workflows', labelKey: 'workflows', href: '/dashboard/workflows' },
+      { label: 'Overview', labelKey: 'overview', href: '/dashboard', icon: LayoutDashboard },
+      { label: 'Agents', labelKey: 'agents', href: '/agents', icon: Bot },
+      { label: 'Workflows', labelKey: 'workflows', href: '/dashboard/workflows', icon: GitBranch },
     ],
   },
   {
     label: 'Manage',
     labelKey: 'manage',
     items: [
-      { label: 'Analytics', labelKey: 'analytics', href: '/dashboard/analytics' },
-      { label: 'Integrations', labelKey: 'integrations', href: '/dashboard/integrations' },
-      { label: 'Team', labelKey: 'team', href: '/dashboard/team' },
+      { label: 'Analytics', labelKey: 'analytics', href: '/dashboard/analytics', icon: BarChart3 },
+      {
+        label: 'Integrations',
+        labelKey: 'integrations',
+        href: '/dashboard/integrations',
+        icon: Plug,
+      },
+      { label: 'Team', labelKey: 'team', href: '/dashboard/team', icon: Users },
     ],
   },
 ]
@@ -37,8 +52,8 @@ export const dashboardClientNavItems: NavItem[] = [
 ]
 
 export const dashboardFooterNavItems: NavItem[] = [
-  { label: 'Settings', labelKey: 'settings', href: '/dashboard/settings' },
-  { label: 'Help', labelKey: 'help', href: '/dashboard/help' },
+  { label: 'Settings', labelKey: 'settings', href: '/dashboard/settings', icon: Settings },
+  { label: 'Help', labelKey: 'help', href: '/dashboard/help', icon: HelpCircle },
 ]
 
 export const footerNavColumns: Array<{ heading: string; items: NavItem[] }> = [
