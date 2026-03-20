@@ -118,13 +118,25 @@
       "delete": "Delete"
     },
     "templates": {
-      "title": "Choose a template",
-      "subtitle": "Start with a pre-built template or build from scratch",
+      "title": "Start from a template",
+      "subtitle": "Pick the closest match — you can customise everything after.",
+      "categoryAll": "All",
+      "categorySupport": "Support",
+      "categorySales": "Sales",
+      "categoryEcommerce": "E-commerce",
+      "categoryOnboarding": "Onboarding",
+      "previewIdentity": "Identity",
+      "previewBehaviour": "Behaviour",
       "previewActions": "Actions",
       "previewKnowledge": "Knowledge",
       "previewChannels": "Channels",
+      "prefillsSections": "Pre-fills all {count} sections",
+      "botName": "Bot name",
+      "welcomeAndTone": "Welcome message + tone preset",
       "none": "None",
       "useTemplate": "Use template",
+      "useTemplateNamed": "Use \"{name}\" →",
+      "noExtraSteps": "No extra steps — lands straight in builder",
       "selectToPreview": "Select a template to preview details"
     },
     "builder": {

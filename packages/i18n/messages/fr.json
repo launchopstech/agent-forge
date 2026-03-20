@@ -118,13 +118,25 @@
       "delete": "Supprimer"
     },
     "templates": {
-      "title": "Choisir un modèle",
-      "subtitle": "Démarrez avec un modèle préconfiguré ou créez depuis zéro",
+      "title": "Partir d'un modèle",
+      "subtitle": "Choisissez le plus proche — vous pourrez tout personnaliser ensuite.",
+      "categoryAll": "Tous",
+      "categorySupport": "Support",
+      "categorySales": "Ventes",
+      "categoryEcommerce": "E-commerce",
+      "categoryOnboarding": "Intégration",
+      "previewIdentity": "Identité",
+      "previewBehaviour": "Comportement",
       "previewActions": "Actions",
       "previewKnowledge": "Connaissances",
       "previewChannels": "Canaux",
+      "prefillsSections": "Pré-remplit les {count} sections",
+      "botName": "Nom du bot",
+      "welcomeAndTone": "Message de bienvenue + ton prédéfini",
       "none": "Aucun",
       "useTemplate": "Utiliser ce modèle",
+      "useTemplateNamed": "Utiliser « {name} » →",
+      "noExtraSteps": "Aucune étape supplémentaire — direction le builder",
       "selectToPreview": "Sélectionnez un modèle pour voir les détails"
     },
     "builder": {
