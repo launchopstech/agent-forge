@@ -3,8 +3,10 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Search } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
+import { Input } from '@forge/ui/src/input'
+import { Progress } from '@forge/ui/src/progress'
 import { Skeleton } from '@forge/ui/src/skeleton'
 import { cn } from '@forge/ui/src/utils'
 import { siteConfig } from '@/config'
@@ -37,6 +39,11 @@ const EMOJI_BG: Record<string, string> = {
   'order-assistant': 'bg-amber-50 dark:bg-amber-950/30',
   'user-onboarding': 'bg-violet-50 dark:bg-violet-950/30',
   'it-helpdesk': 'bg-red-50 dark:bg-red-950/30',
+  'appointment-scheduler': 'bg-cyan-50 dark:bg-cyan-950/30',
+  'product-recommender': 'bg-orange-50 dark:bg-orange-950/30',
+  'faq-bot': 'bg-teal-50 dark:bg-teal-950/30',
+  'survey-collector': 'bg-purple-50 dark:bg-purple-950/30',
+  'billing-assistant': 'bg-emerald-50 dark:bg-emerald-950/30',
   blank: 'bg-muted',
 }
 
@@ -61,6 +68,7 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
   const [selected, setSelected] = useState<AgentTemplate | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const [prefix, accent] = splitName(siteConfig.name, siteConfig.nameAccent)
   const ws = siteConfig.workspaceName
@@ -73,9 +81,19 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
   }, [])
 
   const filteredTemplates = useMemo(() => {
-    if (activeCategory === 'all') return templates
-    return templates.filter((tpl) => tpl.category === activeCategory || tpl.category === 'blank')
-  }, [templates, activeCategory])
+    let result = templates
+    if (activeCategory !== 'all') {
+      result = result.filter((tpl) => tpl.category === activeCategory || tpl.category === 'blank')
+    }
+    if (searchQuery.trim()) {
+      const query = searchQuery.trim().toLowerCase()
+      result = result.filter(
+        (tpl) =>
+          tpl.name.toLowerCase().includes(query) || tpl.description.toLowerCase().includes(query)
+      )
+    }
+    return result
+  }, [templates, activeCategory, searchQuery])
 
   const handleSelect = useCallback((template: AgentTemplate) => {
     setSelected(template)
@@ -88,12 +106,16 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
     router.push('/agents/new/identity')
   }, [applyTemplate, resetDraft, router, selected])
 
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+  }, [])
+
   const handleCategoryChange = useCallback((category: string) => {
     setActiveCategory(category)
   }, [])
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="flex h-full flex-col gap-3 overflow-hidden sm:gap-4">
       {/* Secondary header — brand + workspace */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -113,10 +135,16 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
         </div>
       </div>
 
-      {/* Page heading */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-        <p className="mt-1 text-muted-foreground">{t('subtitle')}</p>
+      {/* Step indicator + heading */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-3">
+          <p className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+            {t('stepIndicator', { step: 1, total: 3 })}
+          </p>
+          <Progress value={33} className="h-1 flex-1" />
+        </div>
+        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{t('title')}</h1>
+        <p className="text-xs text-muted-foreground sm:text-sm">{t('subtitle')}</p>
       </div>
 
       {/* Category filter bar */}
@@ -127,7 +155,7 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
             variant="ghost"
             size="sm"
             className={cn(
-              'h-8 rounded-full text-xs',
+              'h-7 rounded-full text-xs',
               activeCategory === cat && 'bg-primary/10 text-primary hover:bg-primary/15'
             )}
             onClick={() => handleCategoryChange(cat)}
@@ -137,18 +165,36 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
         ))}
       </div>
 
-      {/* Grid + Preview */}
-      <div className="flex gap-6">
+      {/* Search */}
+      <div className="relative shrink-0">
+        <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+          <Search className="size-4 text-muted-foreground" />
+        </div>
+        <Input
+          type="text"
+          placeholder={t('searchPlaceholder')}
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="pl-9 [&]:appearance-none"
+        />
+      </div>
+
+      {/* Grid + Preview — scrollable area */}
+      <div className="flex min-h-0 flex-1 gap-4 overflow-hidden lg:gap-6">
         {/* Template grid */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-y-auto">
           {isLoading ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-32 rounded-xl" />
+                <Skeleton key={i} className="h-28 rounded-xl sm:h-32" />
               ))}
             </div>
+          ) : filteredTemplates.length === 0 ? (
+            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+              {t('noResults')}
+            </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
               {filteredTemplates.map((template) => {
                 const isBlank = template.category === 'blank'
                 const isSelected = selected?.id === template.id
@@ -158,7 +204,7 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
                     key={template.id}
                     type="button"
                     className={cn(
-                      'border-2 rounded-xl p-4 text-left cursor-pointer transition-all',
+                      'border-2 rounded-xl p-3 sm:p-4 text-left cursor-pointer transition-all',
                       'hover:border-primary/50 hover:shadow-sm',
                       isSelected && 'border-primary bg-primary/5 shadow-sm',
                       isBlank && !isSelected && 'border-dashed',
@@ -168,14 +214,14 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
                   >
                     <div
                       className={cn(
-                        'size-9 rounded-xl flex items-center justify-center text-lg mb-2.5',
+                        'size-8 sm:size-9 rounded-xl flex items-center justify-center text-base sm:text-lg mb-2',
                         EMOJI_BG[template.id] ?? 'bg-muted'
                       )}
                     >
                       {template.emoji}
                     </div>
-                    <div className="text-sm font-semibold">{template.name}</div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                    <div className="text-xs font-semibold sm:text-sm">{template.name}</div>
+                    <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5 sm:text-xs sm:mt-1">
                       {template.description}
                     </p>
                   </button>
@@ -184,11 +230,11 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
             </div>
           )}
 
-          {/* Mobile/tablet: action button when selected */}
+          {/* Mobile/tablet: CTA when selected */}
           {selected && (
-            <div className="mt-4 lg:hidden">
-              <Button className="w-full" onClick={handleContinue}>
-                {t('useTemplate')}
+            <div className="mt-3 pb-1 lg:hidden">
+              <Button className="w-full" size="sm" onClick={handleContinue}>
+                {t('useTemplateNamed', { name: selected.name })}
                 <ArrowRight className="ml-2 size-4" />
               </Button>
             </div>
@@ -196,9 +242,9 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
         </div>
 
         {/* Preview panel — desktop only */}
-        <div className="hidden lg:block w-72 shrink-0">
+        <div className="hidden lg:flex w-72 shrink-0 flex-col overflow-hidden">
           {selected ? (
-            <div className="sticky top-6 flex max-h-[calc(100vh-6rem)] flex-col rounded-xl border">
+            <div className="flex max-h-full flex-col rounded-xl border">
               {/* Header — pinned top */}
               <div className="flex items-center gap-3 border-b p-3 shrink-0">
                 <div

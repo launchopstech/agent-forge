@@ -34,11 +34,11 @@ export function DashboardLayout({
   }
 
   return (
-    <SidebarProvider className={className}>
+    <SidebarProvider className={cn('!h-svh !max-h-svh', className)}>
       <AppSidebar navGroups={navGroups} footerItems={footerItems} />
-      <SidebarInset className="min-w-0">
+      <SidebarInset className="min-w-0 overflow-hidden">
         {showTopbar && <Topbar rightSlot={topbarRightSlot} />}
-        <div className="flex-1 p-6">{children}</div>
+        <div className="flex flex-1 flex-col overflow-hidden p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )

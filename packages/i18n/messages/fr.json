@@ -137,7 +137,10 @@
       "useTemplate": "Utiliser ce modèle",
       "useTemplateNamed": "Utiliser « {name} » →",
       "noExtraSteps": "Aucune étape supplémentaire — direction le builder",
-      "selectToPreview": "Sélectionnez un modèle pour voir les détails"
+      "selectToPreview": "Sélectionnez un modèle pour voir les détails",
+      "stepIndicator": "Étape {step} sur {total} — Choisir un modèle",
+      "searchPlaceholder": "Rechercher des modèles...",
+      "noResults": "Aucun modèle ne correspond à votre recherche"
     },
     "builder": {
       "progress": "Progression",

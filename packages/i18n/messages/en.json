@@ -137,7 +137,10 @@
       "useTemplate": "Use template",
       "useTemplateNamed": "Use \"{name}\" →",
       "noExtraSteps": "No extra steps — lands straight in builder",
-      "selectToPreview": "Select a template to preview details"
+      "selectToPreview": "Select a template to preview details",
+      "stepIndicator": "Step {step} of {total} — Choose template",
+      "searchPlaceholder": "Search templates...",
+      "noResults": "No templates match your search"
     },
     "builder": {
       "progress": "Progress",
