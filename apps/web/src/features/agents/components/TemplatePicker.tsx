@@ -44,6 +44,14 @@ const EMOJI_BG: Record<string, string> = {
   'faq-bot': 'bg-teal-50 dark:bg-teal-950/30',
   'survey-collector': 'bg-purple-50 dark:bg-purple-950/30',
   'billing-assistant': 'bg-emerald-50 dark:bg-emerald-950/30',
+  'social-media-manager': 'bg-pink-50 dark:bg-pink-950/30',
+  'hr-assistant': 'bg-indigo-50 dark:bg-indigo-950/30',
+  'travel-planner': 'bg-sky-50 dark:bg-sky-950/30',
+  'code-reviewer': 'bg-slate-50 dark:bg-slate-950/30',
+  'event-coordinator': 'bg-yellow-50 dark:bg-yellow-950/30',
+  'inventory-tracker': 'bg-lime-50 dark:bg-lime-950/30',
+  'compliance-checker': 'bg-stone-50 dark:bg-stone-950/30',
+  'newsletter-writer': 'bg-rose-50 dark:bg-rose-950/30',
   blank: 'bg-muted',
 }
 
@@ -229,16 +237,6 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
               })}
             </div>
           )}
-
-          {/* Mobile/tablet: CTA when selected */}
-          {selected && (
-            <div className="mt-3 pb-1 lg:hidden">
-              <Button className="w-full" size="sm" onClick={handleContinue}>
-                {t('useTemplateNamed', { name: selected.name })}
-                <ArrowRight className="ml-2 size-4" />
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Preview panel — desktop only */}
@@ -325,6 +323,16 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
           )}
         </div>
       </div>
+
+      {/* Mobile/tablet: sticky CTA */}
+      {selected && (
+        <div className="shrink-0 border-t pt-3 lg:hidden">
+          <Button className="w-full" size="sm" onClick={handleContinue}>
+            {t('useTemplateNamed', { name: selected.name })}
+            <ArrowRight className="ml-2 size-4" />
+          </Button>
+        </div>
+      )}
     </div>
   )
 })

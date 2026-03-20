@@ -1,6 +1,27 @@
 {
   "templates": [
     {
+      "id": "blank",
+      "name": "Start from Scratch",
+      "emoji": "✨",
+      "category": "blank",
+      "description": "Build a custom agent from scratch",
+      "identity": {
+        "name": "My Assistant",
+        "welcomeMessage": "Hi! How can I help you today?",
+        "tone": "professional",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "",
+        "responseStyle": 50,
+        "fallback": "handoff"
+      },
+      "actions": [],
+      "knowledge": [],
+      "channels": []
+    },
+    {
       "id": "customer-support",
       "name": "Customer Support",
       "emoji": "💬",
@@ -211,25 +232,172 @@
       "channels": ["web", "email"]
     },
     {
-      "id": "blank",
-      "name": "Start from Scratch",
-      "emoji": "✨",
-      "category": "blank",
-      "description": "Build a custom agent from scratch",
+      "id": "social-media-manager",
+      "name": "Social Media Manager",
+      "emoji": "📱",
+      "category": "sales",
+      "description": "Draft posts, reply to comments, and track engagement",
       "identity": {
-        "name": "My Assistant",
-        "welcomeMessage": "Hi! How can I help you today?",
+        "name": "Social Bot",
+        "welcomeMessage": "Hi! Ready to boost your social presence?",
+        "tone": "friendly",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are a social media management assistant. Help users draft posts, schedule content, respond to comments, and analyze engagement metrics across platforms.",
+        "responseStyle": 70,
+        "fallback": "handoff"
+      },
+      "actions": ["Draft Post", "Schedule Content", "Analyze Engagement"],
+      "knowledge": ["Brand Guidelines", "Content Calendar", "Platform Best Practices"],
+      "channels": ["web", "slack"]
+    },
+    {
+      "id": "hr-assistant",
+      "name": "HR Assistant",
+      "emoji": "👥",
+      "category": "onboarding",
+      "description": "Answer employee questions about policies and benefits",
+      "identity": {
+        "name": "HR Bot",
+        "welcomeMessage": "Hi! I can help with HR questions.",
         "tone": "professional",
         "language": "en-US"
       },
       "behaviour": {
-        "systemPrompt": "",
-        "responseStyle": 50,
+        "systemPrompt": "You are an HR assistant. Help employees with questions about company policies, benefits enrollment, time-off requests, and onboarding procedures.",
+        "responseStyle": 30,
         "fallback": "handoff"
       },
-      "actions": [],
-      "knowledge": [],
-      "channels": []
+      "actions": ["Submit Time Off", "Check Benefits", "Open HR Case"],
+      "knowledge": ["Employee Handbook", "Benefits Guide", "Company Policies"],
+      "channels": ["web", "slack"]
+    },
+    {
+      "id": "travel-planner",
+      "name": "Travel Planner",
+      "emoji": "✈️",
+      "category": "ecommerce",
+      "description": "Search flights, hotels, and build itineraries",
+      "identity": {
+        "name": "Travel Bot",
+        "welcomeMessage": "Hi! Where are you headed?",
+        "tone": "friendly",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are a travel planning assistant. Help users find flights, compare hotels, build itineraries, and provide destination recommendations based on their preferences and budget.",
+        "responseStyle": 60,
+        "fallback": "handoff"
+      },
+      "actions": ["Search Flights", "Compare Hotels", "Build Itinerary"],
+      "knowledge": ["Destination Guides", "Travel Policies", "Loyalty Programs"],
+      "channels": ["web", "email"]
+    },
+    {
+      "id": "code-reviewer",
+      "name": "Code Reviewer",
+      "emoji": "🔍",
+      "category": "support",
+      "description": "Review pull requests and suggest improvements",
+      "identity": {
+        "name": "Code Review Bot",
+        "welcomeMessage": "Hi! Paste your code for review.",
+        "tone": "professional",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are a code review assistant. Analyze code for bugs, performance issues, security vulnerabilities, and style violations. Provide constructive feedback with suggested fixes.",
+        "responseStyle": 20,
+        "fallback": "ticket"
+      },
+      "actions": ["Review PR", "Run Linter", "Suggest Fix"],
+      "knowledge": ["Style Guide", "Security Checklist", "Best Practices"],
+      "channels": ["web", "slack"]
+    },
+    {
+      "id": "event-coordinator",
+      "name": "Event Coordinator",
+      "emoji": "🎉",
+      "category": "onboarding",
+      "description": "Plan events, manage RSVPs, and send reminders",
+      "identity": {
+        "name": "Event Bot",
+        "welcomeMessage": "Hi! Let's plan your event.",
+        "tone": "friendly",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are an event coordination assistant. Help users plan events, manage guest lists, send invitations, track RSVPs, and coordinate logistics.",
+        "responseStyle": 50,
+        "fallback": "email"
+      },
+      "actions": ["Create Event", "Send Invites", "Track RSVPs"],
+      "knowledge": ["Venue Directory", "Catering Options", "Event Templates"],
+      "channels": ["web", "email"]
+    },
+    {
+      "id": "inventory-tracker",
+      "name": "Inventory Tracker",
+      "emoji": "📊",
+      "category": "ecommerce",
+      "description": "Monitor stock levels and automate reorder alerts",
+      "identity": {
+        "name": "Inventory Bot",
+        "welcomeMessage": "Hi! Need a stock update?",
+        "tone": "professional",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are an inventory management assistant. Help users track stock levels, set reorder thresholds, generate inventory reports, and manage supplier communications.",
+        "responseStyle": 20,
+        "fallback": "ticket"
+      },
+      "actions": ["Check Stock", "Set Reorder Alert", "Generate Report"],
+      "knowledge": ["Product Catalog", "Supplier Directory", "Warehouse Policies"],
+      "channels": ["web", "email"]
+    },
+    {
+      "id": "compliance-checker",
+      "name": "Compliance Checker",
+      "emoji": "🛡️",
+      "category": "support",
+      "description": "Verify regulatory compliance and flag risks",
+      "identity": {
+        "name": "Compliance Bot",
+        "welcomeMessage": "Hi! Let me check your compliance status.",
+        "tone": "professional",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are a compliance verification assistant. Help users understand regulatory requirements, check document compliance, flag potential violations, and generate audit-ready reports.",
+        "responseStyle": 20,
+        "fallback": "ticket"
+      },
+      "actions": ["Run Compliance Check", "Flag Violation", "Generate Audit Report"],
+      "knowledge": ["Regulatory Database", "Compliance Policies", "Audit Templates"],
+      "channels": ["web"]
+    },
+    {
+      "id": "newsletter-writer",
+      "name": "Newsletter Writer",
+      "emoji": "✉️",
+      "category": "sales",
+      "description": "Draft, personalize, and schedule email campaigns",
+      "identity": {
+        "name": "Newsletter Bot",
+        "welcomeMessage": "Hi! Ready to craft your next email?",
+        "tone": "friendly",
+        "language": "en-US"
+      },
+      "behaviour": {
+        "systemPrompt": "You are a newsletter writing assistant. Help users draft compelling email content, segment audiences, personalize messaging, and schedule campaign sends.",
+        "responseStyle": 70,
+        "fallback": "handoff"
+      },
+      "actions": ["Draft Email", "Segment Audience", "Schedule Send"],
+      "knowledge": ["Brand Voice Guide", "Email Templates", "Campaign Analytics"],
+      "channels": ["web", "email"]
     }
   ]
 }
