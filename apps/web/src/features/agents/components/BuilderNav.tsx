@@ -39,8 +39,9 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
   )
 
   return (
-    <nav className="flex flex-col flex-1 p-3">
-      <div className="flex flex-col gap-0.5 flex-1">
+    // Mobile: horizontal scroll row. Desktop: vertical flex column filling sidebar.
+    <nav className="flex overflow-x-auto p-2 gap-1 md:flex-col md:flex-1 md:p-3 md:gap-0 md:overflow-visible">
+      <div className="flex gap-0.5 md:flex-col md:flex-1">
         {SECTIONS.map((section) => {
           const isActive = activeSection === section
           const isCompleted = completedSections.includes(section)
@@ -51,13 +52,16 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
               key={section}
               variant="ghost"
               className={cn(
-                'w-full justify-start gap-2 text-sm h-9 px-2',
+                // Mobile: compact pill, shrink-0 so it doesn't collapse in horizontal scroll
+                'shrink-0 gap-2 text-sm h-9 px-3',
+                // Desktop: full-width left-aligned row
+                'md:w-full md:justify-start md:px-2',
                 isActive && 'bg-accent text-accent-foreground font-medium'
               )}
               onClick={() => handleClick(section)}
             >
               <SectionIcon className="size-4 shrink-0 text-muted-foreground" />
-              <span className="flex-1 text-left truncate">{t(`sections.${section}`)}</span>
+              <span className="md:flex-1 text-left truncate">{t(`sections.${section}`)}</span>
               {isCompleted && (
                 <CheckCircle2 className="size-3 text-green-600 dark:text-green-400 shrink-0" />
               )}
@@ -66,8 +70,8 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
         })}
       </div>
 
-      {/* Progress at bottom */}
-      <div className="mt-auto pt-3 border-t space-y-1.5">
+      {/* Progress — desktop only (no room in horizontal mobile strip) */}
+      <div className="hidden md:block mt-auto pt-3 border-t space-y-1.5">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{t('progress')}</span>
           <span>{progressPercent}%</span>

@@ -69,10 +69,11 @@ export const AgentBuilder = React.memo(function AgentBuilder({
   }, [agentId, storedAgentId, hydrateFromAgent])
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-[168px_1fr_300px] h-[calc(100vh-3.5rem)] md:overflow-hidden">
+    <div className="flex flex-col md:grid md:grid-cols-[168px_1fr_300px] md:h-[calc(100vh-3.5rem)] md:overflow-hidden">
       {/* Left nav — horizontal scroll on mobile, fixed sidebar on desktop */}
       <aside className="md:border-r bg-muted/30 flex flex-col shrink-0 md:overflow-y-auto border-b md:border-b-0">
-        <div className="px-4 py-3 shrink-0">
+        {/* Title block — desktop only */}
+        <div className="hidden md:flex flex-col px-4 py-3 shrink-0">
           <div className="font-semibold text-sm truncate">
             {draftAgent.identity.name || t('untitled')}
           </div>
@@ -86,8 +87,8 @@ export const AgentBuilder = React.memo(function AgentBuilder({
         <SectionContent section={section} />
       </main>
 
-      {/* Right: test chat — full width on mobile, fixed column on desktop */}
-      <aside className="md:border-l flex flex-col border-t md:border-t-0 h-[360px] md:h-auto md:overflow-hidden">
+      {/* Right: test chat — 300px at bottom on mobile, fixed column on desktop */}
+      <aside className="border-t md:border-t-0 md:border-l flex flex-col h-[300px] md:h-auto md:overflow-hidden">
         <TestChatPanel />
       </aside>
     </div>
