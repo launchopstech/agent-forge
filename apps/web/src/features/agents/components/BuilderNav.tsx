@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { CheckCircle2, User, SlidersHorizontal, Zap, BookOpen, Radio } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
 import { Progress } from '@forge/ui/src/progress'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@forge/ui/src/tooltip'
 import { cn } from '@forge/ui/src/utils'
 import { useAgentBuilderStore } from '../store/agent-builder.store'
 import type { BuilderSection } from '../types'
@@ -39,45 +40,54 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
   )
 
   return (
-    // Mobile: horizontal scroll row. Desktop: vertical flex column filling sidebar.
-    <nav className="flex overflow-x-auto p-2 gap-1 md:flex-col md:flex-1 md:p-3 md:gap-0 md:overflow-visible">
-      <div className="flex gap-0.5 md:flex-col md:flex-1">
-        {SECTIONS.map((section) => {
-          const isActive = activeSection === section
-          const isCompleted = completedSections.includes(section)
-          const SectionIcon = SECTION_ICONS[section]
+    <TooltipProvider delayDuration={0}>
+      {/* Mobile: horizontal scroll row. Desktop: vertical flex column filling sidebar. */}
+      <nav className="flex overflow-x-auto p-2 gap-1 lg:flex-col lg:flex-1 lg:p-3 lg:gap-0 lg:overflow-visible">
+        <div className="flex gap-0.5 lg:flex-col lg:flex-1">
+          {SECTIONS.map((section) => {
+            const isActive = activeSection === section
+            const isCompleted = completedSections.includes(section)
+            const SectionIcon = SECTION_ICONS[section]
+            const label = t(`sections.${section}`)
 
-          return (
-            <Button
-              key={section}
-              variant="ghost"
-              className={cn(
-                // Mobile: compact pill, shrink-0 so it doesn't collapse in horizontal scroll
-                'shrink-0 gap-2 text-sm h-9 px-3',
-                // Desktop: full-width left-aligned row
-                'md:w-full md:justify-start md:px-2',
-                isActive && 'bg-accent text-accent-foreground font-medium'
-              )}
-              onClick={() => handleClick(section)}
-            >
-              <SectionIcon className="size-4 shrink-0 text-muted-foreground" />
-              <span className="md:flex-1 text-left truncate">{t(`sections.${section}`)}</span>
-              {isCompleted && (
-                <CheckCircle2 className="size-3 text-green-600 dark:text-green-400 shrink-0" />
-              )}
-            </Button>
-          )
-        })}
-      </div>
-
-      {/* Progress — desktop only (no room in horizontal mobile strip) */}
-      <div className="hidden md:block mt-auto pt-3 border-t space-y-1.5">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{t('progress')}</span>
-          <span>{progressPercent}%</span>
+            return (
+              <Tooltip key={section}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      // Mobile: compact pill with taller touch target, shrink-0 for horizontal scroll
+                      'shrink-0 gap-2 text-sm h-11 px-3',
+                      // Desktop: full-width left-aligned row
+                      'lg:w-full lg:justify-start lg:px-2 lg:h-9',
+                      isActive && 'bg-accent text-accent-foreground font-medium'
+                    )}
+                    onClick={() => handleClick(section)}
+                  >
+                    <SectionIcon className="size-4 shrink-0 text-muted-foreground" />
+                    <span className="lg:flex-1 text-left truncate">{label}</span>
+                    {isCompleted && (
+                      <CheckCircle2 className="size-3 text-green-600 dark:text-green-400 shrink-0" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="lg:hidden">
+                  {label}
+                </TooltipContent>
+              </Tooltip>
+            )
+          })}
         </div>
-        <Progress value={progressPercent} className="h-1.5" />
-      </div>
-    </nav>
+
+        {/* Progress — desktop only (no room in horizontal mobile strip) */}
+        <div className="hidden lg:block mt-auto pt-3 border-t space-y-1.5">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{t('progress')}</span>
+            <span>{progressPercent}%</span>
+          </div>
+          <Progress value={progressPercent} className="h-1.5" />
+        </div>
+      </nav>
+    </TooltipProvider>
   )
 }

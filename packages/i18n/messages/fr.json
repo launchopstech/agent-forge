@@ -115,7 +115,20 @@
       "status": "Statut",
       "actions": "Actions",
       "edit": "Modifier",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "viewAgent": "[TODO] Voir l'agent",
+      "showing": "[TODO] Affichage {from}–{to} sur {total}",
+      "pageOf": "[TODO] Page {page} sur {pages}",
+      "prev": "[TODO] Précédent",
+      "next": "[TODO] Suivant",
+      "error": "[TODO] Une erreur est survenue lors du chargement.",
+      "retry": "[TODO] Réessayer",
+      "searchAgents": "[TODO] Rechercher des agents…",
+      "filterByStatus": "[TODO] Filtrer par statut",
+      "allStatuses": "[TODO] Tous les statuts",
+      "statusLive": "[TODO] Live",
+      "statusDraft": "[TODO] Brouillon",
+      "statusPaused": "[TODO] En pause"
     },
     "templates": {
       "title": "Partir d'un modèle",
@@ -148,6 +161,8 @@
       "buildingAgent": "Construction de l'agent",
       "next": "Suivant",
       "back": "Retour",
+      "openTestChat": "[TODO] Ouvrir le chat de test",
+      "closeTestChat": "[TODO] Fermer le chat de test",
       "sections": {
         "identity": "Identité",
         "behaviour": "Comportement",
@@ -222,7 +237,8 @@
       "inputPlaceholder": "Saisir un message…",
       "send": "Envoyer",
       "defaultReply": "Je suis là pour vous aider ! (Réponse simulée)",
-      "confidence": "{value}% de confiance"
+      "confidence": "{value}% de confiance",
+      "typing": "[TODO] Saisie en cours…"
     }
   },
   "marketing": {

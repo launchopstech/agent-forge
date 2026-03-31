@@ -8,16 +8,18 @@ import { Input } from '@forge/ui/src/input'
 import { ScrollArea } from '@forge/ui/src/scroll-area'
 import { cn } from '@forge/ui/src/utils'
 import { useAgentBuilderStore } from '../store/agent-builder.store'
+import { getChatResponse } from '../api/chat-responses'
 
 export const TestChatPanel = React.memo(function TestChatPanel() {
   const t = useTranslations('agentHub.testChat')
   const { testMessages, draftAgent, addTestMessage, clearTestMessages } = useAgentBuilderStore()
   const [input, setInput] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [testMessages])
+  }, [testMessages, isTyping])
 
   const handleSend = useCallback(() => {
     const trimmed = input.trim()
@@ -25,15 +27,13 @@ export const TestChatPanel = React.memo(function TestChatPanel() {
 
     addTestMessage({ role: 'user', content: trimmed })
     setInput('')
+    setIsTyping(true)
 
-    // Simulated assistant reply
-    setTimeout(() => {
-      addTestMessage({
-        role: 'assistant',
-        content: draftAgent.identity.welcomeMessage || t('defaultReply'),
-      })
-    }, 600)
-  }, [addTestMessage, draftAgent.identity.welcomeMessage, input, t])
+    void getChatResponse(trimmed).then((response) => {
+      setIsTyping(false)
+      addTestMessage({ role: 'assistant', content: response.content })
+    })
+  }, [addTestMessage, input])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -109,6 +109,20 @@ export const TestChatPanel = React.memo(function TestChatPanel() {
                 </div>
               </div>
             ))}
+            {isTyping && (
+              <div className="flex gap-2 items-end">
+                <div className="flex flex-col gap-0.5 max-w-[80%]">
+                  <div className="rounded-tl-sm rounded-tr-2xl rounded-br-2xl rounded-bl-2xl bg-muted text-foreground px-3 py-2 text-sm">
+                    <span className="flex gap-1">
+                      <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:0ms]" />
+                      <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:150ms]" />
+                      <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:300ms]" />
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground px-1">{t('typing')}</span>
+                </div>
+              </div>
+            )}
             <div ref={bottomRef} />
           </div>
         )}

@@ -5,53 +5,131 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-pnpm dev        # Start development server at http://localhost:3000
-pnpm build      # Build for production
-pnpm start      # Run production build
-pnpm lint       # Run ESLint
+# Development
+pnpm dev                    # Start dev server at localhost:3000
+pnpm build                  # Production build (Turbo orchestrates all packages)
+pnpm start                  # Run production build
+
+# Quality gates — run ALL before committing
+pnpm typecheck              # tsc --noEmit (ignoreBuildErrors masks errors in build)
+pnpm lint                   # ESLint (all packages)
+pnpm format:check           # Prettier check
+pnpm build                  # Production build must succeed
+pnpm test:coverage          # Unit tests + coverage thresholds
+pnpm storybook:build        # Stories must compile
+pnpm check                  # Runs all of the above + e2e in sequence
+
+# Testing
+pnpm test                   # Vitest watch mode
+pnpm test run               # Single run, no watch
+pnpm test:coverage          # With coverage enforcement
+pnpm --filter=@forge/web exec vitest src/features/example/ExampleForm.test.tsx  # Single test file
+pnpm test:e2e               # Playwright (requires built app)
+pnpm test:e2e:ui            # Playwright with visual debugger
+
+# Other
+pnpm storybook              # Storybook at localhost:6006
+pnpm analyze                # Bundle treemap (ANALYZE=true next build)
+pnpm format                 # Prettier write all
+pnpm lint:fix               # ESLint --fix (via @forge/web filter)
 ```
 
-> This project uses **pnpm** as its package manager (pnpm-lock.yaml is the lockfile).
+This project uses **pnpm** (never npm or yarn) with **Turbo** for monorepo orchestration.
 
 ## Architecture
 
-This is a **Next.js 16 / React 19** app using the App Router, bootstrapped via [v0.app](https://v0.app) and deployed on Vercel.
+**Turbo monorepo** — Next.js 16 / React 19 white-label platform for AI agent apps, deployed on Vercel.
+
+### Monorepo layout
+
+```
+apps/web/               # @forge/web — Main Next.js App Router application
+packages/
+  ui/                   # @forge/ui — shadcn/ui components (owned, editable)
+  ai-ui/                # @forge/ai-ui — AI-specific UI components (Vercel AI SDK)
+  auth/                 # @forge/auth — Pluggable auth adapters
+  brand/                # @forge/brand — White-label branding system
+  config/               # @forge/config — Zod-validated env & app config
+  i18n/                 # @forge/i18n — next-intl setup
+  api-client/           # @forge/api-client — Shared API client utilities
+  tsconfig/             # @forge/tsconfig — Shared TypeScript configs
+```
+
+### Web app source (`apps/web/src/`)
+
+- **`app/`** — Next.js App Router. Route groups: `(auth)`, `(dashboard)`, `(marketing)`
+- **`features/<name>/`** — Feature modules with co-located components, tests, stories, API, store, mocks, and types. This is the primary pattern for adding functionality.
+- **`components/`** — Shared components: `ui/` (shadcn primitives), `layout/` (Navbar, Sidebar, Footer), `auth/`
+- **`config/`** — App config objects: `env.ts` (Zod schema), `nav.ts`, `site.ts`, `themes/`
+- **`hooks/`** — Shared React hooks
+- **`lib/`** — Utilities and services: `utils.ts` (cn helper), `auth/` (pluggable adapters)
+- **`styles/tokens.css`** — OKLCH design tokens (the file to change for branding)
+- **`messages/`** — Translation files (next-intl)
+
+### Path aliases
+
+- `@/*` → `apps/web/src/*` (and specific sub-paths like `@/components/*`, `@/features/*`, `@/lib/*`, `@/hooks/*`, `@/config/*`)
+- `@forge/ui`, `@forge/brand`, `@forge/auth`, `@forge/config`, `@forge/i18n`, `@forge/api-client` → workspace packages
 
 ### Key conventions
 
-- **Path aliases**: `@/components`, `@/components/ui`, `@/lib`, `@/hooks` — all defined in `tsconfig.json`
-- **UI components**: shadcn/ui ("new-york" style) live in `components/ui/`. Add new components with `pnpm dlx shadcn@latest add <component>`. The icon library is lucide-react.
-- **Styling**: Tailwind CSS v4 — configured entirely in `app/globals.css` via `@theme inline` (no `tailwind.config.js`). Colors use OKLCH and are defined as CSS variables with light/dark variants.
-- **`cn()` utility**: `lib/utils.ts` exports `cn()` (clsx + tailwind-merge) — use this for all conditional className composition.
-- **Dark mode**: CSS-variable-based, toggled via the `.dark` class (next-themes via `components/theme-provider.tsx`).
-- **TypeScript build errors are suppressed** (`ignoreBuildErrors: true` in `next.config.mjs`) — do not rely on the build to catch type errors; run `tsc --noEmit` manually if needed.
+- **Styling**: Tailwind CSS v4 via `@theme inline` (no `tailwind.config.js`). Colors use OKLCH CSS variables with light/dark variants.
+- **`cn()` utility**: Always use `cn()` from `lib/utils.ts` (clsx + tailwind-merge) for conditional classNames — never string concatenation.
+- **Dark mode**: CSS-variable-based via next-themes. Toggled by `.dark` class.
+- **Server Components first**: Default to Server Components. Add `'use client'` only at leaf boundaries. Never add it to layout components unless the spec explicitly requires it.
+- **Commit format**: Conventional Commits enforced via commitlint + Husky (e.g., `feat(auth): add OAuth login`).
+- **Pre-commit hooks**: Husky runs lint-staged (ESLint fix, Prettier, related Vitest tests).
 
-### Structure
+## Coverage thresholds (enforced in `vitest.config.mts`)
 
-```
-app/
-  layout.tsx      # Root layout: Geist fonts, Vercel Analytics, metadata
-  page.tsx        # Landing page (currently the only route, uses 'use client')
-  globals.css     # Tailwind imports + all CSS custom properties (design tokens)
-components/
-  ui/             # shadcn/ui primitives (never edit these directly)
-  theme-provider.tsx
-hooks/
-  use-mobile.ts   # Responsive breakpoint hook
-  use-toast.ts    # Toast state management
-lib/
-  utils.ts        # cn() helper
-```
+| Metric     | Minimum |
+| ---------- | ------- |
+| Lines      | 80%     |
+| Statements | 80%     |
+| Branches   | 80%     |
+| Functions  | 60%     |
 
-### Adding new pages/features
+Scope: `src/lib/**`, `src/hooks/**`, `src/features/agents/api/**`, `src/features/agents/store/**` (auth adapters, re-exports, and browser-only hooks excluded). Fix coverage by writing tests, never by lowering thresholds. When adding files to covered directories, co-locate a `*.test.ts(x)`. If genuinely untestable, add to `coverage.exclude` in `vitest.config.mts` with a comment.
 
-New routes go in `app/` following Next.js App Router conventions. Server Components are the default; add `'use client'` only when needed (event handlers, hooks, browser APIs).
+## Bundle health
 
-## Environment Variables
+- Main shared chunk: < 250 kb
+- Per-route bundle: < 150 kb
+- `recharts` must be wrapped with `next/dynamic()` — never in a route bundle directly
+- Each route (`/`, `/dashboard`, `/login`) must have its own chunk separate from shared bundle
 
-### Source of truth per environment
+## Auth pluggability
 
-| Environment                    | Source of truth                                               |
+Active provider set by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|okta` (default: `clerk`).
+
+**Import rules:**
+
+- `src/lib/auth/adapters/clerk/server.ts` — only file that imports from `@clerk/nextjs/server`
+- `src/lib/auth/adapters/clerk/client.ts` — only file that imports from `@clerk/nextjs` (hooks)
+- App code imports from `@/lib/auth` or `@/hooks/use-user` — never directly from `@clerk/nextjs`
+- Provider UI components (`<UserButton />`, `<SignIn />`, `<SignUp />`) allowed at route/page level only, marked `// PROVIDER-SPECIFIC`
+
+**Adding a new provider (4 steps):**
+
+1. Create `src/lib/auth/adapters/<provider>/` with `server.ts`, `client.ts`, `provider.tsx`, `middleware.ts`
+2. Add the new key to `AuthProviderKey` in `src/lib/auth/contracts.ts` — TypeScript flags every missing switch case
+3. Add `import * as <provider>Adapter` + `case '<provider>': return <provider>Adapter` to each registry file
+4. Set `NEXT_PUBLIC_AUTH_PROVIDER=<provider>` in `.env.local`, Vercel, and GitHub Variables
+
+## i18n rules
+
+- No hardcoded user-visible strings in JSX — ESLint `i18next/no-literal-string` enforces this
+- Server Components: `const t = await getTranslations('namespace')` from `next-intl/server`
+- Client Components: `const t = useTranslations('namespace')` from `next-intl`
+- New keys go in `src/messages/en.json` first, then mirror in all locale files
+- Nav items: add `labelKey` in `src/config/nav.ts` matching a key in the `sidebar` namespace
+- Run `pnpm test run src/i18n/i18n.test.ts` after any message file change (guards key parity and empty values)
+
+## Environment variables
+
+### Source of truth
+
+| Environment                    | Source                                                        |
 | ------------------------------ | ------------------------------------------------------------- |
 | Local dev                      | `.env.local` (gitignored)                                     |
 | CI (GitHub Actions)            | GitHub → Settings → Secrets and Variables → Actions           |
@@ -64,150 +142,27 @@ pnpm dlx vercel link          # link local repo to Vercel project (one-time)
 pnpm dlx vercel env pull      # pull all env vars into .env.local
 ```
 
-### Adding a new environment variable
+### Adding a new env var
 
-1. Add it to `.env.example` with a placeholder value and comment (always commit this)
-2. Set real value in **Vercel dashboard** for each environment (Production / Preview / Development)
-3. Set in **GitHub → Settings → Secrets and Variables → Actions** if needed by CI:
-   - Non-sensitive → **Variables** tab: `gh variable set NAME --body "value"`
-   - Sensitive → **Secrets** tab: `gh secret set NAME`
-4. Add to `src/config/env.ts` schema if it must be validated at build time
-5. Run `pnpm dlx vercel env pull` locally to get the updated `.env.local`
+1. Add to `.env.example` with placeholder and comment (always commit)
+2. Set in Vercel dashboard for each environment
+3. Set in GitHub Actions if needed by CI (Variables for non-sensitive, Secrets for sensitive)
+4. Add to `src/config/env.ts` Zod schema if it must be validated at build time
+5. Run `pnpm dlx vercel env pull` locally
 
-### Updating GitHub Actions variables via CLI
+## Code rules
 
-```bash
-# List all variables
-gh variable list
-
-# Set / update a variable
-gh variable set NEXT_PUBLIC_APP_URL --body "https://myapp.com"
-gh variable set NEXT_PUBLIC_APP_ENV --body "production"
-
-# Set / update a secret (sensitive values)
-gh secret set DATABASE_URL
-
-# Pull from Vercel into GitHub Variables (manual sync — run when Vercel vars change)
-# Non-sensitive vars only:
-gh variable set NEXT_PUBLIC_APP_URL --body "$(vercel env pull --yes > /dev/null && grep NEXT_PUBLIC_APP_URL .env.local | cut -d= -f2)"
-```
-
-### Rules
-
-- **Never commit** `.env.local`, `.env*.local`, or any file containing real secrets
-- **Always commit** `.env.example` when adding a new variable
-- **Vercel is the source of truth** — do not manually edit `.env.local` for shared vars; pull from Vercel instead
-- CI workflows reference vars as `${{ vars.NAME }}` (non-sensitive) or `${{ secrets.NAME }}` (sensitive)
-
-## Guardrails — always follow these
-
-### Before starting any phase task
-
-1. Check `memory/MEMORY.md` to confirm which sub-tasks are already done — never re-implement completed work.
-2. Read the relevant section of `docs/specs/nextjs-frontend-specs.md` to understand acceptance criteria.
-
-### Gate checks — run ALL before every commit
-
-```bash
-pnpm typecheck              # zero TS errors (ignoreBuildErrors masks them in build)
-pnpm lint                   # zero errors, zero warnings (no-console fires on console.*)
-pnpm format:check           # zero prettier violations (CI runs this; pre-commit hook only auto-fixes)
-pnpm build                  # production build must succeed
-pnpm test:coverage          # all unit tests must pass AND coverage thresholds must be met
-pnpm exec storybook build   # all stories must compile
-pnpm analyze                # inspect bundle treemap (see bundle health checks below)
-```
-
-Never skip or reorder these. A passing build alone is not sufficient.
-
-### Coverage thresholds (enforced in `vitest.config.mts`)
-
-Thresholds are hardcoded — **if CI fails on coverage, fix it by writing more tests, never by lowering the threshold.**
-
-| Metric     | Minimum |
-| ---------- | ------- |
-| Lines      | 80%     |
-| Statements | 80%     |
-| Branches   | 80%     |
-| Functions  | 60%     |
-
-Scope: `src/lib/**` and `src/hooks/**` (auth adapters, re-exports, and browser-only hooks excluded).
-
-When adding new files to `src/lib/` or `src/hooks/`: write a colocated `*.test.ts(x)` in the same directory before committing. If the file is genuinely untestable (Clerk hooks, browser APIs), add it to the `coverage.exclude` list in `vitest.config.mts` with a comment explaining why.
-
-### Bundle health checks (after every `pnpm analyze`)
-
-Use `pnpm build 2>&1 | grep "First Load JS"` for a quick size summary without opening a browser.
-
-Budgets — **fail if exceeded:**
-
-- Main shared chunk: < 250 kb
-- Per-route bundle: < 150 kb
-
-Red flags to check in the treemap:
-
-- `recharts` appearing in any route bundle → wrap with `next/dynamic()` immediately
-- `date-fns` unexpectedly large → switch to named imports (`import { format } from 'date-fns'`)
-- Any library duplicated (two blocks with the same name) → audit package versions
-- Everything in one giant shared chunk → route-based splitting is broken
-
-Route isolation — each route (`/`, `/dashboard`, `/login`) must have its own small chunk separate from the shared bundle.
-
-### Auth pluggability rules (Phase 6 — Agency Model)
-
-The active provider is selected by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|okta` (default: `clerk`).
-**To switch providers: change the env var + implement the 4 stub files.** Nothing else changes.
-
-**Import rules:**
-
-- `src/lib/auth/adapters/clerk/server.ts` — **only** file allowed to import from `@clerk/nextjs/server`
-- `src/lib/auth/adapters/clerk/client.ts` — **only** file allowed to import from `@clerk/nextjs` (hooks)
-- `src/lib/auth.ts` and `src/hooks/use-user.ts` — the two public API entry points (never changes)
-- All app code imports from `@/lib/auth` or `@/hooks/use-user` — **never** directly from `@clerk/nextjs`
-- Provider UI components (`<UserButton />`, `<SignIn />`, `<SignUp />`) allowed at **route/page level only**, marked `// PROVIDER-SPECIFIC` comment
-
-**Adding a new provider (4 steps):**
-
-1. Create `src/lib/auth/adapters/<provider>/` with `server.ts`, `client.ts`, `provider.tsx`, `middleware.ts`
-2. Add the new key to `AuthProviderKey` in `src/lib/auth/contracts.ts` — TypeScript will flag every registry switch missing the new case
-3. Add `import * as <provider>Adapter` + `case '<provider>': return <provider>Adapter` to each of the 4 registry files
-4. Set `NEXT_PUBLIC_AUTH_PROVIDER=<provider>` in `.env.local`, Vercel, and GitHub Variables
-
-### Code rules
-
-- **`packages/ui/src/` components are owned and editable** — shadcn/ui's philosophy is that components are copied into your repo for you to own. Edit them freely to fix bugs or adjust behavior. Add new components with `pnpm dlx shadcn@latest add <component>` (outputs to `packages/ui/src/` via `components.json`). Keep them generic — no app-specific imports (`@/config`, `@forge/brand`, `@forge/i18n`, etc.). App-specific logic belongs in `apps/web/src/components/`.
-- **Never hardcode copy** in layout components — all text comes from `src/config/` or props
-- **Never add `'use client'`** to Server Components (`MarketingLayout`, `DashboardLayout`, `AuthLayout`, `Footer`) unless the spec explicitly requires it
+- **`packages/ui/src/`** — owned and editable. Add components with `pnpm dlx shadcn@latest add <component>`. Keep generic (no app-specific imports like `@/config`, `@forge/brand`). App-specific wrappers go in `apps/web/src/components/`.
+- **Never hardcode copy** in layout components — text comes from `src/config/` or props
 - **Never commit** build artifacts: `.next/`, `storybook-static/`, `out/`
-- Use `cn()` from `lib/utils.ts` for all conditional className composition — never string concatenation
-- Use `pnpm` — never `npm` or `yarn`
+- **TypeScript build errors are suppressed** (`ignoreBuildErrors: true` in `next.config.mjs`) — always run `pnpm typecheck` separately
+- **`no-explicit-any`**: ERROR — no `any` types allowed
 
-### i18n rules — every UI component and feature MUST follow these
+## Performance rules
 
-- **No hardcoded user-visible strings in JSX** — ESLint rule `i18next/no-literal-string` enforces this at lint time (warns on violations in `src/**/*.tsx`)
-- **Server Components** use `const t = await getTranslations('namespace')` from `next-intl/server`
-- **Client Components** use `const t = useTranslations('namespace')` from `next-intl`
-- **New translation namespace**: add keys to `src/messages/en.json` first, then mirror exact same keys in every other locale file (`fr.json`, etc.)
-- **Nav items** — add `labelKey: 'keyName'` alongside `label` in `src/config/nav.ts`; the key must exist in the `sidebar` namespace in all message files
-- **Adding a new locale**: (1) create `src/messages/<locale>.json`, (2) add the locale to `routing.locales` in `src/i18n/routing.ts`, (3) add to the `messageLoaders` map in `src/i18n/request.ts`, (4) add to the `localeFiles` map in `src/i18n/i18n.test.ts`
-- **Vitest guardrails** (`src/i18n/i18n.test.ts`) — run `pnpm test run src/i18n/i18n.test.ts` after any message file change:
-  - Key parity: all locale files must have identical keys to `en.json`
-  - No empty values: no translation key may have an empty string
-  - Locale coverage: `routing.locales` must match files on disk
-
-### Performance rules
-
-- **React.memo** — wrap all `'use client'` layout components (Navbar, AppSidebar, Topbar) and any component that receives stable props from a frequently-updating parent
-- **useCallback** — wrap every event handler passed as a prop or used in a dependency array
-- **useMemo** — wrap filtered/sorted arrays and expensive derived state; do NOT memoize plain `.map()` calls with no filtering
-- **Dynamic imports** — use `next/dynamic()` for any component > ~50kb (charts, rich text editors, heavy modals)
-- **Images** — always use `next/image` (never `<img>`); set explicit `width`/`height` or `fill` + `sizes` to avoid CLS
-- **Server Components first** — keep components as Server Components unless they need state, effects, or browser APIs; `'use client'` boundary should be as deep (leaf) as possible
-- Refer to `PERFORMANCE.md` for patterns, examples, and Core Web Vitals targets
-
-### After completing any phase task
-
-Update `memory/MEMORY.md`:
-
-- Move the sub-task to the completed list
-- Note any key decisions or patterns introduced
+- `React.memo` on `'use client'` layout components and components with stable props from frequently-updating parents
+- `useCallback` for every event handler passed as a prop or in a dependency array
+- `useMemo` for filtered/sorted arrays and expensive derived state; not for plain `.map()` calls
+- `next/dynamic()` for components > ~50kb (charts, rich editors, heavy modals)
+- `next/image` always (never `<img>`) — set explicit `width`/`height` or `fill` + `sizes`
+- See `docs/PERFORMANCE.md` for patterns and Core Web Vitals targets

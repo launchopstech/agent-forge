@@ -50,7 +50,10 @@ export function KnowledgeSection() {
 
       <div className="max-w-lg space-y-2">
         {AVAILABLE_KNOWLEDGE.map((source) => (
-          <div key={source.name} className="flex items-center gap-3 p-3 border rounded-xl bg-card">
+          <div
+            key={source.name}
+            className="flex items-center gap-3 p-3 border rounded-xl bg-card min-h-[48px] select-none"
+          >
             <span className="size-9 rounded-xl bg-primary/10 flex items-center justify-center text-base flex-shrink-0">
               {source.emoji}
             </span>

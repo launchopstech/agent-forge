@@ -115,7 +115,20 @@
       "status": "Status",
       "actions": "Actions",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "viewAgent": "View agent",
+      "showing": "Showing {from}–{to} of {total}",
+      "pageOf": "Page {page} of {pages}",
+      "prev": "Previous",
+      "next": "Next",
+      "error": "Something went wrong loading your data.",
+      "retry": "Try again",
+      "searchAgents": "Search agents…",
+      "filterByStatus": "Filter by status",
+      "allStatuses": "All statuses",
+      "statusLive": "Live",
+      "statusDraft": "Draft",
+      "statusPaused": "Paused"
     },
     "templates": {
       "title": "Start from a template",
@@ -148,6 +161,8 @@
       "buildingAgent": "Building agent",
       "next": "Next",
       "back": "Back",
+      "openTestChat": "Open test chat",
+      "closeTestChat": "Close test chat",
       "sections": {
         "identity": "Identity",
         "behaviour": "Behaviour",
@@ -222,7 +237,8 @@
       "inputPlaceholder": "Type a message…",
       "send": "Send",
       "defaultReply": "I'm here to help! (This is a simulated response)",
-      "confidence": "{value}% confidence"
+      "confidence": "{value}% confidence",
+      "typing": "Typing…"
     }
   },
   "marketing": {

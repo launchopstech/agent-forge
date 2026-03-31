@@ -72,7 +72,7 @@ export function ChannelsSection() {
         <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 max-w-lg">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
         {AVAILABLE_CHANNELS.map(({ id, labelKey, Icon, iconBg }) => {
           const isActive = channels.includes(id)
           return (

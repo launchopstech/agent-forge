@@ -85,3 +85,26 @@ export interface TestMessage {
   content: string
   timestamp: Date
 }
+
+// ─── Paginated API response ──────────────────────────────────────────────────
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export interface AgentListParams {
+  page?: number
+  pageSize?: number
+  search?: string
+  status?: AgentStatus
+}
+
+// ─── Chat response from mock engine ──────────────────────────────────────────
+
+export interface ChatResponse {
+  content: string
+  confidence: number
+}

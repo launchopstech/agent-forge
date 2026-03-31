@@ -6,6 +6,7 @@ import type { Agent } from '../types'
 vi.mock('../api/agents.api', () => ({
   fetchAgents: vi.fn(),
   deleteAgent: vi.fn(),
+  agentStore: { reset: vi.fn() },
 }))
 vi.mock('../api/metrics.api', () => ({
   fetchMetrics: vi.fn(),
@@ -36,6 +37,13 @@ const MOCK_AGENTS: Agent[] = [
   },
 ]
 
+const MOCK_PAGINATED = {
+  data: MOCK_AGENTS,
+  total: 2,
+  page: 1,
+  pageSize: 10,
+}
+
 const MOCK_METRICS = {
   totalConversations: 150,
   totalConversationsChange: 5,
@@ -62,16 +70,34 @@ beforeEach(() => {
     recommendation: null,
     isLoading: false,
     error: null,
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    search: '',
+    statusFilter: null,
   })
 })
 
 describe('agent-list.store', () => {
   describe('loadAgents', () => {
     it('fetches agents and sets them in state', async () => {
-      vi.mocked(fetchAgents).mockResolvedValue(MOCK_AGENTS)
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
       await useAgentListStore.getState().loadAgents()
       expect(useAgentListStore.getState().agents).toEqual(MOCK_AGENTS)
+      expect(useAgentListStore.getState().total).toBe(2)
       expect(useAgentListStore.getState().isLoading).toBe(false)
+    })
+
+    it('passes pagination params to API', async () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.setState({ page: 2, pageSize: 5, search: 'Bot', statusFilter: 'live' })
+      await useAgentListStore.getState().loadAgents()
+      expect(fetchAgents).toHaveBeenCalledWith({
+        page: 2,
+        pageSize: 5,
+        search: 'Bot',
+        status: 'live',
+      })
     })
 
     it('sets error on failure', async () => {
@@ -103,12 +129,13 @@ describe('agent-list.store', () => {
 
   describe('loadAll', () => {
     it('loads agents, metrics, and intents concurrently', async () => {
-      vi.mocked(fetchAgents).mockResolvedValue(MOCK_AGENTS)
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
       vi.mocked(fetchMetrics).mockResolvedValue(MOCK_METRICS)
       vi.mocked(fetchUnresolvedIntents).mockResolvedValue(MOCK_INTENTS_RESULT)
       await useAgentListStore.getState().loadAll()
       const state = useAgentListStore.getState()
       expect(state.agents).toHaveLength(2)
+      expect(state.total).toBe(2)
       expect(state.metrics?.totalConversations).toBe(150)
       expect(state.unresolvedIntents).toHaveLength(1)
       expect(state.isLoading).toBe(false)
@@ -136,7 +163,7 @@ describe('agent-list.store', () => {
     it('rolls back by reloading agents when API fails', async () => {
       useAgentListStore.setState({ agents: MOCK_AGENTS })
       vi.mocked(deleteAgent).mockRejectedValue(new Error('Delete failed'))
-      vi.mocked(fetchAgents).mockResolvedValue(MOCK_AGENTS)
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
 
       await useAgentListStore.getState().removeAgent('1')
 
@@ -144,6 +171,41 @@ describe('agent-list.store', () => {
       expect(fetchAgents).toHaveBeenCalled()
       expect(useAgentListStore.getState().agents).toEqual(MOCK_AGENTS)
       expect(useAgentListStore.getState().error).toBe('Delete failed')
+    })
+  })
+
+  describe('setSearch', () => {
+    it('resets page to 1 and triggers reload', async () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.setState({ page: 3 })
+      useAgentListStore.getState().setSearch('test')
+      expect(useAgentListStore.getState().search).toBe('test')
+      expect(useAgentListStore.getState().page).toBe(1)
+    })
+  })
+
+  describe('setStatusFilter', () => {
+    it('resets page to 1', () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.setState({ page: 5 })
+      useAgentListStore.getState().setStatusFilter('live')
+      expect(useAgentListStore.getState().statusFilter).toBe('live')
+      expect(useAgentListStore.getState().page).toBe(1)
+    })
+
+    it('accepts null to clear filter', () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.getState().setStatusFilter(null)
+      expect(useAgentListStore.getState().statusFilter).toBeNull()
+    })
+  })
+
+  describe('setPage', () => {
+    it('sets page and triggers reload', () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.getState().setPage(2)
+      expect(useAgentListStore.getState().page).toBe(2)
+      expect(fetchAgents).toHaveBeenCalled()
     })
   })
 })
