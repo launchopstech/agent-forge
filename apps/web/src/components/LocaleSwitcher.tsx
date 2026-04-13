@@ -33,7 +33,13 @@ export const LocaleSwitcher = React.memo(function LocaleSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" disabled={isPending} className="text-xs font-medium">
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={isPending}
+          className="text-xs font-medium"
+          suppressHydrationWarning
+        >
           {localeLabels[locale] ?? locale.toUpperCase()}
         </Button>
       </DropdownMenuTrigger>

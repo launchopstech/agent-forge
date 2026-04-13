@@ -3,7 +3,7 @@
  * Add a new value here when adding a new provider — TypeScript will flag
  * every registry switch that needs a new case.
  */
-export type AuthProviderKey = 'clerk' | 'next-auth' | 'okta'
+export type AuthProviderKey = 'clerk' | 'next-auth' | 'okta' | 'auth-handler'
 
 /**
  * Application properties — tenant/client-configurable values.

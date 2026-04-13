@@ -4,6 +4,7 @@
 import { ClerkAuthProvider } from './adapters/clerk/provider'
 import { NextAuthProvider } from './adapters/next-auth/provider'
 import { OktaAuthProvider } from './adapters/okta/provider'
+import { AuthHandlerProvider } from './adapters/auth-handler/provider'
 import { activeAuthProvider } from '@forge/config/src/properties'
 import type { AuthProviderComponent } from './contracts'
 
@@ -11,6 +12,7 @@ const providerMap: Record<string, AuthProviderComponent> = {
   clerk: ClerkAuthProvider,
   'next-auth': NextAuthProvider,
   okta: OktaAuthProvider,
+  'auth-handler': AuthHandlerProvider,
 }
 
 const Active = providerMap[activeAuthProvider] ?? ClerkAuthProvider

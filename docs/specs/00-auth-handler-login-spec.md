@@ -76,12 +76,12 @@ Success criteria:
 
 ## Phase A — Contracts & Config
 
-- [ ] A1: Add `auth-handler` to `AuthProviderKey` in `packages/config/src/properties.ts`
-- [ ] A2: Add `auth-handler` cases to `packages/auth/src/server-registry.ts`, `client-registry.ts`, `middleware-registry.ts`, and `auth-provider.tsx`
-- [ ] A3: Extend the public auth client surface with `getAccessToken(): Promise<string | null>`
-- [ ] A4: Add env vars to `.env.example`: `AUTH_HANDLER_ISSUER`, `AUTH_HANDLER_CLIENT_ID`, `AUTH_HANDLER_REDIRECT_URI`, `AUTH_HANDLER_SCOPE`, `AUTH_HANDLER_CONNECTION`, `AUTH_HANDLER_SESSION_SECRET`
-- [ ] A5: Define and document dedicated OAuth client `agent-forge-web` in forge-core `auth-handler`
-- [ ] A6: Set default upstream connection for AgentForge to `clerk`
+- [x] A1: Add `auth-handler` to `AuthProviderKey` in `packages/config/src/properties.ts`
+- [x] A2: Add `auth-handler` cases to `packages/auth/src/server-registry.ts`, `client-registry.ts`, `middleware-registry.ts`, and `auth-provider.tsx`
+- [x] A3: Extend the public auth client surface with `getAccessToken(): Promise<string | null>`
+- [x] A4: Add env vars to `.env.example`: `AUTH_HANDLER_ISSUER`, `AUTH_HANDLER_CLIENT_ID`, `AUTH_HANDLER_REDIRECT_URI`, `AUTH_HANDLER_SCOPE`, `AUTH_HANDLER_CONNECTION`, `AUTH_HANDLER_SESSION_SECRET`
+- [x] A5: Define and document dedicated OAuth client `agent-forge-web` in forge-core `auth-handler`
+- [x] A6: Set default upstream connection for AgentForge to `clerk`
 
 **Gate:** Provider selection, client contract, and required config are fully defined with no unresolved auth ownership questions.
 
@@ -89,13 +89,13 @@ Success criteria:
 
 ## Phase B — App-Owned Auth Pages & Kickoff
 
-- [ ] B1: Replace Clerk-only `/login` page with an app-owned login page
-- [ ] B2: Replace Clerk-only `/signup` page with an app-owned signup page
-- [ ] B3: Replace Clerk-only `/forgot-password` page with an app-owned recovery page
-- [ ] B4: Add `GET /api/auth/login`
-- [ ] B5: Generate PKCE verifier/challenge and opaque `state`
-- [ ] B6: Store sealed flow cookie containing `state`, PKCE verifier, auth intent, and return target
-- [ ] B7: Redirect to `${AUTH_HANDLER_ISSUER}/authorize` with `client_id`, `redirect_uri`, `response_type=code`, `scope`, `state`, `code_challenge`, `code_challenge_method=S256`, and `connection=clerk`
+- [x] B1: Replace Clerk-only `/login` page with an app-owned login page
+- [x] B2: Replace Clerk-only `/signup` page with an app-owned signup page
+- [x] B3: Replace Clerk-only `/forgot-password` page with an app-owned recovery page
+- [x] B4: Add `GET /api/auth/login`
+- [x] B5: Generate PKCE verifier/challenge and opaque `state`
+- [x] B6: Store sealed flow cookie containing `state`, PKCE verifier, auth intent, and return target
+- [x] B7: Redirect to `${AUTH_HANDLER_ISSUER}/authorize` with `client_id`, `redirect_uri`, `response_type=code`, `scope`, `state`, `code_challenge`, `code_challenge_method=S256`, and `connection=clerk`
 
 **Gate:** `/login`, `/signup`, and `/forgot-password` all start the `auth-handler` flow and no longer render Clerk components.
 
@@ -103,16 +103,16 @@ Success criteria:
 
 ## Phase C — Callback, Token Exchange, And Session Establishment
 
-- [ ] C1: Add app-owned `/callback` page
-- [ ] C2: Add same-origin callback handler at `POST /api/auth/callback`
-- [ ] C3: Validate callback `state` against the sealed flow cookie
-- [ ] C4: Exchange authorization code at `${AUTH_HANDLER_ISSUER}/token`
-- [ ] C5: Normalize returned claims into the existing `AuthSession` shape
-- [ ] C6: Set secure httpOnly app session cookie
-- [ ] C7: Set secure httpOnly refresh-token cookie
-- [ ] C8: Return access token to the browser callback page for storage in `sessionStorage`
-- [ ] C9: Redirect successful callback to `/dashboard`
-- [ ] C10: Reject invalid, expired, missing, or replayed `state`
+- [x] C1: Add app-owned `/callback` page
+- [x] C2: Add same-origin callback handler at `POST /api/auth/callback`
+- [x] C3: Validate callback `state` against the sealed flow cookie
+- [x] C4: Exchange authorization code at `${AUTH_HANDLER_ISSUER}/token`
+- [x] C5: Normalize returned claims into the existing `AuthSession` shape
+- [x] C6: Set secure httpOnly app session cookie
+- [x] C7: Set secure httpOnly refresh-token cookie
+- [x] C8: Return access token to the browser callback page for storage in `sessionStorage`
+- [x] C9: Redirect successful callback to `/dashboard`
+- [x] C10: Reject invalid, expired, missing, or replayed `state`
 
 **Gate:** Valid callbacks establish both app session state and browser token state; invalid callbacks fail closed.
 
@@ -120,15 +120,15 @@ Success criteria:
 
 ## Phase D — Middleware, SSR, And User State
 
-- [ ] D1: Implement `packages/auth/src/adapters/auth-handler/server.ts`
-- [ ] D2: Implement `packages/auth/src/adapters/auth-handler/client.ts`
-- [ ] D3: Implement `packages/auth/src/adapters/auth-handler/provider.tsx`
-- [ ] D4: Implement `packages/auth/src/adapters/auth-handler/middleware.ts`
-- [ ] D5: Make `getSession()` read and validate the app session cookie
-- [ ] D6: Make `requireAuth()` redirect unauthenticated users to `/login`
-- [ ] D7: Make `useUser()` expose app-owned user state rather than Clerk hook state
-- [ ] D8: Keep `apps/web/src/proxy.ts` protection for `/dashboard(.*)`, `/admin(.*)`, and `/agents(.*)`
-- [ ] D9: Redirect authenticated users away from auth pages to `/dashboard`
+- [x] D1: Implement `packages/auth/src/adapters/auth-handler/server.ts`
+- [x] D2: Implement `packages/auth/src/adapters/auth-handler/client.ts`
+- [x] D3: Implement `packages/auth/src/adapters/auth-handler/provider.tsx`
+- [x] D4: Implement `packages/auth/src/adapters/auth-handler/middleware.ts`
+- [x] D5: Make `getSession()` read and validate the app session cookie
+- [x] D6: Make `requireAuth()` redirect unauthenticated users to `/login`
+- [x] D7: Make `useUser()` expose app-owned user state rather than Clerk hook state
+- [x] D8: Keep `apps/web/src/proxy.ts` protection for `/dashboard(.*)`, `/admin(.*)`, and `/agents(.*)`
+- [x] D9: Redirect authenticated users away from auth pages to `/dashboard`
 
 **Gate:** Protected routes still work before render, and existing app code continues to rely on the same public auth API.
 
@@ -136,15 +136,15 @@ Success criteria:
 
 ## Phase E — Logout, Refresh, And Dashboard User UI
 
-- [ ] E1: Replace Clerk `UserButton` usage with app-owned `UserMenu`
-- [ ] E2: Add `POST /api/auth/refresh`
-- [ ] E3: Make `getAccessToken()` return the in-browser access token when valid
-- [ ] E4: Make `getAccessToken()` call the refresh route when the token is missing or expired
-- [ ] E5: Use the refresh-token cookie server-side to obtain a new access token from `auth-handler`
-- [ ] E6: Rotate app session state on refresh when needed
-- [ ] E7: Add `POST /api/auth/logout`
-- [ ] E8: Clear app session cookie, refresh cookie, and browser token state on logout
-- [ ] E9: Call `${AUTH_HANDLER_ISSUER}/logout` with `return_to=/login` so the `auth-handler` browser session is cleared too
+- [x] E1: Replace Clerk `UserButton` usage with app-owned `UserMenu`
+- [x] E2: Add `POST /api/auth/refresh`
+- [x] E3: Make `getAccessToken()` return the in-browser access token when valid
+- [x] E4: Make `getAccessToken()` call the refresh route when the token is missing or expired
+- [x] E5: Use the refresh-token cookie server-side to obtain a new access token from `auth-handler`
+- [x] E6: Rotate app session state on refresh when needed
+- [x] E7: Add `POST /api/auth/logout`
+- [x] E8: Clear app session cookie, refresh cookie, and browser token state on logout
+- [x] E9: Call `${AUTH_HANDLER_ISSUER}/logout` with `return_to=/login` so the `auth-handler` browser session is cleared too
 
 **Gate:** Dashboard user UI, transparent refresh, and full logout all work without Clerk-owned UI components.
 
@@ -152,14 +152,14 @@ Success criteria:
 
 ## Phase F — Tests & Verification
 
-- [ ] F1: Unit-test session-cookie encode/decode, expiry, and claim normalization
-- [ ] F2: Unit-test `getSession()`, `requireAuth()`, and `getAccessToken()`
-- [ ] F3: Route-handler tests for login kickoff, callback success, callback rejection, refresh, and logout
-- [ ] F4: Middleware tests for unauthenticated `/dashboard` redirect and authenticated `/login` redirect
-- [ ] F5: E2E test the full login redirect chain through `auth-handler` to `/dashboard`
-- [ ] F6: E2E test that page reload remains authenticated via app session cookie
-- [ ] F7: E2E test that expired browser token refreshes without forcing re-login
-- [ ] F8: E2E test that logout clears both AgentForge and `auth-handler` session state
+- [x] F1: Unit-test session-cookie encode/decode, expiry, and claim normalization
+- [x] F2: Unit-test `getSession()`, `requireAuth()`, and `getAccessToken()`
+- [x] F3: Route-handler tests for login kickoff, callback success, callback rejection, refresh, and logout
+- [x] F4: Middleware tests for unauthenticated `/dashboard` redirect and authenticated `/login` redirect
+- [x] F5: E2E test the full login redirect chain through `auth-handler` to `/dashboard`
+- [x] F6: E2E test that page reload remains authenticated via app session cookie
+- [x] F7: E2E test that expired browser token refreshes without forcing re-login
+- [x] F8: E2E test that logout clears both AgentForge and `auth-handler` session state
 
 **Gate:** Auth flow is fully covered at unit, route, middleware, and E2E levels.
 
