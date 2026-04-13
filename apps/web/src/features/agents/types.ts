@@ -19,10 +19,30 @@ export interface TemplateIdentity {
   language: string
 }
 
+export type TonePreset = 'neutral' | 'friendly' | 'formal' | 'custom'
+
+export type GuidanceCategory = 'communication' | 'escalation' | 'other'
+
+export interface GuidanceRule {
+  id: string
+  name: string
+  category: GuidanceCategory
+  whenCondition: string
+  instructions: string
+  enabled: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface TemplateBehaviour {
   systemPrompt: string
   responseStyle: number // 0–100 (concise → detailed)
   fallback: 'handoff' | 'ticket' | 'email'
+  tonePreset: TonePreset
+  customToneInstructions: string
+  useEmojis: boolean
+  showSourceLinks: boolean
+  guidanceRules: GuidanceRule[]
 }
 
 export interface AgentTemplate {

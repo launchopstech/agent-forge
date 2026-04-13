@@ -1,5 +1,24 @@
 import { create } from 'zustand'
-import type { DraftAgent, BuilderSection, TestMessage, AgentTemplate, Agent } from '../types'
+import type {
+  DraftAgent,
+  BuilderSection,
+  TestMessage,
+  AgentTemplate,
+  Agent,
+  GuidanceRule,
+  TemplateBehaviour,
+} from '../types'
+
+const DEFAULT_BEHAVIOUR: TemplateBehaviour = {
+  systemPrompt: '',
+  responseStyle: 50,
+  fallback: 'handoff',
+  tonePreset: 'neutral',
+  customToneInstructions: '',
+  useEmojis: true,
+  showSourceLinks: true,
+  guidanceRules: [],
+}
 
 const DEFAULT_DRAFT: DraftAgent = {
   templateId: null,
@@ -9,11 +28,7 @@ const DEFAULT_DRAFT: DraftAgent = {
     tone: 'professional',
     language: 'en-US',
   },
-  behaviour: {
-    systemPrompt: '',
-    responseStyle: 50,
-    fallback: 'handoff',
-  },
+  behaviour: DEFAULT_BEHAVIOUR,
   actions: [],
   knowledge: [],
   channels: [],
@@ -32,6 +47,10 @@ interface AgentBuilderState {
   markSectionCompleted: (section: BuilderSection) => void
   updateIdentity: (identity: Partial<DraftAgent['identity']>) => void
   updateBehaviour: (behaviour: Partial<DraftAgent['behaviour']>) => void
+  addGuidanceRule: (rule: Omit<GuidanceRule, 'id' | 'createdAt' | 'updatedAt'>) => void
+  updateGuidanceRule: (ruleId: string, patch: Partial<GuidanceRule>) => void
+  removeGuidanceRule: (ruleId: string) => void
+  toggleGuidanceRule: (ruleId: string) => void
   toggleAction: (action: string) => void
   toggleKnowledge: (source: string) => void
   toggleChannel: (channel: string) => void
@@ -70,7 +89,13 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
       draftAgent: {
         templateId: template.id,
         identity: { ...template.identity },
-        behaviour: { ...template.behaviour },
+        behaviour: {
+          ...DEFAULT_BEHAVIOUR,
+          ...template.behaviour,
+          guidanceRules: template.behaviour.guidanceRules
+            ? [...template.behaviour.guidanceRules]
+            : [],
+        },
         actions: [...template.actions],
         knowledge: [...template.knowledge],
         channels: [...template.channels],
@@ -104,6 +129,65 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
       draftAgent: {
         ...state.draftAgent,
         behaviour: { ...state.draftAgent.behaviour, ...behaviour },
+      },
+    }))
+  },
+
+  addGuidanceRule: (rule) => {
+    const now = new Date().toISOString()
+    const newRule: GuidanceRule = {
+      ...rule,
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+    }
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: [...state.draftAgent.behaviour.guidanceRules, newRule],
+        },
+      },
+    }))
+  },
+
+  updateGuidanceRule: (ruleId, patch) => {
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: state.draftAgent.behaviour.guidanceRules.map((r) =>
+            r.id === ruleId ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r
+          ),
+        },
+      },
+    }))
+  },
+
+  removeGuidanceRule: (ruleId) => {
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: state.draftAgent.behaviour.guidanceRules.filter((r) => r.id !== ruleId),
+        },
+      },
+    }))
+  },
+
+  toggleGuidanceRule: (ruleId) => {
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: state.draftAgent.behaviour.guidanceRules.map((r) =>
+            r.id === ruleId ? { ...r, enabled: !r.enabled, updatedAt: new Date().toISOString() } : r
+          ),
+        },
       },
     }))
   },

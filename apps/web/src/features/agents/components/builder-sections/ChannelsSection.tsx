@@ -1,10 +1,8 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Monitor, MessageCircle, Mail, Hash, ClipboardCopy, Check } from 'lucide-react'
-import { Button } from '@forge/ui/src/button'
 import { Badge } from '@forge/ui/src/badge'
 import { cn } from '@forge/ui/src/utils'
 import { useAgentBuilderStore } from '../../store/agent-builder.store'
@@ -38,20 +36,9 @@ const AVAILABLE_CHANNELS = [
 
 export function ChannelsSection() {
   const t = useTranslations('agentHub.builder.channels')
-  const tCommon = useTranslations('agentHub.builder')
-  const router = useRouter()
-  const { draftAgent, toggleChannel, markSectionCompleted, agentId } = useAgentBuilderStore()
+  const { draftAgent, toggleChannel } = useAgentBuilderStore()
   const { channels, identity } = draftAgent
   const [copied, setCopied] = useState(false)
-  const builderBase = `/agents/${agentId ?? 'new'}`
-
-  const handleFinish = useCallback(() => {
-    markSectionCompleted('channels')
-  }, [markSectionCompleted])
-
-  const handleBack = useCallback(() => {
-    router.push(`${builderBase}/knowledge`)
-  }, [router, builderBase])
 
   const embedCode = `<script src="https://cdn.agentforge.io/widget.js"
   data-agent="${identity.name || 'my-agent'}"
@@ -127,13 +114,6 @@ export function ChannelsSection() {
           </div>
         </div>
       )}
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handleBack}>
-          {tCommon('back')}
-        </Button>
-        <Button onClick={handleFinish}>{t('finish')}</Button>
-      </div>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { MessageCircle, X } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
@@ -15,6 +16,53 @@ import { ActionsSection } from './builder-sections/ActionsSection'
 import { KnowledgeSection } from './builder-sections/KnowledgeSection'
 import { ChannelsSection } from './builder-sections/ChannelsSection'
 import type { BuilderSection } from '../types'
+
+const SECTION_ORDER: BuilderSection[] = [
+  'identity',
+  'behaviour',
+  'actions',
+  'knowledge',
+  'channels',
+]
+
+const BuilderFooter = React.memo(function BuilderFooter({
+  section,
+  agentId,
+}: {
+  section: BuilderSection
+  agentId: string
+}) {
+  const router = useRouter()
+  const t = useTranslations('agentHub.builder')
+  const { markSectionCompleted } = useAgentBuilderStore()
+  const builderBase = `/agents/${agentId}`
+  const idx = SECTION_ORDER.indexOf(section)
+  const prevSection = idx > 0 ? SECTION_ORDER[idx - 1] : null
+  const nextSection = idx < SECTION_ORDER.length - 1 ? SECTION_ORDER[idx + 1] : null
+  const isLast = nextSection === null
+
+  const handleBack = useCallback(() => {
+    if (prevSection) router.push(`${builderBase}/${prevSection}`)
+  }, [prevSection, router, builderBase])
+
+  const handleNext = useCallback(() => {
+    markSectionCompleted(section)
+    if (nextSection) router.push(`${builderBase}/${nextSection}`)
+  }, [section, nextSection, markSectionCompleted, router, builderBase])
+
+  return (
+    <div className="shrink-0 border-t bg-background px-4 lg:px-6 py-3 flex justify-between">
+      {prevSection ? (
+        <Button variant="outline" onClick={handleBack}>
+          {t('back')}
+        </Button>
+      ) : (
+        <div />
+      )}
+      <Button onClick={handleNext}>{isLast ? t('finish') : t('next')}</Button>
+    </div>
+  )
+})
 
 interface AgentBuilderProps {
   agentId: string
@@ -74,7 +122,7 @@ export const AgentBuilder = React.memo(function AgentBuilder({
 
   return (
     <>
-      <div className="flex flex-col lg:h-full lg:min-h-0 lg:grid lg:grid-cols-[168px_1fr_300px] lg:overflow-hidden">
+      <div className="flex flex-col h-full min-h-0 lg:grid lg:grid-cols-[168px_1fr_300px] lg:overflow-hidden">
         {/* Left nav — horizontal scroll on mobile, icon-only on tablet, full sidebar on desktop */}
         <aside className="lg:border-r bg-muted/30 flex flex-col shrink-0 lg:overflow-y-auto border-b lg:border-b-0">
           {/* Title block — desktop only */}
@@ -88,8 +136,11 @@ export const AgentBuilder = React.memo(function AgentBuilder({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <SectionContent section={section} />
+        <main className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+            <SectionContent section={section} />
+          </div>
+          <BuilderFooter section={section} agentId={agentId} />
         </main>
 
         {/* Right: test chat — hidden on mobile/tablet, fixed column on desktop */}

@@ -80,50 +80,17 @@ packages/
 - **Commit format**: Conventional Commits enforced via commitlint + Husky (e.g., `feat(auth): add OAuth login`).
 - **Pre-commit hooks**: Husky runs lint-staged (ESLint fix, Prettier, related Vitest tests).
 
-## Coverage thresholds (enforced in `vitest.config.mts`)
-
-| Metric     | Minimum |
-| ---------- | ------- |
-| Lines      | 80%     |
-| Statements | 80%     |
-| Branches   | 80%     |
-| Functions  | 60%     |
-
-Scope: `src/lib/**`, `src/hooks/**`, `src/features/agents/api/**`, `src/features/agents/store/**` (auth adapters, re-exports, and browser-only hooks excluded). Fix coverage by writing tests, never by lowering thresholds. When adding files to covered directories, co-locate a `*.test.ts(x)`. If genuinely untestable, add to `coverage.exclude` in `vitest.config.mts` with a comment.
-
-## Bundle health
-
-- Main shared chunk: < 250 kb
-- Per-route bundle: < 150 kb
-- `recharts` must be wrapped with `next/dynamic()` — never in a route bundle directly
-- Each route (`/`, `/dashboard`, `/login`) must have its own chunk separate from shared bundle
-
 ## Auth pluggability
 
-Active provider set by `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|okta` (default: `clerk`).
+Active provider: `NEXT_PUBLIC_AUTH_PROVIDER=clerk|next-auth|okta` (default: `clerk`). See `packages/auth/CLAUDE.md` for import rules and adding a new provider.
 
-**Import rules:**
+## i18n
 
-- `src/lib/auth/adapters/clerk/server.ts` — only file that imports from `@clerk/nextjs/server`
-- `src/lib/auth/adapters/clerk/client.ts` — only file that imports from `@clerk/nextjs` (hooks)
-- App code imports from `@/lib/auth` or `@/hooks/use-user` — never directly from `@clerk/nextjs`
-- Provider UI components (`<UserButton />`, `<SignIn />`, `<SignUp />`) allowed at route/page level only, marked `// PROVIDER-SPECIFIC`
+See `packages/i18n/CLAUDE.md`. Use the `/i18n-add` skill to add keys across all locales safely.
 
-**Adding a new provider (4 steps):**
+## Coverage, bundle health & performance
 
-1. Create `src/lib/auth/adapters/<provider>/` with `server.ts`, `client.ts`, `provider.tsx`, `middleware.ts`
-2. Add the new key to `AuthProviderKey` in `src/lib/auth/contracts.ts` — TypeScript flags every missing switch case
-3. Add `import * as <provider>Adapter` + `case '<provider>': return <provider>Adapter` to each registry file
-4. Set `NEXT_PUBLIC_AUTH_PROVIDER=<provider>` in `.env.local`, Vercel, and GitHub Variables
-
-## i18n rules
-
-- No hardcoded user-visible strings in JSX — ESLint `i18next/no-literal-string` enforces this
-- Server Components: `const t = await getTranslations('namespace')` from `next-intl/server`
-- Client Components: `const t = useTranslations('namespace')` from `next-intl`
-- New keys go in `src/messages/en.json` first, then mirror in all locale files
-- Nav items: add `labelKey` in `src/config/nav.ts` matching a key in the `sidebar` namespace
-- Run `pnpm test run src/i18n/i18n.test.ts` after any message file change (guards key parity and empty values)
+See `apps/web/CLAUDE.md` for thresholds, bundle budgets, and performance rules.
 
 ## Environment variables
 
@@ -157,12 +124,3 @@ pnpm dlx vercel env pull      # pull all env vars into .env.local
 - **Never commit** build artifacts: `.next/`, `storybook-static/`, `out/`
 - **TypeScript build errors are suppressed** (`ignoreBuildErrors: true` in `next.config.mjs`) — always run `pnpm typecheck` separately
 - **`no-explicit-any`**: ERROR — no `any` types allowed
-
-## Performance rules
-
-- `React.memo` on `'use client'` layout components and components with stable props from frequently-updating parents
-- `useCallback` for every event handler passed as a prop or in a dependency array
-- `useMemo` for filtered/sorted arrays and expensive derived state; not for plain `.map()` calls
-- `next/dynamic()` for components > ~50kb (charts, rich editors, heavy modals)
-- `next/image` always (never `<img>`) — set explicit `width`/`height` or `fill` + `sizes`
-- See `docs/PERFORMANCE.md` for patterns and Core Web Vitals targets

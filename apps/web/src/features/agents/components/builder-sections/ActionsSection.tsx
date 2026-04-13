@@ -1,9 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Button } from '@forge/ui/src/button'
 import { Switch } from '@forge/ui/src/switch'
 import { useAgentBuilderStore } from '../../store/agent-builder.store'
 
@@ -27,20 +24,8 @@ const AVAILABLE_ACTIONS = [
 
 export function ActionsSection() {
   const t = useTranslations('agentHub.builder.actions')
-  const tCommon = useTranslations('agentHub.builder')
-  const router = useRouter()
-  const { draftAgent, toggleAction, markSectionCompleted, agentId } = useAgentBuilderStore()
+  const { draftAgent, toggleAction } = useAgentBuilderStore()
   const { actions } = draftAgent
-  const builderBase = `/agents/${agentId ?? 'new'}`
-
-  const handleNext = useCallback(() => {
-    markSectionCompleted('actions')
-    router.push(`${builderBase}/knowledge`)
-  }, [markSectionCompleted, router, builderBase])
-
-  const handleBack = useCallback(() => {
-    router.push(`${builderBase}/behaviour`)
-  }, [router, builderBase])
 
   return (
     <div className="space-y-6">
@@ -74,13 +59,6 @@ export function ActionsSection() {
       <p className="text-xs text-muted-foreground">
         {t('selectedCount', { count: actions.length })}
       </p>
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handleBack}>
-          {tCommon('back')}
-        </Button>
-        <Button onClick={handleNext}>{tCommon('next')}</Button>
-      </div>
     </div>
   )
 }
