@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import type { AuthSession } from '@forge/auth/src/contracts'
+import type { AuthSession } from '../types'
 import { encodeSession, decodeSession, isExpired, sessionFromClaims } from './session'
 
 describe('Session utilities', () => {
@@ -15,6 +15,7 @@ describe('Session utilities', () => {
           id: 'user-123',
           email: 'test@example.com',
           name: 'Test User',
+          avatarUrl: null,
         },
       }
 
@@ -34,6 +35,8 @@ describe('Session utilities', () => {
         user: {
           id: 'user-123',
           email: 'test@example.com',
+          name: null,
+          avatarUrl: null,
         },
       }
       const customExpiry = Date.now() + 3600000 // 1 hour
