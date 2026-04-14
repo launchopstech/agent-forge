@@ -18,7 +18,21 @@ import {
   AvatarImage,
   Skeleton,
 } from '@forge/ui'
-import { LogOut, Settings, User } from 'lucide-react'
+import { LogOut, Settings, User, CheckCircle2 } from 'lucide-react'
+const handleTestApi = async () => {
+  try {
+    const baseUrl = process.env.PUBLIC_FORGE_API_BASE_URL || ''
+    const url = baseUrl.replace(/\/$/, '') + '/api/test'
+    const accessToken = sessionStorage.getItem('forge_access_token')
+    const res = await fetch(url, {
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+    })
+    const data = await res.json()
+    alert(`API /api/test: ${res.status} - ${JSON.stringify(data)}`)
+  } catch (err) {
+    alert('API /api/test error: ' + (err instanceof Error ? err.message : String(err)))
+  }
+}
 
 export function UserMenu() {
   const { user, isLoading } = useUser()
@@ -71,6 +85,10 @@ export function UserMenu() {
         <DropdownMenuItem disabled>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleTestApi}>
+          <CheckCircle2 className="mr-2 h-4 w-4 text-green-600" />
+          <span>Test Authorizer (/api/test)</span>
         </DropdownMenuItem>
         <DropdownMenuItem disabled>
           <Settings className="mr-2 h-4 w-4" />
