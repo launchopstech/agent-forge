@@ -63,10 +63,10 @@ function matchesPattern(relPath, pattern) {
   // Convert to regex
   const escaped = pat
     .replace(/[.+^${}()|[\]\\]/g, '\\$&') // escape regex specials except * and ?
-    .replace(/\*\*/g, '\x00')              // placeholder for **
-    .replace(/\*/g, '[^/]*')               // * → match within segment
-    .replace(/\?/g, '[^/]')               // ? → single char
-    .replace(/\x00/g, '.*')               // ** → match across segments
+    .replace(/\*\*/g, '\x00') // placeholder for **
+    .replace(/\*/g, '[^/]*') // * → match within segment
+    .replace(/\?/g, '[^/]') // ? → single char
+    .replace(/\x00/g, '.*') // ** → match across segments
 
   const re = new RegExp(`(^|/)${escaped}(/|$)`)
   return re.test(relPath)
