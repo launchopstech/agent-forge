@@ -294,24 +294,30 @@ test.describe('Auth Handler Login Flow', () => {
 })
 
 test.describe('Auth Handler Error Cases', () => {
+  test.beforeEach(async ({ page }) => {
+    // Clear cookies so a stale forge_session doesn't cause middleware to redirect
+    // /login → /dashboard, making the URL check fail
+    await page.context().clearCookies()
+  })
+
   test('Invalid callback state is rejected', async ({ page }) => {
     // Navigate to callback with invalid state
     await page.goto('/callback?code=test-code&state=invalid-state')
 
-    // Wait for React to render the error state or redirect to login
-    await page
+    // Wait for either error message or redirect to /login
+    const errorPromise = page
       .locator('text=/error|invalid|failed/i')
       .first()
-      .waitFor({ timeout: 5000 })
+      .waitFor({ timeout: 3000 })
+      .then(() => 'error')
       .catch(() => null)
+    const redirectPromise = page
+      .waitForURL('**/login**', { timeout: 3000 })
+      .then(() => 'redirect')
+      .catch(() => null)
+    const result = await Promise.race([errorPromise, redirectPromise])
 
-    const hasError = await page
-      .locator('text=/error|invalid|failed/i')
-      .isVisible()
-      .catch(() => false)
-    const isOnLogin = page.url().includes('/login')
-
-    expect(hasError || isOnLogin).toBeTruthy()
+    expect(result).toBeTruthy()
     console.log('✓ Invalid state rejected')
   })
 
