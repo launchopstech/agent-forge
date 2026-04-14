@@ -2,22 +2,26 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 /**
- * Logout endpoint — clears all auth state and redirects to login.
- * This ensures both AgentForge session cookies are cleared.
+ * Logout endpoint — clears all auth state then chains through auth-handler logout.
  *
- * Note: auth-handler session is in a separate cookie and will expire naturally.
- * For a full SSO logout across all auth-handler clients, we would need to call
- * auth-handler's POST /logout endpoint and use the redirect_to from the response.
- *
- * Client-side logout flow:
- * 1. Clear sessionStorage (access token)
- * 2. Navigate to this endpoint (GET or POST)
- * 3. This endpoint clears cookies and redirects to /login
+ * Flow:
+ * 1. Clear :3000 session cookies (forge_session, forge_refresh, forge_oauth_flow)
+ * 2. Redirect browser to auth-handler GET /auth/logout?return_to=/login
+ * 3. Auth-handler clears forge_auth_session on :3002 and redirects to /login
  */
 
 async function handleLogout(request: NextRequest) {
-  // Create redirect response to login page
-  const response = NextResponse.redirect(new URL('/login', request.url))
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL('/', request.url).origin
+  const issuer = process.env.AUTH_HANDLER_ISSUER
+
+  // Build the redirect target: chain through auth-handler logout to clear :3002 session cookie,
+  // then have auth-handler redirect back to our /login page.
+  const loginUrl = `${appUrl}/login`
+  const redirectTarget = issuer
+    ? `${issuer}/logout?return_to=${encodeURIComponent(loginUrl)}`
+    : loginUrl
+
+  const response = NextResponse.redirect(redirectTarget)
 
   // Clear all auth cookies
   clearAuthCookies(response)

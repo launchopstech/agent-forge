@@ -9,7 +9,7 @@ import { useUser } from '@/hooks/use-user'
 export default function HomePage() {
   const { isAuthenticated } = useUser()
   const t = useTranslations('marketing')
-  const ctaHref = isAuthenticated ? '/dashboard' : '/signup'
+  const ctaHref = isAuthenticated ? '/dashboard' : '/login'
 
   const heroCards = [
     { icon: Zap, title: t('feature1Title'), desc: t('feature1Description') },
