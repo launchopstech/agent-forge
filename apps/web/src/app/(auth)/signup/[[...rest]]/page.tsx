@@ -1,8 +1,9 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 // App-owned signup page for auth-handler OAuth flow.
-// When NEXT_PUBLIC_AUTH_PROVIDER=auth-handler, this page immediately
-// redirects to the OAuth 2.0 authorization code flow with signup intent.
+// Immediately redirects to the OAuth 2.0 authorization code flow with signup intent.
 
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'

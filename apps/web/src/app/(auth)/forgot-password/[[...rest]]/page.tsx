@@ -1,8 +1,9 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 // App-owned password recovery page for auth-handler OAuth flow.
-// When NEXT_PUBLIC_AUTH_PROVIDER=auth-handler, this page immediately
-// redirects to the OAuth 2.0 flow with recovery intent.
+// Immediately redirects to the OAuth 2.0 flow with recovery intent.
 
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'

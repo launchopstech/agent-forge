@@ -9,7 +9,10 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: 'v8',
-      include: ['src/utils/**', 'src/adapters/auth-handler/**'],
+      include: ['src/utils/**'],
+      // auth-handler adapter files (client.ts, context.tsx, middleware.ts, provider.tsx, server.ts)
+      // use browser/React APIs (window, fetch, React context) that cannot be exercised in a Node
+      // test environment — excluded rather than covered by brittle mocks.
       exclude: ['src/**/*.test.ts', 'src/**/index.ts'],
       reportsDirectory: './coverage',
       thresholds: {

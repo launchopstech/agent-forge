@@ -1,5 +1,8 @@
 'use client'
 
+// Force SSR so the callback URL params are available on first render.
+export const dynamic = 'force-dynamic'
+
 /**
  * OAuth callback landing page.
  * Receives authorization code from auth-handler, exchanges it for tokens,
@@ -7,21 +10,22 @@
  */
 
 import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, Spinner } from '@forge/ui'
 import { AlertCircle } from 'lucide-react'
 
 export default function CallbackPage() {
-  const searchParams = useSearchParams()
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const handleCallback = async () => {
-      const code = searchParams.get('code')
-      const state = searchParams.get('state')
-      const errorParam = searchParams.get('error')
-      const errorDescription = searchParams.get('error_description')
+      // Read params directly from window.location to avoid useSearchParams() suspend behaviour
+      const params = new URLSearchParams(window.location.search)
+      const code = params.get('code')
+      const state = params.get('state')
+      const errorParam = params.get('error')
+      const errorDescription = params.get('error_description')
 
       // Check for OAuth error response
       if (errorParam) {
@@ -77,7 +81,7 @@ export default function CallbackPage() {
     }
 
     handleCallback()
-  }, [searchParams, router])
+  }, [router])
 
   return (
     <div className="flex min-h-screen items-center justify-center">
