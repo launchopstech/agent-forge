@@ -1,11 +1,29 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { fetchTemplates, fetchTemplate } from './templates.api'
+import { configureMockApi, resetMockApiConfig } from './mock-engine'
+
+beforeEach(() => {
+  resetMockApiConfig()
+  configureMockApi({ latency: { min: 0, max: 0 } })
+})
 
 describe('templates.api', () => {
   describe('fetchTemplates', () => {
     it('returns all templates', async () => {
       const templates = await fetchTemplates()
       expect(templates.length).toBeGreaterThan(0)
+    })
+
+    it('filters by category', async () => {
+      const all = await fetchTemplates()
+      const support = await fetchTemplates('customer-support')
+      expect(support.length).toBeLessThanOrEqual(all.length)
+    })
+
+    it('returns all when category is "all"', async () => {
+      const all = await fetchTemplates()
+      const filtered = await fetchTemplates('all')
+      expect(filtered.length).toBe(all.length)
     })
 
     it('every template has required fields', async () => {

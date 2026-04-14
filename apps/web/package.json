@@ -56,6 +56,7 @@
     "@radix-ui/react-toggle": "catalog:",
     "@radix-ui/react-toggle-group": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
+    "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "catalog:",
     "@vercel/speed-insights": "catalog:",
     "@xyflow/react": "^12.10.1",

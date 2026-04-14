@@ -1,15 +1,22 @@
 import type { AgentTemplate } from '../types'
 import templatesMock from '../mocks/templates.json'
+import { simulateLatency, maybeThrowError } from './mock-engine'
 
 // TODO: Replace mock data with real API calls using apiClient from @forge/api-client
 
-export async function fetchTemplates(): Promise<AgentTemplate[]> {
-  // TODO: return apiClient.get<AgentTemplate[]>('/api/agent-templates')
-  return Promise.resolve(templatesMock.templates as AgentTemplate[])
+export async function fetchTemplates(category?: string): Promise<AgentTemplate[]> {
+  await simulateLatency()
+  maybeThrowError()
+  let templates = templatesMock.templates as AgentTemplate[]
+  if (category && category !== 'all') {
+    templates = templates.filter((t) => t.category === category || t.category === 'blank')
+  }
+  return templates
 }
 
 export async function fetchTemplate(id: string): Promise<AgentTemplate | null> {
-  // TODO: return apiClient.get<AgentTemplate>(`/api/agent-templates/${id}`)
+  await simulateLatency()
+  maybeThrowError()
   const template = templatesMock.templates.find((t) => t.id === id)
-  return Promise.resolve((template as AgentTemplate) ?? null)
+  return (template as AgentTemplate) ?? null
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useAgentBuilderStore } from './agent-builder.store'
 import type { AgentTemplate, Agent } from '../types'
 
@@ -9,10 +9,47 @@ const MOCK_TEMPLATE: AgentTemplate = {
   category: 'support',
   description: 'FAQ, order tracking, and escalation',
   identity: { name: 'Support Bot', welcomeMessage: 'Hi!', tone: 'professional', language: 'en-US' },
-  behaviour: { systemPrompt: 'You are a support bot.', responseStyle: 30, fallback: 'handoff' },
+  behaviour: {
+    systemPrompt: 'You are a support bot.',
+    responseStyle: 30,
+    fallback: 'handoff',
+    tonePreset: 'friendly',
+    customToneInstructions: '',
+    useEmojis: true,
+    showSourceLinks: true,
+    guidanceRules: [
+      {
+        id: 'rule-1',
+        name: 'Refund Handling',
+        category: 'escalation',
+        whenCondition: 'Customer requests a refund',
+        instructions: 'Escalate to supervisor',
+        enabled: true,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+      },
+    ],
+  },
   actions: ['Process Refund', 'Create Ticket'],
   knowledge: ['FAQ Database'],
   channels: ['web'],
+}
+
+const MOCK_TEMPLATE_LEGACY: AgentTemplate = {
+  id: 'legacy',
+  name: 'Legacy',
+  emoji: '📦',
+  category: 'support',
+  description: 'Legacy template without new behaviour fields',
+  identity: { name: 'Legacy Bot', welcomeMessage: 'Hi!', tone: 'professional', language: 'en-US' },
+  behaviour: {
+    systemPrompt: 'Legacy prompt.',
+    responseStyle: 50,
+    fallback: 'handoff',
+  } as AgentTemplate['behaviour'],
+  actions: [],
+  knowledge: [],
+  channels: [],
 }
 
 const MOCK_AGENT: Agent = {
@@ -34,6 +71,10 @@ describe('agent-builder.store', () => {
     it('starts with a blank draft', () => {
       const { draftAgent } = useAgentBuilderStore.getState()
       expect(draftAgent.identity.name).toBe('')
+      expect(draftAgent.behaviour.tonePreset).toBe('neutral')
+      expect(draftAgent.behaviour.useEmojis).toBe(true)
+      expect(draftAgent.behaviour.showSourceLinks).toBe(true)
+      expect(draftAgent.behaviour.guidanceRules).toEqual([])
       expect(draftAgent.actions).toEqual([])
       expect(draftAgent.channels).toEqual([])
     })
@@ -90,6 +131,10 @@ describe('agent-builder.store', () => {
       expect(draftAgent.templateId).toBe('customer-support')
       expect(draftAgent.identity.name).toBe('Support Bot')
       expect(draftAgent.behaviour.systemPrompt).toBe('You are a support bot.')
+      expect(draftAgent.behaviour.tonePreset).toBe('friendly')
+      expect(draftAgent.behaviour.useEmojis).toBe(true)
+      expect(draftAgent.behaviour.guidanceRules).toHaveLength(1)
+      expect(draftAgent.behaviour.guidanceRules[0]?.name).toBe('Refund Handling')
       expect(draftAgent.actions).toEqual(['Process Refund', 'Create Ticket'])
       expect(draftAgent.knowledge).toEqual(['FAQ Database'])
       expect(draftAgent.channels).toEqual(['web'])
@@ -100,6 +145,16 @@ describe('agent-builder.store', () => {
       const { draftAgent } = useAgentBuilderStore.getState()
       draftAgent.actions.push('Extra')
       expect(MOCK_TEMPLATE.actions).not.toContain('Extra')
+    })
+
+    it('applies defaults for legacy templates missing new fields', () => {
+      useAgentBuilderStore.getState().applyTemplate(MOCK_TEMPLATE_LEGACY)
+      const { behaviour } = useAgentBuilderStore.getState().draftAgent
+      expect(behaviour.systemPrompt).toBe('Legacy prompt.')
+      expect(behaviour.tonePreset).toBe('neutral')
+      expect(behaviour.useEmojis).toBe(true)
+      expect(behaviour.showSourceLinks).toBe(true)
+      expect(behaviour.guidanceRules).toEqual([])
     })
   })
 
@@ -141,6 +196,122 @@ describe('agent-builder.store', () => {
       expect(behaviour.responseStyle).toBe(80)
       expect(behaviour.fallback).toBe('ticket')
       expect(behaviour.systemPrompt).toBe('') // default preserved
+    })
+
+    it('merges new behaviour fields', () => {
+      useAgentBuilderStore.getState().updateBehaviour({ tonePreset: 'friendly', useEmojis: false })
+      const { behaviour } = useAgentBuilderStore.getState().draftAgent
+      expect(behaviour.tonePreset).toBe('friendly')
+      expect(behaviour.useEmojis).toBe(false)
+      expect(behaviour.showSourceLinks).toBe(true) // default preserved
+    })
+  })
+
+  describe('addGuidanceRule', () => {
+    it('adds a rule with generated id and timestamps', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'Test',
+        category: 'communication',
+        whenCondition: 'When asked',
+        instructions: 'Do this',
+        enabled: true,
+      })
+      const { guidanceRules } = useAgentBuilderStore.getState().draftAgent.behaviour
+      expect(guidanceRules).toHaveLength(1)
+      expect(guidanceRules[0]?.id).toBeDefined()
+      expect(guidanceRules[0]?.name).toBe('Test')
+      expect(guidanceRules[0]?.createdAt).toBeDefined()
+      expect(guidanceRules[0]?.updatedAt).toBeDefined()
+    })
+
+    it('appends multiple rules', () => {
+      const store = useAgentBuilderStore.getState()
+      store.addGuidanceRule({
+        name: 'R1',
+        category: 'communication',
+        whenCondition: 'c1',
+        instructions: 'i1',
+        enabled: true,
+      })
+      store.addGuidanceRule({
+        name: 'R2',
+        category: 'escalation',
+        whenCondition: 'c2',
+        instructions: 'i2',
+        enabled: true,
+      })
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules).toHaveLength(2)
+    })
+  })
+
+  describe('updateGuidanceRule', () => {
+    it('merges patch into the matching rule', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'Original',
+        category: 'communication',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const ruleId = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.id
+      useAgentBuilderStore.getState().updateGuidanceRule(ruleId, { name: 'Updated' })
+      const rule = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!
+      expect(rule.name).toBe('Updated')
+      expect(rule.category).toBe('communication') // preserved
+    })
+
+    it('updates the updatedAt timestamp', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2025-01-01T00:00:00.000Z'))
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'R',
+        category: 'other',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const original = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!
+      vi.setSystemTime(new Date('2025-01-01T00:01:00.000Z'))
+      useAgentBuilderStore.getState().updateGuidanceRule(original.id, { name: 'New' })
+      const updated = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!
+      expect(updated.updatedAt).not.toBe(original.updatedAt)
+      vi.useRealTimers()
+    })
+  })
+
+  describe('removeGuidanceRule', () => {
+    it('removes the rule by id', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'ToDelete',
+        category: 'communication',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const ruleId = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.id
+      useAgentBuilderStore.getState().removeGuidanceRule(ruleId)
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules).toHaveLength(0)
+    })
+  })
+
+  describe('toggleGuidanceRule', () => {
+    it('flips the enabled flag', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'Toggle',
+        category: 'escalation',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const ruleId = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.id
+      useAgentBuilderStore.getState().toggleGuidanceRule(ruleId)
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.enabled).toBe(
+        false
+      )
+      useAgentBuilderStore.getState().toggleGuidanceRule(ruleId)
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.enabled).toBe(
+        true
+      )
     })
   })
 
@@ -232,12 +403,22 @@ describe('agent-builder.store', () => {
       const store = useAgentBuilderStore.getState()
       store.setAgentId('7')
       store.updateIdentity({ name: 'Modified' })
+      store.updateBehaviour({ tonePreset: 'formal' })
+      store.addGuidanceRule({
+        name: 'R',
+        category: 'communication',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
       store.markSectionCompleted('identity')
       store.addTestMessage({ role: 'user', content: 'test' })
       store.resetDraft()
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBeNull()
       expect(state.draftAgent.identity.name).toBe('')
+      expect(state.draftAgent.behaviour.tonePreset).toBe('neutral')
+      expect(state.draftAgent.behaviour.guidanceRules).toEqual([])
       expect(state.completedSections).toEqual([])
       expect(state.testMessages).toEqual([])
       expect(state.activeSection).toBe('identity')

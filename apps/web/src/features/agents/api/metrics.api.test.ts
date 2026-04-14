@@ -1,5 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { fetchMetrics, fetchUnresolvedIntents } from './metrics.api'
+import { configureMockApi, resetMockApiConfig } from './mock-engine'
+
+beforeEach(() => {
+  resetMockApiConfig()
+  configureMockApi({ latency: { min: 0, max: 0 } })
+})
 
 describe('metrics.api', () => {
   describe('fetchMetrics', () => {

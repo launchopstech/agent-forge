@@ -22,6 +22,7 @@ export interface AuthServerAdapter {
  */
 export interface AuthClientAdapter {
   useUser(): UseUserReturn
+  getAccessToken(): Promise<string | null>
 }
 
 /**
@@ -34,10 +35,10 @@ export interface AuthMiddlewareAdapter {
 
 /**
  * Every provider wrapper component must satisfy this interface.
- * Must be a 'use client' component.
+ * Can be either a sync client component or an async Server Component.
  */
 export interface AuthProviderComponent {
-  (props: { children: React.ReactNode }): React.JSX.Element
+  (props: { children: React.ReactNode }): React.JSX.Element | Promise<React.JSX.Element>
 }
 
 /**

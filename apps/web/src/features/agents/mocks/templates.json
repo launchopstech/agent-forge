@@ -15,7 +15,12 @@
       "behaviour": {
         "systemPrompt": "",
         "responseStyle": 50,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": [],
       "knowledge": [],
@@ -36,7 +41,33 @@
       "behaviour": {
         "systemPrompt": "You are a helpful customer support assistant. Your goal is to assist customers with their questions, resolve issues efficiently, and escalate to human agents when necessary.",
         "responseStyle": 30,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": [
+          {
+            "id": "tpl-cs-1",
+            "name": "Refund Handling",
+            "category": "escalation",
+            "whenCondition": "Customer requests a refund for an order over $100",
+            "instructions": "Escalate to a supervisor before processing. Confirm order details and reason for refund.",
+            "enabled": true,
+            "createdAt": "2025-01-01T00:00:00.000Z",
+            "updatedAt": "2025-01-01T00:00:00.000Z"
+          },
+          {
+            "id": "tpl-cs-2",
+            "name": "Greeting Protocol",
+            "category": "communication",
+            "whenCondition": "A new conversation starts or the customer greets",
+            "instructions": "Greet warmly by name if available. Introduce yourself and ask how you can help today.",
+            "enabled": true,
+            "createdAt": "2025-01-01T00:00:00.000Z",
+            "updatedAt": "2025-01-01T00:00:00.000Z"
+          }
+        ]
       },
       "actions": ["Process Refund", "Book Meeting", "Create Ticket"],
       "knowledge": ["Product Docs", "FAQ Database", "Pricing & Plans"],
@@ -57,7 +88,23 @@
       "behaviour": {
         "systemPrompt": "You are a sales assistant that qualifies leads by understanding their needs, budget, and timeline. Your goal is to identify high-quality prospects and book demo calls.",
         "responseStyle": 60,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "formal",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": [
+          {
+            "id": "tpl-lq-1",
+            "name": "Budget Qualification",
+            "category": "communication",
+            "whenCondition": "Lead mentions budget or pricing questions",
+            "instructions": "Gauge budget range before sharing pricing details. Qualify if within target range before booking a demo.",
+            "enabled": true,
+            "createdAt": "2025-01-01T00:00:00.000Z",
+            "updatedAt": "2025-01-01T00:00:00.000Z"
+          }
+        ]
       },
       "actions": ["Book Demo", "Send Brochure", "Create Lead"],
       "knowledge": ["Product Overview", "Pricing", "Case Studies"],
@@ -78,7 +125,12 @@
       "behaviour": {
         "systemPrompt": "You are an order management assistant. Help customers track their orders, process returns, and resolve delivery issues quickly and efficiently.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Track Order", "Process Return", "Update Address"],
       "knowledge": ["Order Policies", "Return Policy", "Shipping Info"],
@@ -99,7 +151,12 @@
       "behaviour": {
         "systemPrompt": "You are an onboarding assistant. Guide new users through the product setup, answer their initial questions, and help them achieve their first success milestone.",
         "responseStyle": 70,
-        "fallback": "email"
+        "fallback": "email",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Schedule Call", "Send Tutorial", "Create Account"],
       "knowledge": ["Getting Started Guide", "Feature Docs", "Video Tutorials"],
@@ -120,7 +177,12 @@
       "behaviour": {
         "systemPrompt": "You are an IT helpdesk assistant. Help employees with technical issues, password resets, software installations, and other IT requests.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Create IT Ticket", "Reset Password", "Escalate Issue"],
       "knowledge": ["IT Policies", "Common Issues", "Software Guides"],
@@ -141,7 +203,12 @@
       "behaviour": {
         "systemPrompt": "You are an appointment scheduling assistant. Help users find available time slots, book new appointments, reschedule existing ones, and send reminders.",
         "responseStyle": 30,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Book Appointment", "Reschedule", "Cancel Appointment"],
       "knowledge": ["Availability Calendar", "Booking Policies", "Location Info"],
@@ -162,7 +229,12 @@
       "behaviour": {
         "systemPrompt": "You are a product recommendation assistant. Understand customer preferences, budget, and needs to suggest the most relevant products from the catalog.",
         "responseStyle": 60,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Add to Cart", "Compare Products", "Check Availability"],
       "knowledge": ["Product Catalog", "Customer Reviews", "Promotions"],
@@ -183,7 +255,12 @@
       "behaviour": {
         "systemPrompt": "You are a FAQ assistant. Provide clear, concise answers to frequently asked questions. If you cannot find an answer, offer to connect the user with a human agent.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Search FAQ", "Create Ticket", "Rate Answer"],
       "knowledge": ["FAQ Database", "Product Docs", "Company Policies"],
@@ -204,7 +281,12 @@
       "behaviour": {
         "systemPrompt": "You are a survey collection assistant. Guide users through survey questions in a conversational manner, collect their responses, and thank them for their feedback.",
         "responseStyle": 50,
-        "fallback": "email"
+        "fallback": "email",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Start Survey", "Skip Question", "Submit Response"],
       "knowledge": ["Survey Templates", "Response Guidelines", "Privacy Policy"],
@@ -225,7 +307,12 @@
       "behaviour": {
         "systemPrompt": "You are a billing assistant. Help customers with invoice questions, payment processing, subscription changes, and billing disputes.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["View Invoice", "Update Payment", "Apply Discount"],
       "knowledge": ["Billing Policies", "Pricing Plans", "Payment Methods"],
@@ -246,7 +333,12 @@
       "behaviour": {
         "systemPrompt": "You are a social media management assistant. Help users draft posts, schedule content, respond to comments, and analyze engagement metrics across platforms.",
         "responseStyle": 70,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Draft Post", "Schedule Content", "Analyze Engagement"],
       "knowledge": ["Brand Guidelines", "Content Calendar", "Platform Best Practices"],
@@ -267,7 +359,12 @@
       "behaviour": {
         "systemPrompt": "You are an HR assistant. Help employees with questions about company policies, benefits enrollment, time-off requests, and onboarding procedures.",
         "responseStyle": 30,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Submit Time Off", "Check Benefits", "Open HR Case"],
       "knowledge": ["Employee Handbook", "Benefits Guide", "Company Policies"],
@@ -288,7 +385,12 @@
       "behaviour": {
         "systemPrompt": "You are a travel planning assistant. Help users find flights, compare hotels, build itineraries, and provide destination recommendations based on their preferences and budget.",
         "responseStyle": 60,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Search Flights", "Compare Hotels", "Build Itinerary"],
       "knowledge": ["Destination Guides", "Travel Policies", "Loyalty Programs"],
@@ -309,7 +411,12 @@
       "behaviour": {
         "systemPrompt": "You are a code review assistant. Analyze code for bugs, performance issues, security vulnerabilities, and style violations. Provide constructive feedback with suggested fixes.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Review PR", "Run Linter", "Suggest Fix"],
       "knowledge": ["Style Guide", "Security Checklist", "Best Practices"],
@@ -330,7 +437,12 @@
       "behaviour": {
         "systemPrompt": "You are an event coordination assistant. Help users plan events, manage guest lists, send invitations, track RSVPs, and coordinate logistics.",
         "responseStyle": 50,
-        "fallback": "email"
+        "fallback": "email",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Create Event", "Send Invites", "Track RSVPs"],
       "knowledge": ["Venue Directory", "Catering Options", "Event Templates"],
@@ -351,7 +463,12 @@
       "behaviour": {
         "systemPrompt": "You are an inventory management assistant. Help users track stock levels, set reorder thresholds, generate inventory reports, and manage supplier communications.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Check Stock", "Set Reorder Alert", "Generate Report"],
       "knowledge": ["Product Catalog", "Supplier Directory", "Warehouse Policies"],
@@ -372,7 +489,12 @@
       "behaviour": {
         "systemPrompt": "You are a compliance verification assistant. Help users understand regulatory requirements, check document compliance, flag potential violations, and generate audit-ready reports.",
         "responseStyle": 20,
-        "fallback": "ticket"
+        "fallback": "ticket",
+        "tonePreset": "neutral",
+        "customToneInstructions": "",
+        "useEmojis": false,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Run Compliance Check", "Flag Violation", "Generate Audit Report"],
       "knowledge": ["Regulatory Database", "Compliance Policies", "Audit Templates"],
@@ -393,7 +515,12 @@
       "behaviour": {
         "systemPrompt": "You are a newsletter writing assistant. Help users draft compelling email content, segment audiences, personalize messaging, and schedule campaign sends.",
         "responseStyle": 70,
-        "fallback": "handoff"
+        "fallback": "handoff",
+        "tonePreset": "friendly",
+        "customToneInstructions": "",
+        "useEmojis": true,
+        "showSourceLinks": true,
+        "guidanceRules": []
       },
       "actions": ["Draft Email", "Segment Audience", "Schedule Send"],
       "knowledge": ["Brand Voice Guide", "Email Templates", "Campaign Analytics"],

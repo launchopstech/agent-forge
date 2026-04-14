@@ -9,7 +9,7 @@ import { useUser } from '@/hooks/use-user'
 export default function HomePage() {
   const { isAuthenticated } = useUser()
   const t = useTranslations('marketing')
-  const ctaHref = isAuthenticated ? '/dashboard' : '/signup'
+  const ctaHref = isAuthenticated ? '/dashboard' : '/login'
 
   const heroCards = [
     { icon: Zap, title: t('feature1Title'), desc: t('feature1Description') },
@@ -117,7 +117,7 @@ export default function HomePage() {
         className="border-t border-border bg-primary px-6 py-24 text-center sm:px-8"
       >
         <h2 className="text-4xl font-bold text-primary-foreground">{t('ctaTitle')}</h2>
-        <p className="mt-4 text-lg text-primary-foreground/80">{t('ctaSubtitle')}</p>
+        <p className="mt-4 text-lg text-primary-foreground">{t('ctaSubtitle')}</p>
         <Button
           size="lg"
           className="mt-8 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
