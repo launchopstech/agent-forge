@@ -9,6 +9,7 @@ import { Input } from '@forge/ui/src/input'
 import { Skeleton } from '@forge/ui/src/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@forge/ui/src/select'
 import { siteConfig } from '@/config'
+import { useUser } from '@/hooks/use-user'
 import { useAgentListStore } from '../store/agent-list.store'
 import { MetricsGrid } from './MetricsGrid'
 import { AgentTable } from './AgentTable'
@@ -24,6 +25,7 @@ function splitName(name: string, accent?: string): [string, string] {
 
 export const AgentDashboard = React.memo(function AgentDashboard() {
   const t = useTranslations('agentHub.dashboard')
+  const { isLoading: authLoading, isAuthenticated } = useUser()
   const {
     agents,
     metrics,
@@ -44,8 +46,9 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
   } = useAgentListStore()
 
   useEffect(() => {
+    if (authLoading || !isAuthenticated) return
     void loadAll()
-  }, [loadAll])
+  }, [authLoading, isAuthenticated, loadAll])
 
   const tSidebar = useTranslations('sidebar')
   const [prefix, accent] = splitName(siteConfig.name, siteConfig.nameAccent)

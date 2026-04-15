@@ -282,6 +282,12 @@
       "typing": "Typing…"
     }
   },
+  "sessionWarning": {
+    "title": "Your session is about to expire",
+    "description": "You will be logged out in {minutes} minute(s) due to inactivity.",
+    "stayLoggedIn": "Stay logged in",
+    "logOut": "Log out"
+  },
   "marketing": {
     "announcement": "New: Enterprise features now available.",
     "announcementLink": "Learn more →",

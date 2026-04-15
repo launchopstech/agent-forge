@@ -28,6 +28,14 @@ interface TokenResponse {
  * 4. Update refresh cookie with new refresh token
  * 5. Return new access token to client for sessionStorage
  */
+// TODO [P1 — LOGGING] Add structured log lines at each step so Vercel function
+// logs can be correlated with auth-handler CloudWatch logs:
+//   - forge_refresh cookie present/absent (without leaking value)
+//   - token URL being called (issuer + /token)
+//   - HTTP status returned by auth-handler
+//   - whether new refresh token was rotated into the cookie
+// Each line should include a request-id (x-request-id header or crypto.randomUUID())
+// so a single refresh attempt can be traced end-to-end across both services.
 export async function POST(request: NextRequest) {
   try {
     // Validate env vars
@@ -36,6 +44,7 @@ export async function POST(request: NextRequest) {
     const sessionSecret = process.env.AUTH_HANDLER_SESSION_SECRET
 
     if (!issuer || !clientId || !sessionSecret) {
+      // eslint-disable-next-line no-console
       console.error('[auth] Missing AUTH_HANDLER_* environment variables')
       return NextResponse.json({ success: false, error: 'Configuration error' }, { status: 500 })
     }
@@ -56,6 +65,7 @@ export async function POST(request: NextRequest) {
     try {
       refreshData = await unsealCookie<RefreshTokenData>(refreshCookie.value, sessionSecret)
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('[auth] Failed to unseal refresh token:', err)
       return NextResponse.json({ success: false, error: 'Invalid refresh token' }, { status: 401 })
     }
@@ -76,6 +86,7 @@ export async function POST(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorData = await tokenResponse.json().catch(() => ({}))
+      // eslint-disable-next-line no-console
       console.error('[auth] Token refresh failed:', errorData)
 
       // Clear invalid refresh token
@@ -113,6 +124,7 @@ export async function POST(request: NextRequest) {
 
     return response
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error('[auth] Refresh error:', err)
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }

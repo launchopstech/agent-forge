@@ -282,6 +282,12 @@
       "typing": "[TODO] Saisie en cours…"
     }
   },
+  "sessionWarning": {
+    "title": "Votre session est sur le point d'expirer",
+    "description": "Vous serez déconnecté dans {minutes} minute(s) en raison d'inactivité.",
+    "stayLoggedIn": "Rester connecté",
+    "logOut": "Se déconnecter"
+  },
   "marketing": {
     "announcement": "Nouveau : Les fonctionnalités Enterprise sont disponibles.",
     "announcementLink": "En savoir plus →",

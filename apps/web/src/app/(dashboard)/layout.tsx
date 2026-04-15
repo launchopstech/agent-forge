@@ -5,20 +5,24 @@ import { DashboardLayout } from '@/components/layout'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 import { UserMenu } from '@/components/auth/UserMenu'
 import { requireAuth } from '@forge/auth/server'
+import { SessionWarningDialogLoader } from '@/features/auth/components/SessionWarningDialogLoader'
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   await requireAuth('/login')
 
   return (
-    <DashboardLayout
-      topbarRightSlot={
-        <>
-          <LocaleSwitcher />
-          <UserMenu />
-        </>
-      }
-    >
-      {children}
-    </DashboardLayout>
+    <>
+      <DashboardLayout
+        topbarRightSlot={
+          <>
+            <LocaleSwitcher />
+            <UserMenu />
+          </>
+        }
+      >
+        {children}
+      </DashboardLayout>
+      <SessionWarningDialogLoader />
+    </>
   )
 }

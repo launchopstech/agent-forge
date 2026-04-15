@@ -30,6 +30,12 @@
     ],
     "apps/web/src/**/*.{ts,tsx}": [
       "pnpm --filter=@forge/web exec vitest related --run"
+    ],
+    "packages/ui/src/*.tsx": [
+      "node scripts/check-story-coverage.mjs"
+    ],
+    "apps/web/src/features/**/components/*.tsx": [
+      "node scripts/check-story-coverage.mjs"
     ]
   },
   "devDependencies": {
