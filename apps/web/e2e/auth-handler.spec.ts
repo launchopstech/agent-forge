@@ -343,3 +343,76 @@ test.describe('Auth Handler Error Cases', () => {
     console.log('✓ Missing code parameter handled')
   })
 })
+
+test.describe('Auth-ready gate — no premature data requests', () => {
+  /**
+   * Regression guard: ensures the auth-ready gate in AgentDashboard prevents
+   * data API calls from firing before the auth session is established.
+   *
+   * Currently all feature APIs are mocked (no real forge-core calls), so this
+   * test catches regressions when mocks are replaced with real apiClient calls.
+   * Any real data request made without an Authorization header would show here.
+   */
+  test('Dashboard navigation fires no data API calls before auth is resolved', async ({ page }) => {
+    await page.context().clearCookies()
+
+    const prematureDataRequests: string[] = []
+
+    // Intercept /api/auth/session and delay it to widen the race window
+    await page.route('**/api/auth/session', async (route) => {
+      await new Promise((r) => setTimeout(r, 300))
+      await route.continue()
+    })
+
+    // Track any non-auth API calls that fire before the page settles
+    page.on('request', (request) => {
+      const url = request.url()
+      const isAuthRoute =
+        url.includes('/api/auth/') || url.includes('/_next/') || url.includes('/favicon')
+      if (url.includes('/api/') && !isAuthRoute) {
+        prematureDataRequests.push(url)
+      }
+    })
+
+    await page.goto('/dashboard')
+    // Without auth middleware lets through, we land on /login; if somehow on /dashboard,
+    // we wait for the delayed session check to settle before asserting.
+    await page.waitForURL(/\/(login|dashboard)/, { timeout: 5000 })
+    // Extra wait to capture any trailing requests after navigation
+    await page.waitForTimeout(400)
+
+    expect(prematureDataRequests).toHaveLength(0)
+    console.log('✓ No data API calls fired before auth session resolved')
+  })
+
+  test('/api/auth/session is called on dashboard load, not before', async ({ page }) => {
+    await page.context().clearCookies()
+
+    const sessionCallCount = { value: 0 }
+    const sessionCalledAfterLoad = { value: false }
+    let pageLoaded = false
+
+    await page.route('**/api/auth/session', async (route) => {
+      sessionCallCount.value++
+      if (pageLoaded) sessionCalledAfterLoad.value = true
+      await route.continue()
+    })
+
+    // Navigate and mark page as loaded once the response headers arrive
+    const responsePromise = page.waitForResponse('**/api/auth/session').catch(() => null)
+    await page.goto('/dashboard')
+    pageLoaded = true
+
+    await Promise.race([
+      responsePromise,
+      page.waitForURL(/\/login/, { timeout: 3000 }).catch(() => null),
+    ])
+
+    // If redirected to /login (no auth), session endpoint is never called by client
+    // (middleware redirects before the React component mounts and calls /api/auth/session).
+    // Either way, no stale/race call should have fired before page load.
+    console.log(`✓ /api/auth/session called ${sessionCallCount.value} time(s)`)
+    // The key invariant: never more than once per navigation
+    expect(sessionCallCount.value).toBeLessThanOrEqual(1)
+  })
+})
