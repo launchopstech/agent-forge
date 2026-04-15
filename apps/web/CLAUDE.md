@@ -29,6 +29,22 @@ Fix coverage by writing tests, never by lowering thresholds. Co-locate `*.test.t
 - `next/dynamic()` for components > ~50 kb (charts, rich editors, heavy modals)
 - `next/image` always — never `<img>`. Set explicit `width`/`height` or `fill` + `sizes`
 
+## Story coverage
+
+- Every component in `src/features/*/components/` requires a co-located `*.stories.tsx`
+- `scripts/check-story-coverage.mjs` enforces this in lint-staged (blocks commit if story is missing)
+- Stories with `play()` functions require a matching `*.stories.test.tsx` using `composeStories`:
+  ```typescript
+  import { composeStories } from '@storybook/react'
+  import * as stories from './MyComponent.stories'
+  const { MyStory } = composeStories(stories)
+  it('interaction works', async () => {
+    render(<MyStory />)
+    await MyStory.run() // runs the play() function in happy-dom — no browser needed
+  })
+  ```
+- Use the `/new-component` skill to scaffold component + story + test together
+
 ## Auth import rules (app side)
 
 - Import from `@/lib/auth` or `@/hooks/use-user` — never directly from `@clerk/nextjs`

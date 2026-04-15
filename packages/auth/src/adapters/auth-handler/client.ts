@@ -2,13 +2,49 @@
 
 // Auth Handler client adapter implementation.
 
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AuthHandlerContext } from './context'
 import type { AuthClientAdapter } from '../../contracts'
 import type { UseUserReturn } from '../../types'
 
 export const _typeCheck: AuthClientAdapter = { useUser, getAccessToken }
 void _typeCheck
+
+/**
+ * Returns the current session lifecycle status and actions.
+ * Auth-handler specific — only works inside AuthHandlerProvider.
+ */
+export function useSessionStatus() {
+  const context = useContext(AuthHandlerContext)
+
+  if (!context) {
+    throw new Error('useSessionStatus must be used within AuthHandlerProvider')
+  }
+
+  // Compute minutesRemaining in an effect + interval so Date.now() is never
+  // called during render (React purity rule: components must be idempotent).
+  const [minutesRemaining, setMinutesRemaining] = useState<number | null>(null)
+
+  useEffect(() => {
+    const compute = () => {
+      if (!context.tokenExpiresAt) {
+        setMinutesRemaining(null)
+        return
+      }
+      setMinutesRemaining(Math.max(0, Math.floor((context.tokenExpiresAt - Date.now()) / 60_000)))
+    }
+    compute()
+    const id = setInterval(compute, 60_000)
+    return () => clearInterval(id)
+  }, [context.tokenExpiresAt])
+
+  return {
+    status: context.sessionStatus,
+    minutesRemaining,
+    stayLoggedIn: context.refreshSession,
+    signOut: context.signOut,
+  }
+}
 
 /**
  * Hook to access current user session state.
@@ -92,6 +128,7 @@ async function refreshAccessToken(): Promise<string | null> {
 
       return null
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('[auth-handler] Failed to refresh token:', err)
       sessionStorage.removeItem('forge_access_token')
       sessionStorage.removeItem('forge_token_expires_at')
