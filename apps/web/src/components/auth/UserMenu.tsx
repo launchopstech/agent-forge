@@ -21,7 +21,7 @@ import {
 import { LogOut, Settings, User, CheckCircle2 } from 'lucide-react'
 const handleTestApi = async () => {
   try {
-    const baseUrl = process.env.PUBLIC_FORGE_API_BASE_URL || ''
+    const baseUrl = process.env.NEXT_PUBLIC_FORGE_API_BASE_URL || ''
     const url = baseUrl.replace(/\/$/, '') + '/api/test'
     const accessToken = sessionStorage.getItem('forge_access_token')
     const res = await fetch(url, {
