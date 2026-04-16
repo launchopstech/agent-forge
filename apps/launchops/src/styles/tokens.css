@@ -1,0 +1,44 @@
+/* LaunchOps Design Tokens — dark-only, violet/indigo brand */
+
+:root {
+  --bg: #06060f;
+  --surface: #0e0e1c;
+  --surface2: #141428;
+  --border: rgba(124, 58, 237, 0.16);
+  --border-sub: rgba(255, 255, 255, 0.06);
+  --violet: #7c3aed;
+  --violet-hi: #9d62f5;
+  --violet-glow: rgba(124, 58, 237, 0.3);
+  --indigo: #4f46e5;
+  --lo-text: #f0f0ff;
+  --lo-sub: #9393b0;
+  --lo-muted: #5c5c7a;
+  --success: #10b981;
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --max: 1160px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Tailwind / shadcn semantic aliases */
+  --background: #06060f;
+  --foreground: #f0f0ff;
+  --card: #0e0e1c;
+  --card-foreground: #f0f0ff;
+  --popover: #141428;
+  --popover-foreground: #f0f0ff;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #141428;
+  --secondary-foreground: #f0f0ff;
+  --muted: #0e0e1c;
+  --muted-foreground: #9393b0;
+  --accent: #9d62f5;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: #0e0e1c;
+  --ring: #7c3aed;
+  --radius: 10px;
+}
