@@ -2,8 +2,11 @@
 
 import { useState } from 'react'
 
-const FORMSPREE_ID = 'mkokjzrr'
+const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID
 
+if (!FORMSPREE_ID) {
+  throw new Error('Missing NEXT_PUBLIC_FORMSPREE_ID')
+}
 export function Contact() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(false)
