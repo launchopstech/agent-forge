@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "packageManager": "pnpm@9.11.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "turbo dev --filter=@forge/web",
     "build": "turbo build --filter=@forge/web",
