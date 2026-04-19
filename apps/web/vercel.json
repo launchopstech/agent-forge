@@ -1,4 +1,5 @@
 {
+  "installCommand": "cd ../.. && pnpm install",
   "buildCommand": "cd ../.. && pnpm turbo build --filter=@forge/web",
   "framework": "nextjs"
 }
