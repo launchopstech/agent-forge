@@ -8,6 +8,7 @@ import type {
   GuidanceRule,
   TemplateBehaviour,
 } from '../types'
+import { fetchAgent, updateAgent, publishAgent as apiPublishAgent } from '../api/agents.api'
 
 const DEFAULT_BEHAVIOUR: TemplateBehaviour = {
   systemPrompt: '',
@@ -40,6 +41,9 @@ interface AgentBuilderState {
   activeSection: BuilderSection
   completedSections: BuilderSection[]
   testMessages: TestMessage[]
+  isLoading: boolean
+  isSaving: boolean
+  error: string | null
   setAgentId: (id: string | null) => void
   hydrateFromAgent: (agent: Agent) => void
   applyTemplate: (template: AgentTemplate) => void
@@ -57,14 +61,22 @@ interface AgentBuilderState {
   addTestMessage: (message: Omit<TestMessage, 'id' | 'timestamp'>) => void
   clearTestMessages: () => void
   resetDraft: () => void
+  loadAgent: (id: string) => Promise<void>
+  saveDraft: () => Promise<void>
+  publishAgent: () => Promise<void>
 }
 
-export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
+let _saveTimeout: ReturnType<typeof setTimeout> | null = null
+
+export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   agentId: null,
   draftAgent: DEFAULT_DRAFT,
   activeSection: 'identity',
   completedSections: [],
   testMessages: [],
+  isLoading: false,
+  isSaving: false,
+  error: null,
 
   setAgentId: (id) => set({ agentId: id }),
 
@@ -122,6 +134,10 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
         identity: { ...state.draftAgent.identity, ...identity },
       },
     }))
+    if (get().agentId) {
+      if (_saveTimeout) clearTimeout(_saveTimeout)
+      _saveTimeout = setTimeout(() => void get().saveDraft(), 500)
+    }
   },
 
   updateBehaviour: (behaviour) => {
@@ -131,6 +147,10 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
         behaviour: { ...state.draftAgent.behaviour, ...behaviour },
       },
     }))
+    if (get().agentId) {
+      if (_saveTimeout) clearTimeout(_saveTimeout)
+      _saveTimeout = setTimeout(() => void get().saveDraft(), 500)
+    }
   },
 
   addGuidanceRule: (rule) => {
@@ -243,12 +263,63 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
   },
 
   resetDraft: () => {
+    if (_saveTimeout) {
+      clearTimeout(_saveTimeout)
+      _saveTimeout = null
+    }
     set({
       agentId: null,
       draftAgent: DEFAULT_DRAFT,
       activeSection: 'identity',
       completedSections: [],
       testMessages: [],
+      isLoading: false,
+      isSaving: false,
+      error: null,
     })
+  },
+
+  loadAgent: async (id: string) => {
+    set({ isLoading: true, error: null })
+    try {
+      const agent = await fetchAgent(id)
+      if (!agent) {
+        set({ isLoading: false, error: 'Agent not found' })
+        return
+      }
+      get().hydrateFromAgent(agent)
+      set({ isLoading: false })
+    } catch (err) {
+      set({ isLoading: false, error: err instanceof Error ? err.message : 'Failed to load agent' })
+    }
+  },
+
+  saveDraft: async () => {
+    const { agentId, draftAgent } = get()
+    if (!agentId) return
+    set({ isSaving: true })
+    try {
+      await updateAgent(agentId, {
+        name: draftAgent.identity.name,
+        uiConfig: { channels: draftAgent.channels },
+      })
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : 'Failed to save draft' })
+    } finally {
+      set({ isSaving: false })
+    }
+  },
+
+  publishAgent: async () => {
+    const { agentId } = get()
+    if (!agentId) return
+    set({ isSaving: true })
+    try {
+      await apiPublishAgent(agentId)
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : 'Failed to publish agent' })
+    } finally {
+      set({ isSaving: false })
+    }
   },
 }))

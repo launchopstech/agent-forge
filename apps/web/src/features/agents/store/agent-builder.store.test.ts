@@ -2,6 +2,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useAgentBuilderStore } from './agent-builder.store'
 import type { AgentTemplate, Agent } from '../types'
 
+vi.mock('../api/agents.api', () => ({
+  fetchAgent: vi.fn(),
+  updateAgent: vi.fn(),
+  publishAgent: vi.fn(),
+}))
+
+import { fetchAgent, updateAgent, publishAgent as apiPublishAgent } from '../api/agents.api'
+
 const MOCK_TEMPLATE: AgentTemplate = {
   id: 'customer-support',
   name: 'Customer Support',
@@ -63,6 +71,7 @@ const MOCK_AGENT: Agent = {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks()
   useAgentBuilderStore.getState().resetDraft()
 })
 
@@ -422,6 +431,152 @@ describe('agent-builder.store', () => {
       expect(state.completedSections).toEqual([])
       expect(state.testMessages).toEqual([])
       expect(state.activeSection).toBe('identity')
+    })
+
+    it('clears isLoading, isSaving, and error', () => {
+      useAgentBuilderStore.setState({ isLoading: true, isSaving: true, error: 'some error' })
+      useAgentBuilderStore.getState().resetDraft()
+      const state = useAgentBuilderStore.getState()
+      expect(state.isLoading).toBe(false)
+      expect(state.isSaving).toBe(false)
+      expect(state.error).toBeNull()
+    })
+  })
+
+  describe('loadAgent', () => {
+    it('calls fetchAgent with the given id', async () => {
+      vi.mocked(fetchAgent).mockResolvedValue(MOCK_AGENT)
+      await useAgentBuilderStore.getState().loadAgent('42')
+      expect(fetchAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('hydrates the store from the fetched agent', async () => {
+      vi.mocked(fetchAgent).mockResolvedValue(MOCK_AGENT)
+      await useAgentBuilderStore.getState().loadAgent('42')
+      const state = useAgentBuilderStore.getState()
+      expect(state.agentId).toBe('42')
+      expect(state.draftAgent.identity.name).toBe('Existing Bot')
+    })
+
+    it('sets isLoading during the call', async () => {
+      let loadingDuring = false
+      vi.mocked(fetchAgent).mockImplementation(async () => {
+        loadingDuring = useAgentBuilderStore.getState().isLoading
+        return MOCK_AGENT
+      })
+      await useAgentBuilderStore.getState().loadAgent('42')
+      expect(loadingDuring).toBe(true)
+      expect(useAgentBuilderStore.getState().isLoading).toBe(false)
+    })
+
+    it('sets error when agent is not found (null)', async () => {
+      vi.mocked(fetchAgent).mockResolvedValue(null)
+      await useAgentBuilderStore.getState().loadAgent('nonexistent')
+      const state = useAgentBuilderStore.getState()
+      expect(state.error).toBe('Agent not found')
+      expect(state.isLoading).toBe(false)
+    })
+
+    it('sets error on unexpected failure', async () => {
+      vi.mocked(fetchAgent).mockRejectedValue(new Error('Network error'))
+      await useAgentBuilderStore.getState().loadAgent('42')
+      expect(useAgentBuilderStore.getState().error).toBe('Network error')
+    })
+  })
+
+  describe('saveDraft', () => {
+    it('calls updateAgent with agentId and draft fields', async () => {
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+      useAgentBuilderStore.getState().updateIdentity({ name: 'My Bot' })
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(updateAgent).toHaveBeenCalledWith('42', expect.objectContaining({ name: 'My Bot' }))
+    })
+
+    it('does nothing when agentId is null', async () => {
+      useAgentBuilderStore.getState().resetDraft()
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(updateAgent).not.toHaveBeenCalled()
+    })
+
+    it('clears isSaving after completion', async () => {
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(useAgentBuilderStore.getState().isSaving).toBe(false)
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(updateAgent).mockRejectedValue(new Error('Save failed'))
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(useAgentBuilderStore.getState().error).toBe('Save failed')
+      expect(useAgentBuilderStore.getState().isSaving).toBe(false)
+    })
+  })
+
+  describe('publishAgent', () => {
+    it('calls apiPublishAgent with agentId', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(apiPublishAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('does nothing when agentId is null', async () => {
+      useAgentBuilderStore.getState().resetDraft()
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(apiPublishAgent).not.toHaveBeenCalled()
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(apiPublishAgent).mockRejectedValue(new Error('Publish failed'))
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(useAgentBuilderStore.getState().error).toBe('Publish failed')
+    })
+  })
+
+  describe('auto-save debounce', () => {
+    it('schedules saveDraft 500ms after updateIdentity when agentId is set', async () => {
+      vi.useFakeTimers()
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+
+      useAgentBuilderStore.getState().updateIdentity({ name: 'Auto Save Bot' })
+      expect(updateAgent).not.toHaveBeenCalled()
+
+      await vi.advanceTimersByTimeAsync(500)
+      expect(updateAgent).toHaveBeenCalledTimes(1)
+
+      vi.useRealTimers()
+    })
+
+    it('debounces — only saves once for rapid consecutive updates', async () => {
+      vi.useFakeTimers()
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+
+      useAgentBuilderStore.getState().updateIdentity({ name: 'A' })
+      useAgentBuilderStore.getState().updateIdentity({ name: 'AB' })
+      useAgentBuilderStore.getState().updateIdentity({ name: 'ABC' })
+
+      await vi.advanceTimersByTimeAsync(500)
+      expect(updateAgent).toHaveBeenCalledTimes(1)
+
+      vi.useRealTimers()
+    })
+
+    it('does not schedule auto-save when agentId is null', async () => {
+      vi.useFakeTimers()
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.getState().resetDraft() // agentId = null
+
+      useAgentBuilderStore.getState().updateIdentity({ name: 'No Save' })
+      await vi.advanceTimersByTimeAsync(500)
+      expect(updateAgent).not.toHaveBeenCalled()
+
+      vi.useRealTimers()
     })
   })
 })

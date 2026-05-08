@@ -1,13 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { fetchMetrics, fetchUnresolvedIntents } from './metrics.api'
-import { configureMockApi, resetMockApiConfig } from './mock-engine'
 
-beforeEach(() => {
-  resetMockApiConfig()
-  configureMockApi({ latency: { min: 0, max: 0 } })
-})
-
-describe('metrics.api', () => {
+describe('metrics.api (stub)', () => {
   describe('fetchMetrics', () => {
     it('returns dashboard metrics', async () => {
       const metrics = await fetchMetrics()
@@ -23,6 +17,10 @@ describe('metrics.api', () => {
       expect(typeof metrics.resolutionRateChange).toBe('number')
       expect(typeof metrics.handoffRateChange).toBe('number')
       expect(typeof metrics.avgResponseTimeChange).toBe('number')
+    })
+
+    it('never throws', async () => {
+      await expect(fetchMetrics()).resolves.toBeDefined()
     })
   })
 
@@ -48,6 +46,10 @@ describe('metrics.api', () => {
       expect(recommendation).toHaveProperty('message')
       expect(recommendation).toHaveProperty('cta')
       expect(recommendation).toHaveProperty('agentId')
+    })
+
+    it('never throws', async () => {
+      await expect(fetchUnresolvedIntents()).resolves.toBeDefined()
     })
   })
 })

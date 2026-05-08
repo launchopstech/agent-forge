@@ -1,8 +1,10 @@
 name: CI — Development
 
+# Runs CI checks on PRs to develop only.
+# Preview deployments are handled automatically by Vercel's GitHub integration.
+# Branch deployments to the development environment use deploy-development.yml.
+
 on:
-  push:
-    branches: [develop]
   pull_request:
     branches: [develop]
 

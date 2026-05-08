@@ -25,10 +25,18 @@ interface OAuthFlowState {
  * 2. Seal flow state into encrypted cookie (10 min expiry)
  * 3. Redirect to auth-handler /authorize endpoint
  */
+/** Validates returnTo is a same-origin relative path to prevent open redirect. */
+function sanitizeReturnTo(value: string | null): string {
+  const path = value ?? '/dashboard'
+  // Must start with / and not be a protocol-relative URL (//evil.com)
+  if (path.startsWith('/') && !path.startsWith('//')) return path
+  return '/dashboard'
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const intent = (searchParams.get('intent') ?? 'login') as OAuthFlowState['intent']
-  const returnTo = searchParams.get('returnTo') ?? '/dashboard'
+  const returnTo = sanitizeReturnTo(searchParams.get('returnTo'))
 
   // Validate env vars
   const issuer = process.env.AUTH_HANDLER_ISSUER

@@ -55,14 +55,14 @@ export async function setupAuthState(
     },
   ])
 
-  // Set access token in sessionStorage
+  // Set access token in sessionStorage — must match the format expected by
+  // packages/auth/src/adapters/auth-handler/client.ts getAccessToken():
+  //   forge_access_token     = plain JWT string
+  //   forge_token_expires_at = numeric timestamp as string
   await page.evaluate(
     ({ token, ttl }) => {
-      const tokenData = {
-        token,
-        expiresAt: Date.now() + ttl,
-      }
-      sessionStorage.setItem('forge_access_token', JSON.stringify(tokenData))
+      sessionStorage.setItem('forge_access_token', token)
+      sessionStorage.setItem('forge_token_expires_at', (Date.now() + ttl).toString())
     },
     { token: createMockAccessToken(userId), ttl: accessTokenTTL }
   )
@@ -108,16 +108,7 @@ export async function getSessionCookies(page: Page) {
  * Gets the access token from sessionStorage.
  */
 export async function getAccessToken(page: Page): Promise<string | null> {
-  return await page.evaluate(() => {
-    const tokenData = sessionStorage.getItem('forge_access_token')
-    if (!tokenData) return null
-    try {
-      const parsed = JSON.parse(tokenData)
-      return parsed.token || null
-    } catch {
-      return null
-    }
-  })
+  return await page.evaluate(() => sessionStorage.getItem('forge_access_token'))
 }
 
 /**

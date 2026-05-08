@@ -162,6 +162,7 @@
       "next": "Suivant",
       "back": "Retour",
       "finish": "[TODO] Finish & Save",
+      "saving": "[TODO] Saving…",
       "openTestChat": "[TODO] Ouvrir le chat de test",
       "closeTestChat": "[TODO] Fermer le chat de test",
       "sections": {

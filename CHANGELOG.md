@@ -7,29 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.1.0.0] - 2026-05-08
 
 ### Added
 
-- Phase 5 performance optimizations
-- React.memo on all layout components (Navbar, Footer, AppSidebar, Topbar)
-- ResponsiveImage component wrapper for next/image
-- Bundle analyzer with webpack support
-- Lighthouse CI workflow
-- Vercel Analytics integration
-- Performance documentation (docs/PERFORMANCE.md)
-- Code review documentation (docs/CODE_REVIEW_PHASE_1-4.md)
-- React patterns audit (docs/REACT_PATTERNS_AUDIT.md)
+- **Auth-handler adapter** — custom OAuth 2.0 / PKCE authorization flow independent of Clerk, supporting credential login (email/password), OAuth kickoff, token refresh, and session management
+- **Agent CRUD E2E tests** — Playwright test suite (A1–A4) covering create, list, edit, and delete agent flows via the Agent Builder; all 29 runnable tests passing
+- **Session lifecycle management** — proactive token refresh, session expiry warning dialog (`SessionWarningDialog`), and drift guard to prevent stale sessions
+- **Launchops marketing app** — new `apps/launchops` Next.js app with Hero, Pricing, Services, Work portfolio, Contact form, and Manifesto components
+- **DataTable component** — flexible, mobile-responsive data table in `@forge/ui` with sorting and pagination
+- **Guidance rules** — per-agent guidance rule CRUD (create, edit, delete) with `GuidanceRuleDialog` and `GuidanceRulesList` components; `TonePresetSelector` for behaviour presets
+- **Agent behaviour refactor** — split `BehaviourSection` into `BasicSettings`, `AdvancedSection`, and tone preset selector; added guidance rules to agent builder store
+- **PKCE utilities** — `generateCodeVerifier`, `generateCodeChallenge`, `generateState` in `@forge/auth`
+- **AES-256-GCM cookie sealing** — `sealCookie` / `unsealCookie` in `@forge/auth` for tamper-proof session and flow-state cookies
+- **Session encoding** — `sessionFromClaims`, `encodeSession`, `decodeSession` in `@forge/auth`
+- **AG-UI protocol spec** — documentation for agent-to-UI streaming protocol (`docs/specs/ag-ui-protocol-spec.md`)
+- **CI/CD pipelines** — `ci-development.yml` and `ci-qa.yml` refactored to pull-request triggers; new `deploy-development.yml` and `deploy-qa.yml` workflows
+- **ARCHITECTURE.md** — comprehensive architecture documentation (`docs/ARCHITECTURE.md`)
 
 ### Changed
 
-- Enhanced README with agency-ready structure
-- Updated nextjs-frontend-specs.md with Phase 5 & 12 details
+- **Auth routes** — `/api/auth/login`, `/api/auth/credentials`, `/api/auth/callback`, `/api/auth/logout`, `/api/auth/refresh`, `/api/auth/session` implemented using the auth-handler adapter
+- **Agent API** — `agents.api.ts` and `metrics.api.ts` updated to use `@forge/api-client` with Bearer token auth
+- **AgentDashboard** — auth-ready gate prevents API calls before token is available; unit tests added
+- **AgentTable** — enhanced with mobile support, status badges, and pagination via `AgentTablePagination`
+- **i18n messages** — English and French translations updated for new auth/agent features
 
 ### Fixed
 
-- Bundle analyzer compatibility with Next.js 16 Turbopack
-- Prettier formatting violations in documentation
+- **Open redirect** — `returnTo` query parameter now sanitized in `/api/auth/login` and `/api/auth/credentials` to reject protocol-relative URLs and absolute URLs
+- **CSRF logout** — removed GET handler from `/api/auth/logout`; POST-only prevents forced logout via `<img src>` or prefetch
+- **Dead code** — removed unused `const session = encodeSession(...)` variable in `callback/route.ts`
+- **E2E auth helper** — `setupAuthState()` now writes `forge_access_token` as plain JWT string + `forge_token_expires_at` as separate key, matching the production `getAccessToken()` format
+- **Hydration mismatch** — `UserButton` replaced with `UserButtonClient` in dashboard layout
+
+### Security
+
+- Open redirect prevention in auth flow `returnTo` parameter
+- CSRF logout prevention via POST-only logout endpoint
 
 ---
 
@@ -53,90 +68,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - White-label ready architecture (no hardcoded branding)
 - Project documentation structure
 
-### Documentation
-
-- README.md with setup instructions
-- docs/specs/nextjs-frontend-specs.md (13-phase plan)
-- docs/prompts/prompts-guideline-claude.md
-- docs/specs/domain-setup.md
-- CLAUDE.md for environment setup
-
 ---
 
-## Version History
-
-### Version Format
-
-```
-MAJOR.MINOR.PATCH
-
-MAJOR: Breaking changes
-MINOR: New features (backward compatible)
-PATCH: Bug fixes (backward compatible)
-```
-
-### Change Categories
-
-- **Added:** New features
-- **Changed:** Changes to existing functionality
-- **Deprecated:** Soon-to-be removed features
-- **Removed:** Removed features
-- **Fixed:** Bug fixes
-- **Security:** Vulnerability fixes
-
----
-
-## [Unreleased] - Planned Features
-
-### Phase 6 - Authentication
-
-- [ ] Clerk/Auth.js integration
-- [ ] Protected routes
-- [ ] Role-based access control
-
-### Phase 7 - Data Layer
-
-- [ ] Database setup (Prisma/Drizzle)
-- [ ] tRPC/Server Actions
-- [ ] Data fetching patterns
-
-### Phase 8 - Testing
-
-- [ ] Vitest unit tests
-- [ ] Playwright E2E tests
-- [ ] > 80% code coverage
-
-### Phase 9 - Visual Regression
-
-- [ ] Chromatic integration
-- [ ] Storybook deployment
-- [ ] Visual diff testing
-
-### Phase 10 - CI/CD
-
-- [ ] Enhanced GitHub Actions workflows
-- [ ] Automated dependency updates
-- [ ] Release automation
-
-### Phase 11 - Documentation
-
-- [ ] i18n scaffolding
-- [ ] THEMING.md guide
-- [ ] Architecture diagrams
-
-### Phase 12 - White-Labeling
-
-- [ ] Brand config system
-- [ ] Tenant context provider
-- [ ] Multi-environment setup
-
-### Phase 13 - Deployment
-
-- [ ] Vercel environment configuration
-- [ ] GoDaddy domain setup
-- [ ] Production monitoring
-
----
-
-[Unreleased]: https://github.com/bomatra/agent-forge/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/bomatra/agent-forge/releases/tag/v0.1.0
+[0.1.0.0]: https://github.com/launchopstech/agent-forge/releases/tag/v0.1.0.0

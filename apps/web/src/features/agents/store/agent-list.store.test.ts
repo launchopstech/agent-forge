@@ -1,19 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+vi.mock('@/hooks/use-toast', () => ({ toast: vi.fn() }))
 import { useAgentListStore } from './agent-list.store'
 import type { Agent } from '../types'
 
 // Mock the API layer so tests don't depend on mock data files
 vi.mock('../api/agents.api', () => ({
   fetchAgents: vi.fn(),
+  createAgent: vi.fn(),
   deleteAgent: vi.fn(),
-  agentStore: { reset: vi.fn() },
 }))
 vi.mock('../api/metrics.api', () => ({
   fetchMetrics: vi.fn(),
   fetchUnresolvedIntents: vi.fn(),
 }))
 
-import { fetchAgents, deleteAgent } from '../api/agents.api'
+import { fetchAgents, createAgent as apiCreateAgent, deleteAgent } from '../api/agents.api'
 import { fetchMetrics, fetchUnresolvedIntents } from '../api/metrics.api'
 
 const MOCK_AGENTS: Agent[] = [
@@ -206,6 +208,31 @@ describe('agent-list.store', () => {
       useAgentListStore.getState().setPage(2)
       expect(useAgentListStore.getState().page).toBe(2)
       expect(fetchAgents).toHaveBeenCalled()
+    })
+  })
+
+  describe('createAgent', () => {
+    it('calls createAgent API with the provided data', async () => {
+      vi.mocked(apiCreateAgent).mockResolvedValue(MOCK_AGENTS[0]!)
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      const data = { name: 'New Bot' }
+      await useAgentListStore.getState().createAgent(data)
+      expect(apiCreateAgent).toHaveBeenCalledWith(data)
+    })
+
+    it('reloads agent list after successful create', async () => {
+      vi.mocked(apiCreateAgent).mockResolvedValue(MOCK_AGENTS[0]!)
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      const data = { name: 'New Bot' }
+      await useAgentListStore.getState().createAgent(data)
+      expect(fetchAgents).toHaveBeenCalled()
+    })
+
+    it('sets error state on API failure', async () => {
+      vi.mocked(apiCreateAgent).mockRejectedValue(new Error('Create failed'))
+      const data = { name: 'Bad Bot' }
+      await useAgentListStore.getState().createAgent(data)
+      expect(useAgentListStore.getState().error).toBe('Create failed')
     })
   })
 })
