@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { unsealCookie, sealCookie } from '@forge/auth/src/utils/cookies'
-import { sessionFromClaims, encodeSession } from '@forge/auth/src/utils/session'
+import { sessionFromClaims } from '@forge/auth/src/utils/session'
 
 interface OAuthFlowState {
   state: string
@@ -147,7 +147,6 @@ export async function POST(request: NextRequest) {
 
     // Create session from claims
     const sessionData = sessionFromClaims(claims)
-    const session = encodeSession({ user: sessionData.user })
 
     // Seal session cookie (8 hour expiry)
     const sealedSession = await sealCookie(sessionData, sessionSecret)

@@ -3,14 +3,14 @@ import { NextResponse } from 'next/server'
 
 /**
  * Logout endpoint — clears all auth state then chains through auth-handler logout.
+ * POST only: GET is intentionally omitted to prevent CSRF logout via <img src> or prefetch.
  *
  * Flow:
  * 1. Clear :3000 session cookies (forge_session, forge_refresh, forge_oauth_flow)
  * 2. Redirect browser to auth-handler GET /auth/logout?return_to=/login
  * 3. Auth-handler clears forge_auth_session on :3002 and redirects to /login
  */
-
-async function handleLogout(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL('/', request.url).origin
   const issuer = process.env.AUTH_HANDLER_ISSUER
 
@@ -27,14 +27,6 @@ async function handleLogout(request: NextRequest) {
   clearAuthCookies(response)
 
   return response
-}
-
-export async function GET(request: NextRequest) {
-  return handleLogout(request)
-}
-
-export async function POST(request: NextRequest) {
-  return handleLogout(request)
 }
 
 /**

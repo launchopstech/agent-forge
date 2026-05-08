@@ -28,9 +28,17 @@ interface OAuthFlowState {
  * 4. Seal flow state cookie (for PKCE verification in /callback)
  * 5. Redirect browser to /callback with auth code
  */
+/** Validates returnTo is a same-origin relative path to prevent open redirect. */
+function sanitizeReturnTo(value: string | undefined): string {
+  const path = value ?? '/dashboard'
+  if (path.startsWith('/') && !path.startsWith('//')) return path
+  return '/dashboard'
+}
+
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as { email?: string; password?: string; returnTo?: string }
-  const { email, password, returnTo = '/dashboard' } = body
+  const { email, password } = body
+  const returnTo = sanitizeReturnTo(body.returnTo)
 
   if (!email || !password) {
     return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 })
