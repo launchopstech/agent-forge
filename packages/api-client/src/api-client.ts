@@ -9,7 +9,7 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? ''
+const BASE_URL = process.env.NEXT_PUBLIC_FORGE_API_BASE_URL ?? ''
 
 async function request<T>(
   path: string,

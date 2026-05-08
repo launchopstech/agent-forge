@@ -7,7 +7,7 @@ import { MessageCircle, X } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@forge/ui/src/sheet'
 import { useAgentBuilderStore } from '../store/agent-builder.store'
-import { fetchAgent } from '../api/agents.api'
+import { fetchAgent, createAgent } from '../api/agents.api'
 import { BuilderNav } from './BuilderNav'
 import { TestChatPanel } from './TestChatPanel'
 import { IdentitySection } from './builder-sections/IdentitySection'
@@ -34,7 +34,8 @@ const BuilderFooter = React.memo(function BuilderFooter({
 }) {
   const router = useRouter()
   const t = useTranslations('agentHub.builder')
-  const { markSectionCompleted } = useAgentBuilderStore()
+  const { markSectionCompleted, draftAgent, saveDraft } = useAgentBuilderStore()
+  const [isCreating, setIsCreating] = useState(false)
   const builderBase = `/agents/${agentId}`
   const idx = SECTION_ORDER.indexOf(section)
   const prevSection = idx > 0 ? SECTION_ORDER[idx - 1] : null
@@ -50,6 +51,25 @@ const BuilderFooter = React.memo(function BuilderFooter({
     if (nextSection) router.push(`${builderBase}/${nextSection}`)
   }, [section, nextSection, markSectionCompleted, router, builderBase])
 
+  const handleFinish = useCallback(async () => {
+    markSectionCompleted(section)
+    if (agentId === 'new') {
+      setIsCreating(true)
+      try {
+        await createAgent({
+          name: draftAgent.identity.name || 'Untitled Agent',
+          uiConfig: { channels: draftAgent.channels },
+        })
+        router.push('/agents')
+      } finally {
+        setIsCreating(false)
+      }
+    } else {
+      await saveDraft()
+      router.push('/agents')
+    }
+  }, [agentId, draftAgent, markSectionCompleted, section, saveDraft, router])
+
   return (
     <div className="shrink-0 border-t bg-background px-4 lg:px-6 py-3 flex justify-between">
       {prevSection ? (
@@ -59,7 +79,12 @@ const BuilderFooter = React.memo(function BuilderFooter({
       ) : (
         <div />
       )}
-      <Button onClick={handleNext}>{isLast ? t('finish') : t('next')}</Button>
+      <Button
+        onClick={isLast ? () => void handleFinish() : handleNext}
+        disabled={isLast && isCreating}
+      >
+        {isLast ? (isCreating ? t('saving') : t('finish')) : t('next')}
+      </Button>
     </div>
   )
 })

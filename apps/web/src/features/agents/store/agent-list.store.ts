@@ -6,8 +6,14 @@ import type {
   UnresolvedIntent,
   Recommendation,
 } from '../types'
-import { fetchAgents, deleteAgent } from '../api/agents.api'
+import {
+  fetchAgents,
+  createAgent as apiCreateAgent,
+  deleteAgent,
+  type CreateAgentPayload,
+} from '../api/agents.api'
 import { fetchMetrics, fetchUnresolvedIntents } from '../api/metrics.api'
+import { toast } from '@/hooks/use-toast'
 
 interface AgentListState {
   agents: Agent[]
@@ -28,6 +34,7 @@ interface AgentListState {
   loadAgents: () => Promise<void>
   loadMetrics: () => Promise<void>
   loadAll: () => Promise<void>
+  createAgent: (data: CreateAgentPayload) => Promise<void>
   removeAgent: (id: string) => Promise<void>
   setPage: (page: number) => void
   setSearch: (search: string) => void
@@ -102,6 +109,17 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
     }
   },
 
+  createAgent: async (data: CreateAgentPayload) => {
+    try {
+      await apiCreateAgent(data)
+      await get().loadAgents()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to create agent'
+      set({ error: message })
+      toast({ title: 'Error', description: message, variant: 'destructive' })
+    }
+  },
+
   removeAgent: async (id: string) => {
     set((state) => ({ agents: state.agents.filter((a) => a.id !== id) }))
     try {
@@ -115,11 +133,9 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
         search: search || undefined,
         status: statusFilter ?? undefined,
       })
-      set({
-        agents: result.data,
-        total: result.total,
-        error: err instanceof Error ? err.message : 'Failed to delete agent',
-      })
+      const message = err instanceof Error ? err.message : 'Failed to delete agent'
+      set({ agents: result.data, total: result.total, error: message })
+      toast({ title: 'Error', description: message, variant: 'destructive' })
     }
   },
 

@@ -8,6 +8,7 @@
     "./middleware": "./src/middleware-registry.ts",
     "./provider": "./src/auth-provider.tsx",
     "./contracts": "./src/contracts.ts",
+    "./client-registry": "./src/client-registry.ts",
     "./adapters/clerk/server": "./src/adapters/clerk/server.ts",
     "./adapters/clerk/middleware": "./src/adapters/clerk/middleware.ts"
   },

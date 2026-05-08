@@ -1,149 +1,261 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { ApiError } from '@forge/api-client'
+
+vi.mock('@forge/api-client', () => ({
+  apiClient: {
+    get: vi.fn(),
+    post: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+  },
+  ApiError: class ApiError extends Error {
+    status: number
+    data?: unknown
+    constructor(status: number, message: string, data?: unknown) {
+      super(message)
+      this.name = 'ApiError'
+      this.status = status
+      this.data = data
+    }
+  },
+}))
+
+vi.mock('@forge/auth/client-registry', () => ({
+  getAccessToken: vi.fn().mockResolvedValue('test-token'),
+}))
+
+import { apiClient } from '@forge/api-client'
 import {
   fetchAgents,
   fetchAgent,
   createAgent,
   updateAgent,
   deleteAgent,
-  agentStore,
+  publishAgent,
 } from './agents.api'
-import { configureMockApi, resetMockApiConfig } from './mock-engine'
+import type { Agent } from '../types'
+
+const MOCK_AGENTS: Agent[] = [
+  {
+    id: '1',
+    name: 'Customer Bot',
+    channels: [],
+    conversations: 100,
+    resolution: 80,
+    csat: 4.5,
+    status: 'live',
+  },
+  {
+    id: '2',
+    name: 'Sales Bot',
+    channels: [],
+    conversations: 50,
+    resolution: 70,
+    csat: 4.0,
+    status: 'draft',
+  },
+  {
+    id: '3',
+    name: 'Support Bot',
+    channels: [],
+    conversations: 30,
+    resolution: 60,
+    csat: 3.5,
+    status: 'draft',
+  },
+  {
+    id: '4',
+    name: 'HR Bot',
+    channels: [],
+    conversations: 20,
+    resolution: 55,
+    csat: 3.0,
+    status: 'paused',
+  },
+]
 
 beforeEach(() => {
-  resetMockApiConfig()
-  configureMockApi({ latency: { min: 0, max: 0 } })
-  agentStore.reset()
+  vi.clearAllMocks()
+  // Reset location mock
+  Object.defineProperty(window, 'location', {
+    writable: true,
+    value: { href: '' },
+  })
 })
 
-describe('agents.api', () => {
-  describe('fetchAgents', () => {
-    it('returns paginated response', async () => {
-      const result = await fetchAgents()
-      expect(result).toHaveProperty('data')
-      expect(result).toHaveProperty('total')
-      expect(result).toHaveProperty('page')
-      expect(result).toHaveProperty('pageSize')
-      expect(result.data.length).toBeGreaterThan(0)
-      expect(result.data[0]).toMatchObject({ id: expect.any(String), name: expect.any(String) })
-    })
-
-    it('paginates correctly', async () => {
-      const page1 = await fetchAgents({ page: 1, pageSize: 3 })
-      const page2 = await fetchAgents({ page: 2, pageSize: 3 })
-      expect(page1.data).toHaveLength(3)
-      expect(page2.data).toHaveLength(3)
-      expect(page1.data[0]?.id).not.toBe(page2.data[0]?.id)
-    })
-
-    it('filters by status', async () => {
-      const result = await fetchAgents({ status: 'draft' })
-      expect(result.data.length).toBeGreaterThan(0)
-      for (const agent of result.data) {
-        expect(agent.status).toBe('draft')
-      }
-    })
-
-    it('filters by search', async () => {
-      const result = await fetchAgents({ search: 'Customer' })
-      expect(result.data.length).toBeGreaterThan(0)
-      for (const agent of result.data) {
-        expect(agent.name.toLowerCase()).toContain('customer')
-      }
-    })
-
-    it('returns empty data for non-matching search', async () => {
-      const result = await fetchAgents({ search: 'zzz-no-match-zzz' })
-      expect(result.data).toHaveLength(0)
-      expect(result.total).toBe(0)
-    })
-
-    it('every agent has required fields', async () => {
-      const result = await fetchAgents()
-      for (const agent of result.data) {
-        expect(agent).toHaveProperty('id')
-        expect(agent).toHaveProperty('name')
-        expect(agent).toHaveProperty('channels')
-        expect(agent).toHaveProperty('conversations')
-        expect(agent).toHaveProperty('status')
-      }
-    })
+describe('fetchAgents', () => {
+  it('calls GET /api/agents', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+    await fetchAgents()
+    expect(apiClient.get).toHaveBeenCalledWith(
+      '/api/agents',
+      expect.objectContaining({ getToken: expect.any(Function) })
+    )
   })
 
-  describe('fetchAgent', () => {
-    it('returns agent by id', async () => {
-      const agent = await fetchAgent('1')
-      expect(agent).not.toBeNull()
-      expect(agent?.id).toBe('1')
-    })
-
-    it('returns null for unknown id', async () => {
-      const agent = await fetchAgent('nonexistent-999')
-      expect(agent).toBeNull()
-    })
+  it('returns paginated response shape', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+    const result = await fetchAgents()
+    expect(result).toHaveProperty('data')
+    expect(result).toHaveProperty('total')
+    expect(result).toHaveProperty('page')
+    expect(result).toHaveProperty('pageSize')
   })
 
-  describe('createAgent', () => {
-    it('returns new agent with a generated id', async () => {
-      const data = {
-        name: 'Test Bot',
-        channels: [],
-        conversations: 0,
-        resolution: null,
-        csat: null,
-        status: 'draft' as const,
-      }
-      const agent = await createAgent(data)
-      expect(agent.id).toBeDefined()
-      expect(agent.name).toBe('Test Bot')
-      expect(agent.status).toBe('draft')
-    })
-
-    it('persists agent in store', async () => {
-      const data = {
-        name: 'Persisted Bot',
-        channels: [],
-        conversations: 0,
-        resolution: null,
-        csat: null,
-        status: 'draft' as const,
-      }
-      const agent = await createAgent(data)
-      const fetched = await fetchAgent(agent.id)
-      expect(fetched?.name).toBe('Persisted Bot')
-    })
+  it('paginates correctly', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+    const page1 = await fetchAgents({ page: 1, pageSize: 2 })
+    const page2 = await fetchAgents({ page: 2, pageSize: 2 })
+    expect(page1.data).toHaveLength(2)
+    expect(page2.data).toHaveLength(2)
+    expect(page1.data[0]?.id).not.toBe(page2.data[0]?.id)
   })
 
-  describe('updateAgent', () => {
-    it('merges partial data onto existing agent', async () => {
-      const updated = await updateAgent('1', { name: 'Renamed Bot' })
-      expect(updated.id).toBe('1')
-      expect(updated.name).toBe('Renamed Bot')
-    })
-
-    it('persists update in store', async () => {
-      await updateAgent('1', { name: 'Renamed Bot' })
-      const fetched = await fetchAgent('1')
-      expect(fetched?.name).toBe('Renamed Bot')
-    })
-
-    it('throws for unknown agent id', async () => {
-      await expect(updateAgent('nonexistent-999', { name: 'X' })).rejects.toThrow('nonexistent-999')
-    })
+  it('filters by status client-side', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+    const result = await fetchAgents({ status: 'draft' })
+    expect(result.data.every((a) => a.status === 'draft')).toBe(true)
+    expect(result.total).toBe(2)
   })
 
-  describe('deleteAgent', () => {
-    it('resolves without error', async () => {
-      await expect(deleteAgent('1')).resolves.toBeUndefined()
-    })
+  it('filters by search client-side', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+    const result = await fetchAgents({ search: 'customer' })
+    expect(result.data).toHaveLength(1)
+    expect(result.data[0]?.name).toBe('Customer Bot')
+  })
 
-    it('removes agent from store', async () => {
-      await deleteAgent('1')
-      const fetched = await fetchAgent('1')
-      expect(fetched).toBeNull()
-    })
+  it('returns empty data for non-matching search', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+    const result = await fetchAgents({ search: 'zzz-no-match-zzz' })
+    expect(result.data).toHaveLength(0)
+    expect(result.total).toBe(0)
+  })
 
-    it('throws for unknown id', async () => {
-      await expect(deleteAgent('nonexistent-999')).rejects.toThrow()
-    })
+  it('redirects to /login on 401', async () => {
+    vi.mocked(apiClient.get).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+    await fetchAgents()
+    expect(window.location.href).toBe('/login')
+  })
+})
+
+describe('fetchAgent', () => {
+  it('calls GET /api/agents/:id', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS[0])
+    await fetchAgent('1')
+    expect(apiClient.get).toHaveBeenCalledWith('/api/agents/1', expect.any(Object))
+  })
+
+  it('returns agent on success', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS[0])
+    const agent = await fetchAgent('1')
+    expect(agent?.id).toBe('1')
+  })
+
+  it('returns null on 404', async () => {
+    vi.mocked(apiClient.get).mockRejectedValue(new ApiError(404, 'Not Found'))
+    const agent = await fetchAgent('nonexistent')
+    expect(agent).toBeNull()
+  })
+
+  it('redirects to /login on 401', async () => {
+    vi.mocked(apiClient.get).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+    await fetchAgent('1')
+    expect(window.location.href).toBe('/login')
+  })
+
+  it('rethrows non-ApiError errors', async () => {
+    vi.mocked(apiClient.get).mockRejectedValue(new Error('Network error'))
+    await expect(fetchAgent('1')).rejects.toThrow('Network error')
+  })
+})
+
+describe('createAgent', () => {
+  it('calls POST /api/agents', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue(MOCK_AGENTS[0])
+    const data = { name: 'New Bot' }
+    await createAgent(data)
+    expect(apiClient.post).toHaveBeenCalledWith('/api/agents', data, expect.any(Object))
+  })
+
+  it('returns the created agent', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue(MOCK_AGENTS[0])
+    const data = { name: 'New Bot' }
+    const agent = await createAgent(data)
+    expect(agent.id).toBe('1')
+  })
+
+  it('redirects to /login on 401', async () => {
+    vi.mocked(apiClient.post).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+    const data = { name: 'New Bot' }
+    await createAgent(data)
+    expect(window.location.href).toBe('/login')
+  })
+})
+
+describe('updateAgent', () => {
+  it('calls PATCH /api/agents/:id', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], name: 'Renamed' })
+    await updateAgent('1', { name: 'Renamed' })
+    expect(apiClient.patch).toHaveBeenCalledWith(
+      '/api/agents/1',
+      { name: 'Renamed' },
+      expect.any(Object)
+    )
+  })
+
+  it('returns updated agent', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], name: 'Renamed' })
+    const agent = await updateAgent('1', { name: 'Renamed' })
+    expect(agent.name).toBe('Renamed')
+  })
+
+  it('redirects to /login on 401', async () => {
+    vi.mocked(apiClient.patch).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+    await updateAgent('1', { name: 'X' })
+    expect(window.location.href).toBe('/login')
+  })
+})
+
+describe('deleteAgent', () => {
+  it('calls DELETE /api/agents/:id', async () => {
+    vi.mocked(apiClient.delete).mockResolvedValue(undefined)
+    await deleteAgent('1')
+    expect(apiClient.delete).toHaveBeenCalledWith('/api/agents/1', expect.any(Object))
+  })
+
+  it('resolves without error on success', async () => {
+    vi.mocked(apiClient.delete).mockResolvedValue(undefined)
+    await expect(deleteAgent('1')).resolves.toBeUndefined()
+  })
+
+  it('redirects to /login on 401', async () => {
+    vi.mocked(apiClient.delete).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+    await deleteAgent('1')
+    expect(window.location.href).toBe('/login')
+  })
+})
+
+describe('publishAgent', () => {
+  it('calls PATCH /api/agents/:id/status with live', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'live' })
+    await publishAgent('1')
+    expect(apiClient.patch).toHaveBeenCalledWith(
+      '/api/agents/1/status',
+      { status: 'live' },
+      expect.any(Object)
+    )
+  })
+
+  it('returns the updated agent', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'live' })
+    const agent = await publishAgent('1')
+    expect(agent.status).toBe('live')
+  })
+
+  it('redirects to /login on 401', async () => {
+    vi.mocked(apiClient.patch).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+    await publishAgent('1')
+    expect(window.location.href).toBe('/login')
   })
 })
