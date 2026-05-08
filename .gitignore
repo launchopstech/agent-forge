@@ -52,3 +52,4 @@ chrome-profile-*/
 
 # package-lock (project uses pnpm)
 package-lock.json
+.env*.local
