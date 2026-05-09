@@ -28,9 +28,11 @@ const SECTION_ORDER: BuilderSection[] = [
 const BuilderFooter = React.memo(function BuilderFooter({
   section,
   agentId,
+  onOpenChat,
 }: {
   section: BuilderSection
   agentId: string
+  onOpenChat: () => void
 }) {
   const router = useRouter()
   const t = useTranslations('agentHub.builder')
@@ -71,7 +73,7 @@ const BuilderFooter = React.memo(function BuilderFooter({
   }, [agentId, draftAgent, markSectionCompleted, section, saveDraft, router])
 
   return (
-    <div className="shrink-0 border-t bg-background px-4 lg:px-6 py-3 flex justify-between">
+    <div className="shrink-0 border-t bg-background px-4 lg:px-6 py-3 flex items-center justify-between">
       {prevSection ? (
         <Button variant="outline" onClick={handleBack}>
           {t('back')}
@@ -79,6 +81,15 @@ const BuilderFooter = React.memo(function BuilderFooter({
       ) : (
         <div />
       )}
+      <Button
+        size="icon"
+        variant="default"
+        className="lg:hidden h-10 w-10 rounded-full"
+        onClick={onOpenChat}
+        aria-label={t('openTestChat')}
+      >
+        <MessageCircle className="size-5" />
+      </Button>
       <Button
         onClick={isLast ? () => void handleFinish() : handleNext}
         disabled={isLast && isCreating}
@@ -165,7 +176,7 @@ export const AgentBuilder = React.memo(function AgentBuilder({
           <div className="flex-1 overflow-y-auto p-4 lg:p-6">
             <SectionContent section={section} />
           </div>
-          <BuilderFooter section={section} agentId={agentId} />
+          <BuilderFooter section={section} agentId={agentId} onOpenChat={handleOpenChat} />
         </main>
 
         {/* Right: test chat — hidden on mobile/tablet, fixed column on desktop */}
@@ -174,17 +185,7 @@ export const AgentBuilder = React.memo(function AgentBuilder({
         </aside>
       </div>
 
-      {/* Mobile/tablet: FAB to open test chat */}
-      <Button
-        size="icon"
-        className="lg:hidden fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg"
-        onClick={handleOpenChat}
-        aria-label={t('openTestChat')}
-      >
-        <MessageCircle className="size-5" />
-      </Button>
-
-      {/* Mobile/tablet: Sheet for test chat */}
+      {/* Mobile/tablet: Sheet for test chat (trigger is inside BuilderFooter) */}
       <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
         <SheetContent side="bottom" className="h-[70vh] p-0 [&>button]:hidden">
           <SheetHeader className="sr-only">

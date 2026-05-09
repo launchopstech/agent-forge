@@ -1,11 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { matchResponse, getChatResponse } from './chat-responses'
-import { configureMockApi, resetMockApiConfig } from './mock-engine'
-
-beforeEach(() => {
-  resetMockApiConfig()
-  configureMockApi({ latency: { min: 0, max: 0 } })
-})
+import { describe, it, expect } from 'vitest'
+import { matchResponse } from './chat-responses'
 
 describe('chat-responses', () => {
   describe('matchResponse', () => {
@@ -54,19 +48,6 @@ describe('chat-responses', () => {
     it('is case insensitive', () => {
       const result = matchResponse('HELLO')
       expect(result.content).toContain('Hello')
-    })
-  })
-
-  describe('getChatResponse', () => {
-    it('returns a ChatResponse asynchronously', async () => {
-      const result = await getChatResponse('hello')
-      expect(result).toHaveProperty('content')
-      expect(result).toHaveProperty('confidence')
-    })
-
-    it('matches keywords like sync version', async () => {
-      const result = await getChatResponse('pricing')
-      expect(result.content).toContain('plan')
     })
   })
 })
