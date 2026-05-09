@@ -1,3 +1,4 @@
+
 #!/usr/bin/env node
 /**
  * PreToolUse hook — blocks Read/Glob/Grep on paths matching .claudeignore patterns.
