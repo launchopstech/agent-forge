@@ -59,6 +59,7 @@ interface AgentBuilderState {
   toggleKnowledge: (source: string) => void
   toggleChannel: (channel: string) => void
   addTestMessage: (message: Omit<TestMessage, 'id' | 'timestamp'>) => void
+  appendToLastTestMessage: (chunk: string) => void
   clearTestMessages: () => void
   resetDraft: () => void
   loadAgent: (id: string) => Promise<void>
@@ -251,11 +252,21 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
         ...state.testMessages,
         {
           ...message,
-          id: String(Date.now()),
+          id: crypto.randomUUID(),
           timestamp: new Date(),
         },
       ],
     }))
+  },
+
+  appendToLastTestMessage: (chunk) => {
+    set((state) => {
+      const msgs = state.testMessages
+      const last = msgs[msgs.length - 1]
+      if (!last || last.role !== 'assistant') return state
+      const updated: TestMessage = { ...last, content: last.content + chunk }
+      return { testMessages: [...msgs.slice(0, -1), updated] }
+    })
   },
 
   clearTestMessages: () => {

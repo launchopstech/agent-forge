@@ -1,5 +1,4 @@
 import type { ChatResponse } from '../types'
-import { simulateLatency } from './mock-engine'
 
 interface ResponseRule {
   keywords: string[]
@@ -96,10 +95,4 @@ export function matchResponse(userMessage: string): ChatResponse {
   }
 
   return DEFAULT_RESPONSE
-}
-
-/** Get a chat response with simulated typing delay. */
-export async function getChatResponse(userMessage: string): Promise<ChatResponse> {
-  await simulateLatency()
-  return matchResponse(userMessage)
 }

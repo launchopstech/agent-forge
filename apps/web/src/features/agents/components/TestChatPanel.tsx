@@ -2,47 +2,96 @@
 
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { Send, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
-import { Input } from '@forge/ui/src/input'
-import { ScrollArea } from '@forge/ui/src/scroll-area'
 import { cn } from '@forge/ui/src/utils'
+import {
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+  ConversationScrollButton,
+  Message,
+  MessageContent,
+  MessageResponse,
+  PromptInput,
+  PromptInputTextarea,
+  PromptInputFooter,
+  PromptInputSubmit,
+  PromptInputTools,
+  type PromptInputMessage,
+} from '@forge/ai-ui'
 import { useAgentBuilderStore } from '../store/agent-builder.store'
-import { getChatResponse } from '../api/chat-responses'
+import { streamChat } from '../api/chat.api'
+import { getAccessToken } from '@forge/auth/client-registry'
+import { toast } from '@/hooks/use-toast'
 
 export const TestChatPanel = React.memo(function TestChatPanel() {
   const t = useTranslations('agentHub.testChat')
-  const { testMessages, draftAgent, addTestMessage, clearTestMessages } = useAgentBuilderStore()
-  const [input, setInput] = useState('')
+  const {
+    testMessages,
+    draftAgent,
+    agentId,
+    addTestMessage,
+    appendToLastTestMessage,
+    clearTestMessages,
+  } = useAgentBuilderStore()
   const [isTyping, setIsTyping] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const [isStreaming, setIsStreaming] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [testMessages, isTyping])
+    return () => {
+      abortRef.current?.abort()
+    }
+  }, [])
 
-  const handleSend = useCallback(() => {
-    const trimmed = input.trim()
-    if (!trimmed) return
+  const handleSend = useCallback(
+    ({ text }: PromptInputMessage) => {
+      const trimmed = text.trim()
+      if (!trimmed || isTyping || isStreaming || !agentId) return
 
-    addTestMessage({ role: 'user', content: trimmed })
-    setInput('')
-    setIsTyping(true)
+      addTestMessage({ role: 'user', content: trimmed })
+      setIsTyping(true)
 
-    void getChatResponse(trimmed).then((response) => {
-      setIsTyping(false)
-      addTestMessage({ role: 'assistant', content: response.content })
-    })
-  }, [addTestMessage, input])
+      const controller = new AbortController()
+      abortRef.current = controller
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        handleSend()
-      }
+      const messages = useAgentBuilderStore
+        .getState()
+        .testMessages.map(({ role, content }) => ({ role, content }))
+
+      void (async () => {
+        addTestMessage({ role: 'assistant', content: '' })
+        let firstChunk = true
+        try {
+          for await (const chunk of streamChat(
+            agentId,
+            messages,
+            getAccessToken,
+            controller.signal
+          )) {
+            if (firstChunk) {
+              setIsTyping(false)
+              setIsStreaming(true)
+              firstChunk = false
+            }
+            appendToLastTestMessage(chunk)
+          }
+        } catch (err) {
+          if ((err as Error).name !== 'AbortError') {
+            toast({
+              title: t('errorTitle'),
+              description: (err as Error).message,
+              variant: 'destructive',
+            })
+          }
+        } finally {
+          setIsTyping(false)
+          setIsStreaming(false)
+        }
+      })()
     },
-    [handleSend]
+    [addTestMessage, appendToLastTestMessage, agentId, isTyping, isStreaming, t]
   )
 
   return (
@@ -62,7 +111,8 @@ export const TestChatPanel = React.memo(function TestChatPanel() {
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          onClick={clearTestMessages}
+          onClick={isStreaming ? undefined : clearTestMessages}
+          disabled={isStreaming}
           title={t('clear')}
         >
           <Trash2 className="size-4" />
@@ -70,77 +120,62 @@ export const TestChatPanel = React.memo(function TestChatPanel() {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-4 py-3">
-        {testMessages.length === 0 ? (
-          <div className="flex h-32 items-center justify-center text-center text-sm text-muted-foreground">
-            {t('emptyState')}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {testMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className={cn('flex gap-2 items-end', msg.role === 'user' && 'flex-row-reverse')}
-              >
-                <div className="flex flex-col gap-0.5 max-w-[80%]">
-                  <div
-                    className={cn(
-                      'px-3 py-2 text-sm',
-                      msg.role === 'user'
-                        ? 'rounded-tl-2xl rounded-tr-sm rounded-br-2xl rounded-bl-2xl bg-primary text-primary-foreground'
-                        : 'rounded-tl-sm rounded-tr-2xl rounded-br-2xl rounded-bl-2xl bg-muted text-foreground'
+      <Conversation className="flex-1">
+        <ConversationContent className="gap-4">
+          {testMessages.length === 0 ? (
+            <ConversationEmptyState title={t('emptyState')} />
+          ) : (
+            <>
+              {testMessages.map((msg) => (
+                <Message key={msg.id} from={msg.role}>
+                  <MessageContent>
+                    {msg.role === 'assistant' ? (
+                      <MessageResponse>{msg.content}</MessageResponse>
+                    ) : (
+                      msg.content
                     )}
-                  >
-                    {msg.content}
-                  </div>
-                  {msg.role === 'assistant' && (
-                    <span className="text-[10px] text-muted-foreground px-1">
-                      {t('confidence', { value: 98 })}
-                    </span>
-                  )}
+                  </MessageContent>
                   <span
                     className={cn(
                       'text-[10px] text-muted-foreground px-1',
                       msg.role === 'user' && 'text-right'
                     )}
                   >
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                </div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex gap-2 items-end">
-                <div className="flex flex-col gap-0.5 max-w-[80%]">
-                  <div className="rounded-tl-sm rounded-tr-2xl rounded-br-2xl rounded-bl-2xl bg-muted text-foreground px-3 py-2 text-sm">
+                </Message>
+              ))}
+              {isTyping && (
+                <Message from="assistant">
+                  <MessageContent>
                     <span className="flex gap-1">
                       <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:0ms]" />
                       <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:150ms]" />
                       <span className="size-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:300ms]" />
                     </span>
-                  </div>
+                  </MessageContent>
                   <span className="text-[10px] text-muted-foreground px-1">{t('typing')}</span>
-                </div>
-              </div>
-            )}
-            <div ref={bottomRef} />
-          </div>
-        )}
-      </ScrollArea>
+                </Message>
+              )}
+            </>
+          )}
+        </ConversationContent>
+        <ConversationScrollButton />
+      </Conversation>
 
       {/* Input */}
-      <div className="border-t px-4 py-3 flex gap-2 shrink-0">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={t('inputPlaceholder')}
-          className="flex-1"
-        />
-        <Button size="icon" onClick={handleSend} disabled={!input.trim()}>
-          <Send className="size-4" />
-          <span className="sr-only">{t('send')}</span>
-        </Button>
+      <div className="border-t px-3 py-3 shrink-0">
+        <PromptInput onSubmit={handleSend}>
+          <PromptInputTextarea placeholder={t('inputPlaceholder')} className="min-h-[40px]" />
+          <PromptInputFooter>
+            <PromptInputTools />
+            <PromptInputSubmit
+              status={isTyping ? 'submitted' : isStreaming ? 'streaming' : undefined}
+              disabled={isTyping || isStreaming || !agentId}
+              title={!agentId ? t('saveAgentFirst') : undefined}
+            />
+          </PromptInputFooter>
+        </PromptInput>
       </div>
     </div>
   )

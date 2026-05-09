@@ -280,7 +280,9 @@
       "send": "Send",
       "defaultReply": "I'm here to help! (This is a simulated response)",
       "confidence": "{value}% confidence",
-      "typing": "Typing…"
+      "typing": "Typing…",
+      "saveAgentFirst": "Save agent first",
+      "errorTitle": "Chat error"
     }
   },
   "sessionWarning": {
