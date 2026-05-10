@@ -8,7 +8,7 @@ import { requireAuth } from '@forge/auth/server'
 import { SessionWarningDialogLoader } from '@/features/auth/components/SessionWarningDialogLoader'
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  await requireAuth('/login')
+  const session = await requireAuth('/login')
 
   return (
     <>
@@ -16,7 +16,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
         topbarRightSlot={
           <>
             <LocaleSwitcher />
-            <UserMenu />
+            <UserMenu initialUser={session.user} />
           </>
         }
       >

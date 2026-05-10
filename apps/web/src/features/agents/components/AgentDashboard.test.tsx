@@ -99,12 +99,16 @@ describe('AgentDashboard — auth-ready gate', () => {
     await waitFor(() => expect(mockLoadAll).not.toHaveBeenCalled(), { timeout: 200 })
   })
 
-  it('does NOT call loadAll when auth is ready but user is not authenticated', async () => {
+  it('calls loadAll when auth is ready even if user is not authenticated (provider handles redirect)', async () => {
+    // isAuthenticated guard was removed — the provider keeps isLoading=true until
+    // session is confirmed, so by the time authLoading flips to false, signOut()
+    // has already been called for unauthenticated users (redirecting to /login).
+    // loadAll() firing here is expected; the 401 from the API triggers redirect401().
     mockUseUser.mockReturnValue({ isLoading: false, isAuthenticated: false })
 
     render(<AgentDashboard />)
 
-    await waitFor(() => expect(mockLoadAll).not.toHaveBeenCalled(), { timeout: 200 })
+    await waitFor(() => expect(mockLoadAll).toHaveBeenCalledOnce())
   })
 
   it('calls loadAll once auth is ready and user is authenticated', async () => {

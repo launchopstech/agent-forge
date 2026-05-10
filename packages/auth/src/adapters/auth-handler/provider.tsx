@@ -41,23 +41,52 @@ export const AuthHandlerProvider: AuthProviderComponent = ({ children }) => {
   const lastActivityAt = useRef<number>(Date.now())
   const lastActivityUpdate = useRef<number>(0)
 
+  // ── Safe sessionStorage helpers (iOS Safari Private Mode guard) ───────────
+  // In iOS Safari Private Browsing, sessionStorage.setItem throws SecurityError.
+  // We catch silently — tokens still work for the current request, just aren't cached.
+  const safeSessionGet = (key: string): string | null => {
+    try {
+      return sessionStorage.getItem(key)
+    } catch {
+      return null
+    }
+  }
+  const safeSessionSet = (key: string, value: string): void => {
+    try {
+      sessionStorage.setItem(key, value)
+    } catch {
+      /* unavailable */
+    }
+  }
+  const safeSessionRemove = (key: string): void => {
+    try {
+      sessionStorage.removeItem(key)
+    } catch {
+      /* unavailable */
+    }
+  }
+
   const isUserActive = useCallback(() => Date.now() - lastActivityAt.current < ACTIVITY_IDLE_MS, [])
 
   // ── Sign out ─────────────────────────────────────────────────────────────
 
-  const signOut = useCallback(async () => {
-    sessionStorage.removeItem('forge_access_token')
-    sessionStorage.removeItem('forge_token_expires_at')
-    setSession(null)
-    setTokenExpiresAt(null)
-    setSessionStatus('expired')
-    try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-    } catch {
-      // best-effort — redirect regardless
-    }
-    router.push('/login?reason=session_expired')
-  }, [router])
+  const signOut = useCallback(
+    async (reason: 'session_expired' | 'logout' = 'session_expired') => {
+      safeSessionRemove('forge_access_token')
+      safeSessionRemove('forge_token_expires_at')
+      setSession(null)
+      setTokenExpiresAt(null)
+      setSessionStatus('expired')
+      try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      } catch {
+        // best-effort — redirect regardless
+      }
+      const loginUrl = reason === 'session_expired' ? '/login?reason=session_expired' : '/login'
+      router.push(loginUrl)
+    },
+    [router]
+  )
 
   // ── Refresh session ───────────────────────────────────────────────────────
 
@@ -67,9 +96,9 @@ export const AuthHandlerProvider: AuthProviderComponent = ({ children }) => {
       if (!res.ok) return false
       const data = await res.json()
       if (data.accessToken) {
-        sessionStorage.setItem('forge_access_token', data.accessToken)
+        safeSessionSet('forge_access_token', data.accessToken)
         const exp = Date.now() + (data.expiresIn as number) * 1000
-        sessionStorage.setItem('forge_token_expires_at', exp.toString())
+        safeSessionSet('forge_token_expires_at', exp.toString())
         setTokenExpiresAt(exp)
         setSessionStatus('active')
         return true
@@ -86,22 +115,35 @@ export const AuthHandlerProvider: AuthProviderComponent = ({ children }) => {
     const fetchSession = async () => {
       try {
         const response = await fetch('/api/auth/session', { credentials: 'include' })
-        if (response.ok) {
-          const data = await response.json()
-          setSession(data.session ?? null)
-        } else {
+        if (!response.ok) {
           setSession(null)
+          setSessionStatus('expired')
+          return
         }
+
+        const data = await response.json()
+        const sessionData: AuthSession | null = data.session ?? null
+
+        if (!sessionData) {
+          setSession(null)
+          setSessionStatus('expired')
+          return
+        }
+
+        setSession(sessionData)
+        // Seed tokenExpiresAt from sessionStorage so the 30s check interval starts correctly.
+        // Token refresh happens lazily on the first getAccessToken() call (client.ts has
+        // _refreshInFlight dedup to prevent concurrent refreshes).
+        const stored = safeSessionGet('forge_token_expires_at')
+        if (stored) setTokenExpiresAt(parseInt(stored, 10))
+        setSessionStatus('active')
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('[auth-handler] Failed to fetch session:', err)
         setSession(null)
+        setSessionStatus('expired')
       } finally {
-        // Seed token expiry from sessionStorage on first load
-        const stored = sessionStorage.getItem('forge_token_expires_at')
-        if (stored) setTokenExpiresAt(parseInt(stored, 10))
         setIsLoading(false)
-        setSessionStatus('active')
       }
     }
 
@@ -134,7 +176,7 @@ export const AuthHandlerProvider: AuthProviderComponent = ({ children }) => {
 
   useEffect(() => {
     const check = async () => {
-      const stored = sessionStorage.getItem('forge_token_expires_at')
+      const stored = safeSessionGet('forge_token_expires_at')
       if (!stored) return // no token yet — nothing to check
 
       const exp = parseInt(stored, 10)
