@@ -10,7 +10,8 @@
     "./contracts": "./src/contracts.ts",
     "./client-registry": "./src/client-registry.ts",
     "./adapters/clerk/server": "./src/adapters/clerk/server.ts",
-    "./adapters/clerk/middleware": "./src/adapters/clerk/middleware.ts"
+    "./adapters/clerk/middleware": "./src/adapters/clerk/middleware.ts",
+    "./adapters/auth-handler/client": "./src/adapters/auth-handler/client.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

@@ -70,10 +70,34 @@ export function useUser(): UseUserReturn {
  *
  * @returns Access token string or null if not authenticated
  */
+// ── Safe sessionStorage helpers (iOS Safari Private Mode guard) ─────────────
+// sessionStorage.getItem/setItem throws SecurityError in iOS Safari Private mode.
+function safeSessionGet(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+function safeSessionSet(key: string, value: string): void {
+  try {
+    sessionStorage.setItem(key, value)
+  } catch {
+    /* unavailable */
+  }
+}
+function safeSessionRemove(key: string): void {
+  try {
+    sessionStorage.removeItem(key)
+  } catch {
+    /* unavailable */
+  }
+}
+
 export async function getAccessToken(): Promise<string | null> {
   // Check if we have a token in sessionStorage
-  const token = sessionStorage.getItem('forge_access_token')
-  const expiresAtStr = sessionStorage.getItem('forge_token_expires_at')
+  const token = safeSessionGet('forge_access_token')
+  const expiresAtStr = safeSessionGet('forge_token_expires_at')
 
   if (!token || !expiresAtStr) {
     // No token stored, try to refresh
@@ -112,17 +136,17 @@ async function refreshAccessToken(): Promise<string | null> {
       })
 
       if (!response.ok) {
-        sessionStorage.removeItem('forge_access_token')
-        sessionStorage.removeItem('forge_token_expires_at')
+        safeSessionRemove('forge_access_token')
+        safeSessionRemove('forge_token_expires_at')
         return null
       }
 
       const data = await response.json()
 
       if (data.accessToken) {
-        sessionStorage.setItem('forge_access_token', data.accessToken)
+        safeSessionSet('forge_access_token', data.accessToken)
         const expiresAt = Date.now() + data.expiresIn * 1000
-        sessionStorage.setItem('forge_token_expires_at', expiresAt.toString())
+        safeSessionSet('forge_token_expires_at', expiresAt.toString())
         return data.accessToken as string
       }
 
@@ -130,8 +154,8 @@ async function refreshAccessToken(): Promise<string | null> {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('[auth-handler] Failed to refresh token:', err)
-      sessionStorage.removeItem('forge_access_token')
-      sessionStorage.removeItem('forge_token_expires_at')
+      safeSessionRemove('forge_access_token')
+      safeSessionRemove('forge_token_expires_at')
       return null
     } finally {
       _refreshInFlight = null

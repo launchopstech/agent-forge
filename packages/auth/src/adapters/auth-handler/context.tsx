@@ -24,7 +24,7 @@ export interface AuthHandlerContextValue {
    */
   refreshSession: () => Promise<boolean>
   /** Clear session state, call the logout endpoint, and redirect to /login. */
-  signOut: () => Promise<void>
+  signOut: (reason?: 'session_expired' | 'logout') => Promise<void>
 }
 
 export const AuthHandlerContext = createContext<AuthHandlerContextValue | null>(null)

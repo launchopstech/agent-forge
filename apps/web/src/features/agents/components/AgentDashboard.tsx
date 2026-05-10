@@ -25,7 +25,7 @@ function splitName(name: string, accent?: string): [string, string] {
 
 export const AgentDashboard = React.memo(function AgentDashboard() {
   const t = useTranslations('agentHub.dashboard')
-  const { isLoading: authLoading, isAuthenticated } = useUser()
+  const { isLoading: authLoading } = useUser()
   const {
     agents,
     metrics,
@@ -46,9 +46,12 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
   } = useAgentListStore()
 
   useEffect(() => {
-    if (authLoading || !isAuthenticated) return
+    // authLoading stays true until AuthHandlerProvider confirms the session (active or expired).
+    // By the time it flips to false, the provider has either established a session or called signOut().
+    // No isAuthenticated guard needed — unauthenticated users are redirected by signOut() → /login.
+    if (authLoading) return
     void loadAll()
-  }, [authLoading, isAuthenticated, loadAll])
+  }, [authLoading, loadAll])
 
   const tSidebar = useTranslations('sidebar')
   const [prefix, accent] = splitName(siteConfig.name, siteConfig.nameAccent)
