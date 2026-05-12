@@ -293,6 +293,17 @@
       "typing": "Typing…",
       "saveAgentFirst": "Save agent first",
       "errorTitle": "Chat error"
+    },
+    "publicChat": {
+      "verifiedShareLink": "Verified share link",
+      "emptyState": "Chat with {agentName}",
+      "inputPlaceholder": "Message {agentName}",
+      "unavailableTitle": "This agent is not available",
+      "unavailableDescription": "The link may be invalid, expired, or paused by the agent owner.",
+      "metadataTitle": "Chat with {agentName}",
+      "metadataDescription": "Chat with {agentName} on AgentHub.",
+      "unavailableMetadataTitle": "Agent unavailable",
+      "unavailableMetadataDescription": "This AgentHub share link is unavailable."
     }
   },
   "sessionWarning": {

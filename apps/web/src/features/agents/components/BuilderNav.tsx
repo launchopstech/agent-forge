@@ -46,6 +46,7 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
     activeSection,
     completedSections,
     agentStatus,
+    agentShareToken,
     isSaving,
     publishAgent,
     pauseAgent,
@@ -56,8 +57,10 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
 
   const progressPercent = Math.round((completedSections.length / SECTIONS.length) * 100)
   const canChangeStatus = agentId !== 'new' && agentStatus !== null
-  const showShareLink = canChangeStatus && agentStatus === 'live'
-  const shareUrl = showShareLink ? `${siteConfig.url.replace(/\/$/, '')}/chat/${agentId}` : null
+  const showShareLink = canChangeStatus && agentStatus === 'live' && Boolean(agentShareToken)
+  const shareUrl = showShareLink
+    ? `${siteConfig.url.replace(/\/$/, '')}/chat/${agentId}?token=${encodeURIComponent(agentShareToken ?? '')}`
+    : null
 
   const statusLabel =
     agentStatus === 'draft'

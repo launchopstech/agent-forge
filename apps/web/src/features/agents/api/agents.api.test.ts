@@ -47,6 +47,7 @@ const MOCK_AGENTS: Agent[] = [
     resolution: 80,
     csat: 4.5,
     status: 'live',
+    shareToken: 'share-token-1',
   },
   {
     id: '2',
@@ -155,6 +156,12 @@ describe('fetchAgent', () => {
     expect(agent?.id).toBe('1')
   })
 
+  it('maps shareToken from the API row', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS[0])
+    const agent = await fetchAgent('1')
+    expect(agent?.shareToken).toBe('share-token-1')
+  })
+
   it('returns null on 404', async () => {
     vi.mocked(apiClient.get).mockRejectedValue(new ApiError(404, 'Not Found'))
     const agent = await fetchAgent('nonexistent')
@@ -251,9 +258,14 @@ describe('updateAgentStatus', () => {
   })
 
   it('returns the updated agent', async () => {
-    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'paused' })
+    vi.mocked(apiClient.patch).mockResolvedValue({
+      ...MOCK_AGENTS[0],
+      status: 'paused',
+      shareToken: 'share-token-1',
+    })
     const agent = await updateAgentStatus('1', 'paused')
     expect(agent.status).toBe('paused')
+    expect(agent.shareToken).toBe('share-token-1')
   })
 
   it('redirects to /login on 401', async () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { streamChat } from './chat.api'
+import { fetchPublicAgent, streamChat, streamPublicChat } from './chat.api'
 
 // Helper: encode SSE lines into a ReadableStream
 function makeStream(lines: string[]): ReadableStream<Uint8Array> {
@@ -19,6 +19,15 @@ function makeMockResponse(status: number, body: ReadableStream<Uint8Array> | nul
     ok: status >= 200 && status < 300,
     status,
     body,
+  } as unknown as Response
+}
+
+function makeJsonResponse(status: number, data: unknown) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    body: null,
+    json: vi.fn().mockResolvedValue(data),
   } as unknown as Response
 }
 
@@ -141,5 +150,66 @@ describe('streamChat', () => {
     }
 
     expect(chunks).toEqual(['visible'])
+  })
+})
+
+describe('fetchPublicAgent', () => {
+  it('fetches public metadata with the share token query parameter', async () => {
+    const metadata = {
+      id: 'agent-1',
+      name: 'Public Bot',
+      welcomeMessage: 'Hello',
+      status: 'live',
+    }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeJsonResponse(200, metadata)))
+
+    await expect(fetchPublicAgent('agent-1', 'share token')).resolves.toEqual(metadata)
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/public/agents/agent-1?token=share%20token',
+      expect.objectContaining({
+        headers: expect.objectContaining({ Accept: 'application/json' }),
+      })
+    )
+  })
+
+  it('returns null when the public metadata endpoint returns 404', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeJsonResponse(404, {})))
+
+    await expect(fetchPublicAgent('agent-1', 'bad-token')).resolves.toBeNull()
+  })
+})
+
+describe('streamPublicChat', () => {
+  it('streams public chat without an Authorization header', async () => {
+    const body = makeStream([
+      'data: {"type":"delta","content":"public"}\n',
+      'data: {"type":"done"}\n',
+    ])
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeMockResponse(200, body)))
+
+    const chunks: string[] = []
+    for await (const chunk of streamPublicChat('agent-1', [], 'share-token')) {
+      chunks.push(chunk)
+    }
+
+    expect(chunks).toEqual(['public'])
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/public/agents/agent-1/chat/stream?token=share-token',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.not.objectContaining({ Authorization: expect.any(String) }),
+      })
+    )
+  })
+
+  it('throws when the public stream request is rejected', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeMockResponse(404, makeStream([]))))
+
+    await expect(async () => {
+      for await (const _ of streamPublicChat('agent-1', [], 'bad-token')) {
+        // drain
+      }
+    }).rejects.toThrow('Chat error: 404')
   })
 })

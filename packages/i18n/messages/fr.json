@@ -293,6 +293,17 @@
       "typing": "Saisie en cours…",
       "saveAgentFirst": "Enregistrez l'agent d'abord",
       "errorTitle": "Erreur de chat"
+    },
+    "publicChat": {
+      "verifiedShareLink": "Lien de partage vérifié",
+      "emptyState": "Discuter avec {agentName}",
+      "inputPlaceholder": "Message à {agentName}",
+      "unavailableTitle": "Cet agent n'est pas disponible",
+      "unavailableDescription": "Le lien est peut-être invalide, expiré ou suspendu par le propriétaire de l'agent.",
+      "metadataTitle": "Discuter avec {agentName}",
+      "metadataDescription": "Discutez avec {agentName} sur AgentHub.",
+      "unavailableMetadataTitle": "Agent indisponible",
+      "unavailableMetadataDescription": "Ce lien de partage AgentHub est indisponible."
     }
   },
   "sessionWarning": {

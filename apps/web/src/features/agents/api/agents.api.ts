@@ -40,6 +40,7 @@ interface AgentRow {
   id: string
   name: string
   status: string
+  shareToken?: string | null
   uiConfig?: { channels?: string[] } | null
   channels?: Agent['channels']
   conversations?: number
@@ -56,6 +57,7 @@ function mapAgentRow(row: AgentRow): Agent {
     conversations: row.conversations ?? 0,
     resolution: row.resolution ?? null,
     csat: row.csat ?? null,
+    shareToken: row.shareToken ?? null,
   }
 }
 

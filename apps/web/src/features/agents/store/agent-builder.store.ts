@@ -45,6 +45,7 @@ const DEFAULT_DRAFT: DraftAgent = {
 interface AgentBuilderState {
   agentId: string | null
   agentStatus: AgentStatus | null
+  agentShareToken: string | null
   draftAgent: DraftAgent
   activeSection: BuilderSection
   completedSections: BuilderSection[]
@@ -82,6 +83,7 @@ let _saveTimeout: ReturnType<typeof setTimeout> | null = null
 export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   agentId: null,
   agentStatus: null,
+  agentShareToken: null,
   draftAgent: DEFAULT_DRAFT,
   activeSection: 'identity',
   completedSections: [],
@@ -90,12 +92,16 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   isSaving: false,
   error: null,
 
-  setAgentId: (id) => set(id === null ? { agentId: null, agentStatus: null } : { agentId: id }),
+  setAgentId: (id) =>
+    set(
+      id === null ? { agentId: null, agentStatus: null, agentShareToken: null } : { agentId: id }
+    ),
 
   hydrateFromAgent: (agent: Agent) => {
     set({
       agentId: agent.id,
       agentStatus: agent.status,
+      agentShareToken: agent.shareToken ?? null,
       draftAgent: {
         ...DEFAULT_DRAFT,
         identity: {
@@ -293,6 +299,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     set({
       agentId: null,
       agentStatus: null,
+      agentShareToken: null,
       draftAgent: DEFAULT_DRAFT,
       activeSection: 'identity',
       completedSections: [],
@@ -340,7 +347,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     set({ isSaving: true, error: null })
     try {
       const agent = await apiPublishAgent(agentId)
-      set({ agentStatus: agent.status })
+      set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to publish agent'
       set({ error: message })
@@ -356,7 +363,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     set({ isSaving: true, error: null })
     try {
       const agent = await apiPauseAgent(agentId)
-      set({ agentStatus: agent.status })
+      set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to pause agent'
       set({ error: message })
@@ -372,7 +379,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     set({ isSaving: true, error: null })
     try {
       const agent = await apiResumeAgent(agentId)
-      set({ agentStatus: agent.status })
+      set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to resume agent'
       set({ error: message })
