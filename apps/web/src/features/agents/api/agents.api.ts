@@ -41,20 +41,28 @@ interface AgentRow {
   name: string
   status: string
   uiConfig?: { channels?: string[] } | null
+  channels?: Agent['channels']
+  conversations?: number
+  resolution?: number | null
+  csat?: number | null
+}
+
+function mapAgentRow(row: AgentRow): Agent {
+  return {
+    id: row.id,
+    name: row.name,
+    status: row.status as Agent['status'],
+    channels: (row.channels ?? row.uiConfig?.channels ?? []) as Agent['channels'],
+    conversations: row.conversations ?? 0,
+    resolution: row.resolution ?? null,
+    csat: row.csat ?? null,
+  }
 }
 
 export async function fetchAgent(id: string): Promise<Agent | null> {
   try {
     const row = await apiClient.get<AgentRow>(`/api/agents/${id}`, { getToken: getAccessToken })
-    return {
-      id: row.id,
-      name: row.name,
-      status: row.status as Agent['status'],
-      channels: (row.uiConfig?.channels ?? []) as Agent['channels'],
-      conversations: 0,
-      resolution: null,
-      csat: null,
-    }
+    return mapAgentRow(row)
   } catch (err) {
     if (redirect401(err)) return null
     if (err instanceof ApiError && err.status === 404) return null
@@ -105,15 +113,28 @@ export async function deleteAgent(id: string): Promise<void> {
   }
 }
 
-export async function publishAgent(id: string): Promise<Agent> {
+export async function updateAgentStatus(id: string, status: AgentStatus): Promise<Agent> {
   try {
-    return await apiClient.patch<Agent>(
+    const row = await apiClient.patch<AgentRow>(
       `/api/agents/${id}/status`,
-      { status: 'live' satisfies AgentStatus },
+      { status },
       { getToken: getAccessToken }
     )
+    return mapAgentRow(row)
   } catch (err) {
     if (redirect401(err)) return {} as Agent
     throw err
   }
+}
+
+export function publishAgent(id: string): Promise<Agent> {
+  return updateAgentStatus(id, 'live')
+}
+
+export function pauseAgent(id: string): Promise<Agent> {
+  return updateAgentStatus(id, 'paused')
+}
+
+export function resumeAgent(id: string): Promise<Agent> {
+  return updateAgentStatus(id, 'live')
 }

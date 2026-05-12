@@ -7,8 +7,15 @@ import type {
   Agent,
   GuidanceRule,
   TemplateBehaviour,
+  AgentStatus,
 } from '../types'
-import { fetchAgent, updateAgent, publishAgent as apiPublishAgent } from '../api/agents.api'
+import {
+  fetchAgent,
+  updateAgent,
+  publishAgent as apiPublishAgent,
+  pauseAgent as apiPauseAgent,
+  resumeAgent as apiResumeAgent,
+} from '../api/agents.api'
 
 const DEFAULT_BEHAVIOUR: TemplateBehaviour = {
   systemPrompt: '',
@@ -37,6 +44,7 @@ const DEFAULT_DRAFT: DraftAgent = {
 
 interface AgentBuilderState {
   agentId: string | null
+  agentStatus: AgentStatus | null
   draftAgent: DraftAgent
   activeSection: BuilderSection
   completedSections: BuilderSection[]
@@ -65,12 +73,15 @@ interface AgentBuilderState {
   loadAgent: (id: string) => Promise<void>
   saveDraft: () => Promise<void>
   publishAgent: () => Promise<void>
+  pauseAgent: () => Promise<void>
+  resumeAgent: () => Promise<void>
 }
 
 let _saveTimeout: ReturnType<typeof setTimeout> | null = null
 
 export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   agentId: null,
+  agentStatus: null,
   draftAgent: DEFAULT_DRAFT,
   activeSection: 'identity',
   completedSections: [],
@@ -79,11 +90,12 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   isSaving: false,
   error: null,
 
-  setAgentId: (id) => set({ agentId: id }),
+  setAgentId: (id) => set(id === null ? { agentId: null, agentStatus: null } : { agentId: id }),
 
   hydrateFromAgent: (agent: Agent) => {
     set({
       agentId: agent.id,
+      agentStatus: agent.status,
       draftAgent: {
         ...DEFAULT_DRAFT,
         identity: {
@@ -280,6 +292,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     }
     set({
       agentId: null,
+      agentStatus: null,
       draftAgent: DEFAULT_DRAFT,
       activeSection: 'identity',
       completedSections: [],
@@ -324,11 +337,46 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   publishAgent: async () => {
     const { agentId } = get()
     if (!agentId) return
-    set({ isSaving: true })
+    set({ isSaving: true, error: null })
     try {
-      await apiPublishAgent(agentId)
+      const agent = await apiPublishAgent(agentId)
+      set({ agentStatus: agent.status })
     } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Failed to publish agent' })
+      const message = err instanceof Error ? err.message : 'Failed to publish agent'
+      set({ error: message })
+      throw err
+    } finally {
+      set({ isSaving: false })
+    }
+  },
+
+  pauseAgent: async () => {
+    const { agentId } = get()
+    if (!agentId) return
+    set({ isSaving: true, error: null })
+    try {
+      const agent = await apiPauseAgent(agentId)
+      set({ agentStatus: agent.status })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to pause agent'
+      set({ error: message })
+      throw err
+    } finally {
+      set({ isSaving: false })
+    }
+  },
+
+  resumeAgent: async () => {
+    const { agentId } = get()
+    if (!agentId) return
+    set({ isSaving: true, error: null })
+    try {
+      const agent = await apiResumeAgent(agentId)
+      set({ agentStatus: agent.status })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to resume agent'
+      set({ error: message })
+      throw err
     } finally {
       set({ isSaving: false })
     }
