@@ -31,7 +31,10 @@ import {
   createAgent,
   updateAgent,
   deleteAgent,
+  updateAgentStatus,
   publishAgent,
+  pauseAgent,
+  resumeAgent,
 } from './agents.api'
 import type { Agent } from '../types'
 
@@ -236,26 +239,58 @@ describe('deleteAgent', () => {
   })
 })
 
-describe('publishAgent', () => {
-  it('calls PATCH /api/agents/:id/status with live', async () => {
-    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'live' })
-    await publishAgent('1')
+describe('updateAgentStatus', () => {
+  it('calls PATCH /api/agents/:id/status with the requested status', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'paused' })
+    await updateAgentStatus('1', 'paused')
     expect(apiClient.patch).toHaveBeenCalledWith(
       '/api/agents/1/status',
-      { status: 'live' },
+      { status: 'paused' },
       expect.any(Object)
     )
   })
 
   it('returns the updated agent', async () => {
-    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'live' })
-    const agent = await publishAgent('1')
-    expect(agent.status).toBe('live')
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'paused' })
+    const agent = await updateAgentStatus('1', 'paused')
+    expect(agent.status).toBe('paused')
   })
 
   it('redirects to /login on 401', async () => {
     vi.mocked(apiClient.patch).mockRejectedValue(new ApiError(401, 'Unauthorized'))
-    await publishAgent('1')
+    await updateAgentStatus('1', 'live')
     expect(window.location.href).toBe('/login')
+  })
+})
+
+describe('status convenience helpers', () => {
+  it('publishAgent sets status to live', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[1], status: 'live' })
+    await publishAgent('2')
+    expect(apiClient.patch).toHaveBeenCalledWith(
+      '/api/agents/2/status',
+      { status: 'live' },
+      expect.any(Object)
+    )
+  })
+
+  it('pauseAgent sets status to paused', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[0], status: 'paused' })
+    await pauseAgent('1')
+    expect(apiClient.patch).toHaveBeenCalledWith(
+      '/api/agents/1/status',
+      { status: 'paused' },
+      expect.any(Object)
+    )
+  })
+
+  it('resumeAgent sets status to live', async () => {
+    vi.mocked(apiClient.patch).mockResolvedValue({ ...MOCK_AGENTS[3], status: 'live' })
+    await resumeAgent('4')
+    expect(apiClient.patch).toHaveBeenCalledWith(
+      '/api/agents/4/status',
+      { status: 'live' },
+      expect.any(Object)
+    )
   })
 })

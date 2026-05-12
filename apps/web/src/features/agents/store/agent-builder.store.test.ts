@@ -6,9 +6,17 @@ vi.mock('../api/agents.api', () => ({
   fetchAgent: vi.fn(),
   updateAgent: vi.fn(),
   publishAgent: vi.fn(),
+  pauseAgent: vi.fn(),
+  resumeAgent: vi.fn(),
 }))
 
-import { fetchAgent, updateAgent, publishAgent as apiPublishAgent } from '../api/agents.api'
+import {
+  fetchAgent,
+  updateAgent,
+  publishAgent as apiPublishAgent,
+  pauseAgent as apiPauseAgent,
+  resumeAgent as apiResumeAgent,
+} from '../api/agents.api'
 
 const MOCK_TEMPLATE: AgentTemplate = {
   id: 'customer-support',
@@ -95,6 +103,10 @@ describe('agent-builder.store', () => {
     it('starts with no completed sections', () => {
       expect(useAgentBuilderStore.getState().completedSections).toEqual([])
     })
+
+    it('starts with no loaded agent status', () => {
+      expect(useAgentBuilderStore.getState().agentStatus).toBeNull()
+    })
   })
 
   describe('setAgentId', () => {
@@ -107,6 +119,12 @@ describe('agent-builder.store', () => {
       useAgentBuilderStore.getState().setAgentId(null)
       expect(useAgentBuilderStore.getState().agentId).toBeNull()
     })
+
+    it('clears agentStatus when clearing agent id', () => {
+      useAgentBuilderStore.setState({ agentId: '99', agentStatus: 'live' })
+      useAgentBuilderStore.getState().setAgentId(null)
+      expect(useAgentBuilderStore.getState().agentStatus).toBeNull()
+    })
   })
 
   describe('hydrateFromAgent', () => {
@@ -115,6 +133,11 @@ describe('agent-builder.store', () => {
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBe('42')
       expect(state.draftAgent.identity.name).toBe('Existing Bot')
+    })
+
+    it('sets agentStatus from existing agent', () => {
+      useAgentBuilderStore.getState().hydrateFromAgent({ ...MOCK_AGENT, status: 'paused' })
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('paused')
     })
 
     it('maps channels to lowercase', () => {
@@ -425,6 +448,7 @@ describe('agent-builder.store', () => {
       store.resetDraft()
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBeNull()
+      expect(state.agentStatus).toBeNull()
       expect(state.draftAgent.identity.name).toBe('')
       expect(state.draftAgent.behaviour.tonePreset).toBe('neutral')
       expect(state.draftAgent.behaviour.guidanceRules).toEqual([])
@@ -523,6 +547,13 @@ describe('agent-builder.store', () => {
       expect(apiPublishAgent).toHaveBeenCalledWith('42')
     })
 
+    it('updates local agentStatus from the response', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'draft' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('live')
+    })
+
     it('does nothing when agentId is null', async () => {
       useAgentBuilderStore.getState().resetDraft()
       await useAgentBuilderStore.getState().publishAgent()
@@ -532,8 +563,54 @@ describe('agent-builder.store', () => {
     it('sets error on failure', async () => {
       vi.mocked(apiPublishAgent).mockRejectedValue(new Error('Publish failed'))
       useAgentBuilderStore.setState({ agentId: '42' })
-      await useAgentBuilderStore.getState().publishAgent()
+      await expect(useAgentBuilderStore.getState().publishAgent()).rejects.toThrow('Publish failed')
       expect(useAgentBuilderStore.getState().error).toBe('Publish failed')
+    })
+  })
+
+  describe('pauseAgent', () => {
+    it('calls apiPauseAgent with agentId', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'paused' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(apiPauseAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('updates local agentStatus from the response', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'paused' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('paused')
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(apiPauseAgent).mockRejectedValue(new Error('Pause failed'))
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await expect(useAgentBuilderStore.getState().pauseAgent()).rejects.toThrow('Pause failed')
+      expect(useAgentBuilderStore.getState().error).toBe('Pause failed')
+    })
+  })
+
+  describe('resumeAgent', () => {
+    it('calls apiResumeAgent with agentId', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(apiResumeAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('updates local agentStatus from the response', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('live')
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(apiResumeAgent).mockRejectedValue(new Error('Resume failed'))
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await expect(useAgentBuilderStore.getState().resumeAgent()).rejects.toThrow('Resume failed')
+      expect(useAgentBuilderStore.getState().error).toBe('Resume failed')
     })
   })
 

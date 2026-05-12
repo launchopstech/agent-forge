@@ -26,14 +26,14 @@ interface AgentTableProps {
   onPageChange?: (page: number) => void
 }
 
-function statusVariant(status: AgentStatus): 'default' | 'secondary' | 'destructive' {
+function statusBadgeClass(status: AgentStatus): string {
   switch (status) {
     case 'live':
-      return 'default'
+      return 'border-green-200 bg-green-50 text-green-700 dark:border-green-900/50 dark:bg-green-950/40 dark:text-green-300'
     case 'draft':
-      return 'secondary'
+      return 'border-border bg-muted text-muted-foreground'
     case 'paused':
-      return 'destructive'
+      return 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-900/50 dark:bg-yellow-950/40 dark:text-yellow-300'
   }
 }
 
@@ -84,7 +84,10 @@ function AgentMobileCard({
       <Link href={`/agents/${agent.id}/identity`} className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium truncate">{agent.name}</span>
-          <Badge variant={statusVariant(agent.status)} className="text-[10px] shrink-0">
+          <Badge
+            variant="outline"
+            className={`text-[10px] shrink-0 ${statusBadgeClass(agent.status)}`}
+          >
             {agent.status}
           </Badge>
         </div>
@@ -191,7 +194,9 @@ function useAgentColumns(
         accessorKey: 'status',
         header: () => t('status'),
         cell: ({ row }) => (
-          <Badge variant={statusVariant(row.original.status)}>{row.original.status}</Badge>
+          <Badge variant="outline" className={statusBadgeClass(row.original.status)}>
+            {row.original.status}
+          </Badge>
         ),
       },
       {
