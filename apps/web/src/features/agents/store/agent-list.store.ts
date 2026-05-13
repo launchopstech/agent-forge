@@ -12,7 +12,7 @@ import {
   deleteAgent,
   type CreateAgentPayload,
 } from '../api/agents.api'
-import { fetchMetrics, fetchUnresolvedIntents } from '../api/metrics.api'
+import { EMPTY_DASHBOARD_METRICS, fetchMetrics, fetchUnresolvedIntents } from '../api/metrics.api'
 import { toast } from '@/hooks/use-toast'
 
 interface AgentListState {
@@ -34,6 +34,7 @@ interface AgentListState {
   loadAgents: () => Promise<void>
   loadMetrics: () => Promise<void>
   loadAll: () => Promise<void>
+  refreshDashboardData: () => Promise<void>
   createAgent: (data: CreateAgentPayload) => Promise<void>
   removeAgent: (id: string) => Promise<void>
   setPage: (page: number) => void
@@ -71,48 +72,102 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
   },
 
   loadMetrics: async () => {
-    try {
-      const [metrics, { intents, recommendation }] = await Promise.all([
-        fetchMetrics(),
-        fetchUnresolvedIntents(),
-      ])
-      set({ metrics, unresolvedIntents: intents, recommendation })
-    } catch (err) {
-      set({ error: err instanceof Error ? err.message : 'Failed to load metrics' })
-    }
+    const [metricsResult, intentsResult] = await Promise.allSettled([
+      fetchMetrics(),
+      fetchUnresolvedIntents(),
+    ])
+
+    set({
+      metrics: metricsResult.status === 'fulfilled' ? metricsResult.value : EMPTY_DASHBOARD_METRICS,
+      ...(intentsResult.status === 'fulfilled'
+        ? {
+            unresolvedIntents: intentsResult.value.intents,
+            recommendation: intentsResult.value.recommendation,
+          }
+        : {
+            error:
+              intentsResult.reason instanceof Error
+                ? intentsResult.reason.message
+                : 'Failed to load metrics',
+          }),
+    })
   },
 
   loadAll: async () => {
     const { page, pageSize, search, statusFilter } = get()
     set({ isLoading: true, error: null })
-    try {
-      const [agentsResult, metrics, { intents, recommendation }] = await Promise.all([
-        fetchAgents({
-          page,
-          pageSize,
-          search: search || undefined,
-          status: statusFilter ?? undefined,
-        }),
-        fetchMetrics(),
-        fetchUnresolvedIntents(),
-      ])
+
+    const [agentsResult, metricsResult, intentsResult] = await Promise.allSettled([
+      fetchAgents({
+        page,
+        pageSize,
+        search: search || undefined,
+        status: statusFilter ?? undefined,
+      }),
+      fetchMetrics(),
+      fetchUnresolvedIntents(),
+    ])
+
+    if (agentsResult.status === 'rejected') {
       set({
-        agents: agentsResult.data,
-        total: agentsResult.total,
-        metrics,
-        unresolvedIntents: intents,
-        recommendation,
         isLoading: false,
+        metrics:
+          metricsResult.status === 'fulfilled' ? metricsResult.value : EMPTY_DASHBOARD_METRICS,
+        error:
+          agentsResult.reason instanceof Error
+            ? agentsResult.reason.message
+            : 'Failed to load data',
       })
-    } catch (err) {
-      set({ isLoading: false, error: err instanceof Error ? err.message : 'Failed to load data' })
+      return
     }
+
+    set({
+      agents: agentsResult.value.data,
+      total: agentsResult.value.total,
+      metrics: metricsResult.status === 'fulfilled' ? metricsResult.value : EMPTY_DASHBOARD_METRICS,
+      ...(intentsResult.status === 'fulfilled'
+        ? {
+            unresolvedIntents: intentsResult.value.intents,
+            recommendation: intentsResult.value.recommendation,
+          }
+        : {}),
+      isLoading: false,
+    })
+  },
+
+  refreshDashboardData: async () => {
+    const { page, pageSize, search, statusFilter } = get()
+    const [agentsResult, metricsResult] = await Promise.allSettled([
+      fetchAgents({
+        page,
+        pageSize,
+        search: search || undefined,
+        status: statusFilter ?? undefined,
+      }),
+      fetchMetrics(),
+    ])
+
+    set({
+      ...(agentsResult.status === 'fulfilled'
+        ? {
+            agents: agentsResult.value.data,
+            total: agentsResult.value.total,
+            error: null,
+          }
+        : {
+            error:
+              agentsResult.reason instanceof Error
+                ? agentsResult.reason.message
+                : 'Failed to refresh agents',
+          }),
+      metrics: metricsResult.status === 'fulfilled' ? metricsResult.value : EMPTY_DASHBOARD_METRICS,
+    })
   },
 
   createAgent: async (data: CreateAgentPayload) => {
     try {
       await apiCreateAgent(data)
-      await get().loadAgents()
+      await get().refreshDashboardData()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create agent'
       set({ error: message })
@@ -124,6 +179,7 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
     set((state) => ({ agents: state.agents.filter((a) => a.id !== id) }))
     try {
       await deleteAgent(id)
+      await get().refreshDashboardData()
     } catch (err) {
       // Rollback on failure by reloading
       const { page, pageSize, search, statusFilter } = get()

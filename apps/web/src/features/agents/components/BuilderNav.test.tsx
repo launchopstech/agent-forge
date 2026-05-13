@@ -46,6 +46,7 @@ function arrange(status: AgentStatus | null, options: { isSaving?: boolean } = {
   useAgentBuilderStore.setState({
     agentId: status ? 'agent-123' : null,
     agentStatus: status,
+    agentShareToken: status === 'live' ? 'share-token-123' : null,
     activeSection: 'identity',
     completedSections: [],
     isSaving: options.isSaving ?? false,
@@ -78,7 +79,9 @@ describe('BuilderNav publish flow controls', () => {
     arrange('live')
     render(<BuilderNav agentId="agent-123" />)
 
-    expect(screen.getAllByText('https://app.example.com/chat/agent-123')).toHaveLength(1)
+    expect(
+      screen.getAllByText('https://app.example.com/chat/agent-123?token=share-token-123')
+    ).toHaveLength(1)
 
     await userEvent.click(screen.getAllByRole('button', { name: /pause/i })[0]!)
     expect(pauseAgent).toHaveBeenCalledOnce()
@@ -86,8 +89,19 @@ describe('BuilderNav publish flow controls', () => {
 
     await userEvent.click(screen.getAllByLabelText('copyShareLink')[0]!)
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      'https://app.example.com/chat/agent-123'
+      'https://app.example.com/chat/agent-123?token=share-token-123'
     )
+  })
+
+  it('does not show the share URL for live agents missing a share token', () => {
+    arrange('live')
+    useAgentBuilderStore.setState({ agentShareToken: null })
+    render(<BuilderNav agentId="agent-123" />)
+
+    expect(screen.queryByLabelText('copyShareLink')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/https:\/\/app\.example\.com\/chat\/agent-123/)
+    ).not.toBeInTheDocument()
   })
 
   it('resumes paused agents', async () => {

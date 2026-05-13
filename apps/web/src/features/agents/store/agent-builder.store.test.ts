@@ -10,6 +10,18 @@ vi.mock('../api/agents.api', () => ({
   resumeAgent: vi.fn(),
 }))
 
+const listStoreMocks = vi.hoisted(() => ({
+  refreshDashboardData: vi.fn(),
+}))
+
+vi.mock('./agent-list.store', () => ({
+  useAgentListStore: {
+    getState: () => ({
+      refreshDashboardData: listStoreMocks.refreshDashboardData,
+    }),
+  },
+}))
+
 import {
   fetchAgent,
   updateAgent,
@@ -76,6 +88,7 @@ const MOCK_AGENT: Agent = {
   resolution: 80,
   csat: 4.5,
   status: 'live',
+  shareToken: 'share-token-42',
 }
 
 beforeEach(() => {
@@ -107,6 +120,10 @@ describe('agent-builder.store', () => {
     it('starts with no loaded agent status', () => {
       expect(useAgentBuilderStore.getState().agentStatus).toBeNull()
     })
+
+    it('starts with no loaded share token', () => {
+      expect(useAgentBuilderStore.getState().agentShareToken).toBeNull()
+    })
   })
 
   describe('setAgentId', () => {
@@ -121,9 +138,14 @@ describe('agent-builder.store', () => {
     })
 
     it('clears agentStatus when clearing agent id', () => {
-      useAgentBuilderStore.setState({ agentId: '99', agentStatus: 'live' })
+      useAgentBuilderStore.setState({
+        agentId: '99',
+        agentStatus: 'live',
+        agentShareToken: 'share-token',
+      })
       useAgentBuilderStore.getState().setAgentId(null)
       expect(useAgentBuilderStore.getState().agentStatus).toBeNull()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBeNull()
     })
   })
 
@@ -138,6 +160,11 @@ describe('agent-builder.store', () => {
     it('sets agentStatus from existing agent', () => {
       useAgentBuilderStore.getState().hydrateFromAgent({ ...MOCK_AGENT, status: 'paused' })
       expect(useAgentBuilderStore.getState().agentStatus).toBe('paused')
+    })
+
+    it('sets agentShareToken from existing agent', () => {
+      useAgentBuilderStore.getState().hydrateFromAgent(MOCK_AGENT)
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('share-token-42')
     })
 
     it('maps channels to lowercase', () => {
@@ -449,6 +476,7 @@ describe('agent-builder.store', () => {
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBeNull()
       expect(state.agentStatus).toBeNull()
+      expect(state.agentShareToken).toBeNull()
       expect(state.draftAgent.identity.name).toBe('')
       expect(state.draftAgent.behaviour.tonePreset).toBe('neutral')
       expect(state.draftAgent.behaviour.guidanceRules).toEqual([])
@@ -554,6 +582,24 @@ describe('agent-builder.store', () => {
       expect(useAgentBuilderStore.getState().agentStatus).toBe('live')
     })
 
+    it('updates local agentShareToken from the response', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        status: 'live',
+        shareToken: 'new-share-token',
+      })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'draft' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('new-share-token')
+    })
+
+    it('refreshes dashboard data after successful publish', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'draft' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
     it('does nothing when agentId is null', async () => {
       useAgentBuilderStore.getState().resetDraft()
       await useAgentBuilderStore.getState().publishAgent()
@@ -565,6 +611,7 @@ describe('agent-builder.store', () => {
       useAgentBuilderStore.setState({ agentId: '42' })
       await expect(useAgentBuilderStore.getState().publishAgent()).rejects.toThrow('Publish failed')
       expect(useAgentBuilderStore.getState().error).toBe('Publish failed')
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
     })
   })
 
@@ -583,11 +630,30 @@ describe('agent-builder.store', () => {
       expect(useAgentBuilderStore.getState().agentStatus).toBe('paused')
     })
 
+    it('preserves local agentShareToken from the pause response', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        status: 'paused',
+        shareToken: 'share-token-42',
+      })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('share-token-42')
+    })
+
+    it('refreshes dashboard data after successful pause', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'paused' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
     it('sets error on failure', async () => {
       vi.mocked(apiPauseAgent).mockRejectedValue(new Error('Pause failed'))
       useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
       await expect(useAgentBuilderStore.getState().pauseAgent()).rejects.toThrow('Pause failed')
       expect(useAgentBuilderStore.getState().error).toBe('Pause failed')
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
     })
   })
 
@@ -606,11 +672,30 @@ describe('agent-builder.store', () => {
       expect(useAgentBuilderStore.getState().agentStatus).toBe('live')
     })
 
+    it('updates local agentShareToken from the resume response', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        status: 'live',
+        shareToken: 'resumed-share-token',
+      })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('resumed-share-token')
+    })
+
+    it('refreshes dashboard data after successful resume', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
     it('sets error on failure', async () => {
       vi.mocked(apiResumeAgent).mockRejectedValue(new Error('Resume failed'))
       useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
       await expect(useAgentBuilderStore.getState().resumeAgent()).rejects.toThrow('Resume failed')
       expect(useAgentBuilderStore.getState().error).toBe('Resume failed')
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
     })
   })
 

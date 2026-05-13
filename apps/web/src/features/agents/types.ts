@@ -10,6 +10,7 @@ export interface Agent {
   resolution: number | null
   csat: number | null
   status: AgentStatus
+  shareToken?: string | null
 }
 
 export interface TemplateIdentity {
@@ -59,14 +60,10 @@ export interface AgentTemplate {
 }
 
 export interface DashboardMetrics {
-  totalConversations: number
-  totalConversationsChange: number
-  resolutionRate: number
-  resolutionRateChange: number
-  handoffRate: number
-  handoffRateChange: number
-  avgResponseTime: string
-  avgResponseTimeChange: number
+  totalAgents: number | null
+  activeAgents: number | null
+  totalMessages: number | null
+  period: 'all-time'
 }
 
 export interface UnresolvedIntent {

@@ -1,26 +1,67 @@
-import { describe, it, expect } from 'vitest'
-import { fetchMetrics, fetchUnresolvedIntents } from './metrics.api'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { ApiError } from '@forge/api-client'
 
-describe('metrics.api (stub)', () => {
+vi.mock('@forge/api-client', () => ({
+  apiClient: {
+    get: vi.fn(),
+  },
+  ApiError: class ApiError extends Error {
+    status: number
+    data?: unknown
+    constructor(status: number, message: string, data?: unknown) {
+      super(message)
+      this.name = 'ApiError'
+      this.status = status
+      this.data = data
+    }
+  },
+}))
+
+vi.mock('@forge/auth/client-registry', () => ({
+  getAccessToken: vi.fn().mockResolvedValue('test-token'),
+}))
+
+import { apiClient } from '@forge/api-client'
+import { EMPTY_DASHBOARD_METRICS, fetchMetrics, fetchUnresolvedIntents } from './metrics.api'
+
+const MOCK_METRICS = {
+  totalAgents: 3,
+  activeAgents: 2,
+  totalMessages: 5,
+  period: 'all-time' as const,
+}
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  Object.defineProperty(window, 'location', {
+    value: { href: '' },
+    writable: true,
+  })
+})
+
+describe('metrics.api', () => {
   describe('fetchMetrics', () => {
-    it('returns dashboard metrics', async () => {
-      const metrics = await fetchMetrics()
-      expect(metrics.totalConversations).toBeGreaterThan(0)
-      expect(metrics.resolutionRate).toBeGreaterThanOrEqual(0)
-      expect(metrics.handoffRate).toBeGreaterThanOrEqual(0)
-      expect(typeof metrics.avgResponseTime).toBe('string')
+    it('calls GET /api/metrics with bearer token support', async () => {
+      vi.mocked(apiClient.get).mockResolvedValue(MOCK_METRICS)
+
+      await expect(fetchMetrics()).resolves.toEqual(MOCK_METRICS)
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/api/metrics',
+        expect.objectContaining({ getToken: expect.any(Function), cache: 'no-store' })
+      )
     })
 
-    it('includes change fields', async () => {
-      const metrics = await fetchMetrics()
-      expect(typeof metrics.totalConversationsChange).toBe('number')
-      expect(typeof metrics.resolutionRateChange).toBe('number')
-      expect(typeof metrics.handoffRateChange).toBe('number')
-      expect(typeof metrics.avgResponseTimeChange).toBe('number')
+    it('redirects to login and returns empty metrics on 401', async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new ApiError(401, 'Unauthorized'))
+
+      await expect(fetchMetrics()).resolves.toEqual(EMPTY_DASHBOARD_METRICS)
+      expect(window.location.href).toBe('/login')
     })
 
-    it('never throws', async () => {
-      await expect(fetchMetrics()).resolves.toBeDefined()
+    it('throws non-auth errors', async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new Error('Network error'))
+
+      await expect(fetchMetrics()).rejects.toThrow('Network error')
     })
   })
 
@@ -39,17 +80,6 @@ describe('metrics.api (stub)', () => {
         expect(intent.percentage).toBeGreaterThanOrEqual(0)
         expect(['high', 'medium', 'low']).toContain(intent.severity)
       }
-    })
-
-    it('recommendation has required fields', async () => {
-      const { recommendation } = await fetchUnresolvedIntents()
-      expect(recommendation).toHaveProperty('message')
-      expect(recommendation).toHaveProperty('cta')
-      expect(recommendation).toHaveProperty('agentId')
-    })
-
-    it('never throws', async () => {
-      await expect(fetchUnresolvedIntents()).resolves.toBeDefined()
     })
   })
 })

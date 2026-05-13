@@ -119,8 +119,8 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
       {/* Metrics row — fixed height */}
       <div className="shrink-0">
         {isLoading || !metrics ? (
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-32 rounded-xl" />
             ))}
           </div>

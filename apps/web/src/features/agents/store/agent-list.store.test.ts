@@ -11,6 +11,12 @@ vi.mock('../api/agents.api', () => ({
   deleteAgent: vi.fn(),
 }))
 vi.mock('../api/metrics.api', () => ({
+  EMPTY_DASHBOARD_METRICS: {
+    totalAgents: null,
+    activeAgents: null,
+    totalMessages: null,
+    period: 'all-time',
+  },
   fetchMetrics: vi.fn(),
   fetchUnresolvedIntents: vi.fn(),
 }))
@@ -47,14 +53,10 @@ const MOCK_PAGINATED = {
 }
 
 const MOCK_METRICS = {
-  totalConversations: 150,
-  totalConversationsChange: 5,
-  resolutionRate: 75,
-  resolutionRateChange: 2,
-  handoffRate: 10,
-  handoffRateChange: -1,
-  avgResponseTime: '1.5s',
-  avgResponseTimeChange: 0,
+  totalAgents: 2,
+  activeAgents: 1,
+  totalMessages: 7,
+  period: 'all-time' as const,
 }
 
 const MOCK_INTENTS_RESULT = {
@@ -64,6 +66,9 @@ const MOCK_INTENTS_RESULT = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+  vi.mocked(fetchMetrics).mockResolvedValue(MOCK_METRICS)
+  vi.mocked(fetchUnresolvedIntents).mockResolvedValue(MOCK_INTENTS_RESULT)
   // Reset store state
   useAgentListStore.setState({
     agents: [],
@@ -121,11 +126,19 @@ describe('agent-list.store', () => {
       expect(state.recommendation?.cta).toBe('Fix it')
     })
 
-    it('sets error on failure', async () => {
+    it('uses placeholder metrics without setting a dashboard error when metrics fail', async () => {
       vi.mocked(fetchMetrics).mockRejectedValue(new Error('Metrics unavailable'))
       vi.mocked(fetchUnresolvedIntents).mockResolvedValue(MOCK_INTENTS_RESULT)
       await useAgentListStore.getState().loadMetrics()
-      expect(useAgentListStore.getState().error).toBe('Metrics unavailable')
+      const state = useAgentListStore.getState()
+      expect(state.metrics).toEqual({
+        totalAgents: null,
+        activeAgents: null,
+        totalMessages: null,
+        period: 'all-time',
+      })
+      expect(state.unresolvedIntents).toHaveLength(1)
+      expect(state.error).toBeNull()
     })
   })
 
@@ -138,8 +151,27 @@ describe('agent-list.store', () => {
       const state = useAgentListStore.getState()
       expect(state.agents).toHaveLength(2)
       expect(state.total).toBe(2)
-      expect(state.metrics?.totalConversations).toBe(150)
+      expect(state.metrics?.totalAgents).toBe(2)
       expect(state.unresolvedIntents).toHaveLength(1)
+      expect(state.isLoading).toBe(false)
+    })
+
+    it('keeps agent data visible when metrics fail', async () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      vi.mocked(fetchMetrics).mockRejectedValue(new Error('Metrics unavailable'))
+      vi.mocked(fetchUnresolvedIntents).mockResolvedValue(MOCK_INTENTS_RESULT)
+
+      await useAgentListStore.getState().loadAll()
+
+      const state = useAgentListStore.getState()
+      expect(state.agents).toHaveLength(2)
+      expect(state.metrics).toEqual({
+        totalAgents: null,
+        activeAgents: null,
+        totalMessages: null,
+        period: 'all-time',
+      })
+      expect(state.error).toBeNull()
       expect(state.isLoading).toBe(false)
     })
   })
@@ -162,6 +194,16 @@ describe('agent-list.store', () => {
       expect(deleteAgent).toHaveBeenCalledWith('2')
     })
 
+    it('refreshes metrics after successful delete', async () => {
+      useAgentListStore.setState({ agents: MOCK_AGENTS })
+      vi.mocked(deleteAgent).mockResolvedValue(undefined)
+
+      await useAgentListStore.getState().removeAgent('1')
+
+      expect(fetchMetrics).toHaveBeenCalled()
+      expect(useAgentListStore.getState().metrics).toEqual(MOCK_METRICS)
+    })
+
     it('rolls back by reloading agents when API fails', async () => {
       useAgentListStore.setState({ agents: MOCK_AGENTS })
       vi.mocked(deleteAgent).mockRejectedValue(new Error('Delete failed'))
@@ -171,6 +213,7 @@ describe('agent-list.store', () => {
 
       // Should have re-fetched and restored agents
       expect(fetchAgents).toHaveBeenCalled()
+      expect(fetchMetrics).not.toHaveBeenCalled()
       expect(useAgentListStore.getState().agents).toEqual(MOCK_AGENTS)
       expect(useAgentListStore.getState().error).toBe('Delete failed')
     })
@@ -226,6 +269,16 @@ describe('agent-list.store', () => {
       const data = { name: 'New Bot' }
       await useAgentListStore.getState().createAgent(data)
       expect(fetchAgents).toHaveBeenCalled()
+    })
+
+    it('refreshes metrics after successful create', async () => {
+      vi.mocked(apiCreateAgent).mockResolvedValue(MOCK_AGENTS[0]!)
+      const data = { name: 'New Bot' }
+
+      await useAgentListStore.getState().createAgent(data)
+
+      expect(fetchMetrics).toHaveBeenCalled()
+      expect(useAgentListStore.getState().metrics).toEqual(MOCK_METRICS)
     })
 
     it('sets error state on API failure', async () => {

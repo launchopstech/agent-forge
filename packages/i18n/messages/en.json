@@ -96,6 +96,9 @@
       "newAgent": "New Agent",
       "yourAgents": "Your Agents",
       "insights": "Insights",
+      "totalAgents": "Total Agents",
+      "activeAgents": "Live Agents",
+      "totalMessages": "Messages",
       "totalConversations": "Total Conversations",
       "resolutionRate": "Resolution Rate",
       "handoffRate": "Handoff Rate",
@@ -293,6 +296,17 @@
       "typing": "Typing…",
       "saveAgentFirst": "Save agent first",
       "errorTitle": "Chat error"
+    },
+    "publicChat": {
+      "verifiedShareLink": "Verified share link",
+      "emptyState": "Chat with {agentName}",
+      "inputPlaceholder": "Message {agentName}",
+      "unavailableTitle": "This agent is not available",
+      "unavailableDescription": "The link may be invalid, expired, or paused by the agent owner.",
+      "metadataTitle": "Chat with {agentName}",
+      "metadataDescription": "Chat with {agentName} on AgentHub.",
+      "unavailableMetadataTitle": "Agent unavailable",
+      "unavailableMetadataDescription": "This AgentHub share link is unavailable."
     }
   },
   "sessionWarning": {
