@@ -11,8 +11,11 @@ export interface PublicAgentMetadata {
 
 function apiUrl(path: string): string {
   const baseUrl =
-    process.env.NEXT_PUBLIC_FORGE_API_BASE_URL ?? process.env.PUBLIC_FORGE_API_BASE_URL ?? ''
-  return `${baseUrl}${path}`
+    process.env.NEXT_PUBLIC_FORGE_API_BASE_URL ?? process.env.PUBLIC_FORGE_API_BASE_URL
+  if (!baseUrl?.trim()) {
+    throw new Error('Forge API base URL is not configured')
+  }
+  return `${baseUrl.replace(/\/$/, '')}${path}`
 }
 
 async function* readSseDeltas(response: Response): AsyncGenerator<string> {

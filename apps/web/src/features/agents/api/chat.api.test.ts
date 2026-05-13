@@ -32,14 +32,29 @@ function makeJsonResponse(status: number, data: unknown) {
 }
 
 const GET_TOKEN = vi.fn().mockResolvedValue('test-token')
+const API_BASE_URL = 'https://api.dev.mindrithm.ai'
+const ORIGINAL_NEXT_PUBLIC_FORGE_API_BASE_URL = process.env.NEXT_PUBLIC_FORGE_API_BASE_URL
+const ORIGINAL_PUBLIC_FORGE_API_BASE_URL = process.env.PUBLIC_FORGE_API_BASE_URL
 
 beforeEach(() => {
   vi.clearAllMocks()
   GET_TOKEN.mockResolvedValue('test-token')
+  process.env.NEXT_PUBLIC_FORGE_API_BASE_URL = API_BASE_URL
+  delete process.env.PUBLIC_FORGE_API_BASE_URL
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
+  if (ORIGINAL_NEXT_PUBLIC_FORGE_API_BASE_URL === undefined) {
+    delete process.env.NEXT_PUBLIC_FORGE_API_BASE_URL
+  } else {
+    process.env.NEXT_PUBLIC_FORGE_API_BASE_URL = ORIGINAL_NEXT_PUBLIC_FORGE_API_BASE_URL
+  }
+  if (ORIGINAL_PUBLIC_FORGE_API_BASE_URL === undefined) {
+    delete process.env.PUBLIC_FORGE_API_BASE_URL
+  } else {
+    process.env.PUBLIC_FORGE_API_BASE_URL = ORIGINAL_PUBLIC_FORGE_API_BASE_URL
+  }
 })
 
 describe('streamChat', () => {
@@ -166,7 +181,7 @@ describe('fetchPublicAgent', () => {
     await expect(fetchPublicAgent('agent-1', 'share token')).resolves.toEqual(metadata)
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/public/agents/agent-1?token=share%20token',
+      `${API_BASE_URL}/api/public/agents/agent-1?token=share%20token`,
       expect.objectContaining({
         headers: expect.objectContaining({ Accept: 'application/json' }),
       })
@@ -177,6 +192,15 @@ describe('fetchPublicAgent', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(makeJsonResponse(404, {})))
 
     await expect(fetchPublicAgent('agent-1', 'bad-token')).resolves.toBeNull()
+  })
+
+  it('does not fall back to a relative API URL when the API base URL is missing', async () => {
+    delete process.env.NEXT_PUBLIC_FORGE_API_BASE_URL
+    delete process.env.PUBLIC_FORGE_API_BASE_URL
+
+    await expect(fetchPublicAgent('agent-1', 'share-token')).rejects.toThrow(
+      'Forge API base URL is not configured'
+    )
   })
 })
 
@@ -195,7 +219,7 @@ describe('streamPublicChat', () => {
 
     expect(chunks).toEqual(['public'])
     expect(fetch).toHaveBeenCalledWith(
-      '/api/public/agents/agent-1/chat/stream?token=share-token',
+      `${API_BASE_URL}/api/public/agents/agent-1/chat/stream?token=share-token`,
       expect.objectContaining({
         method: 'POST',
         headers: expect.not.objectContaining({ Authorization: expect.any(String) }),
