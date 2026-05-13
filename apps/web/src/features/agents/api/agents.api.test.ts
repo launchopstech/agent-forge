@@ -93,7 +93,7 @@ describe('fetchAgents', () => {
     await fetchAgents()
     expect(apiClient.get).toHaveBeenCalledWith(
       '/api/agents',
-      expect.objectContaining({ getToken: expect.any(Function) })
+      expect.objectContaining({ getToken: expect.any(Function), cache: 'no-store' })
     )
   })
 
@@ -147,7 +147,10 @@ describe('fetchAgent', () => {
   it('calls GET /api/agents/:id', async () => {
     vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS[0])
     await fetchAgent('1')
-    expect(apiClient.get).toHaveBeenCalledWith('/api/agents/1', expect.any(Object))
+    expect(apiClient.get).toHaveBeenCalledWith(
+      '/api/agents/1',
+      expect.objectContaining({ getToken: expect.any(Function), cache: 'no-store' })
+    )
   })
 
   it('returns agent on success', async () => {

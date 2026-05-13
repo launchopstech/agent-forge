@@ -14,7 +14,10 @@ export async function fetchAgents(params?: AgentListParams): Promise<PaginatedRe
   const { page = 1, pageSize = 10, search, status } = params ?? {}
   let agents: Agent[]
   try {
-    agents = await apiClient.get<Agent[]>('/api/agents', { getToken: getAccessToken })
+    agents = await apiClient.get<Agent[]>('/api/agents', {
+      getToken: getAccessToken,
+      cache: 'no-store',
+    })
   } catch (err) {
     if (redirect401(err)) return { data: [], total: 0, page, pageSize }
     throw err
@@ -63,7 +66,10 @@ function mapAgentRow(row: AgentRow): Agent {
 
 export async function fetchAgent(id: string): Promise<Agent | null> {
   try {
-    const row = await apiClient.get<AgentRow>(`/api/agents/${id}`, { getToken: getAccessToken })
+    const row = await apiClient.get<AgentRow>(`/api/agents/${id}`, {
+      getToken: getAccessToken,
+      cache: 'no-store',
+    })
     return mapAgentRow(row)
   } catch (err) {
     if (redirect401(err)) return null

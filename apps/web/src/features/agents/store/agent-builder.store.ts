@@ -16,6 +16,7 @@ import {
   pauseAgent as apiPauseAgent,
   resumeAgent as apiResumeAgent,
 } from '../api/agents.api'
+import { useAgentListStore } from './agent-list.store'
 
 const DEFAULT_BEHAVIOUR: TemplateBehaviour = {
   systemPrompt: '',
@@ -348,6 +349,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     try {
       const agent = await apiPublishAgent(agentId)
       set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
+      void useAgentListStore.getState().refreshDashboardData()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to publish agent'
       set({ error: message })
@@ -364,6 +366,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     try {
       const agent = await apiPauseAgent(agentId)
       set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
+      void useAgentListStore.getState().refreshDashboardData()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to pause agent'
       set({ error: message })
@@ -380,6 +383,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     try {
       const agent = await apiResumeAgent(agentId)
       set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
+      void useAgentListStore.getState().refreshDashboardData()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to resume agent'
       set({ error: message })
