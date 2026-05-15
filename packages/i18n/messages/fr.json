@@ -281,7 +281,7 @@
         "qaTitle": "Questions-réponses",
         "qaDescription": "Ajoutez les questions et réponses exactes que l'agent doit connaître.",
         "addQa": "Ajouter une Q&R",
-        "qaEmpty": "Ajoutez votre première Q&R pour apprendre à l'agent votre entreprise",
+        "qaEmpty": "Ajoutez votre première Q&R pour apprendre à l'agent à connaître votre entreprise",
         "questionLabel": "Question",
         "questionPlaceholder": "Question",
         "answerLabel": "Réponse",
