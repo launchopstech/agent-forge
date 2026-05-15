@@ -106,6 +106,7 @@ export const mindRithmBrand: BrandConfig = {
   },
   assets: {
     logoPath: '/brands/mindrithm/logo.svg',
+    logoIconPath: '/brands/mindrithm/logo-icon.svg',
     faviconPath: '/brands/mindrithm/favicon.ico',
   },
 }
