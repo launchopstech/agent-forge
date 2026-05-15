@@ -60,7 +60,10 @@ const BuilderFooter = React.memo(function BuilderFooter({
       try {
         await createAgent({
           name: draftAgent.identity.name || 'Untitled Agent',
+          templateId: draftAgent.templateId ?? undefined,
+          agentType: draftAgent.agentType,
           uiConfig: { channels: draftAgent.channels },
+          knowledgeSourceSlugs: draftAgent.knowledge,
         })
         router.push('/agents')
       } finally {

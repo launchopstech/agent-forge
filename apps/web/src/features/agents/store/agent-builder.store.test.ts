@@ -3,6 +3,7 @@ import { useAgentBuilderStore } from './agent-builder.store'
 import type { AgentTemplate, Agent } from '../types'
 
 vi.mock('../api/agents.api', () => ({
+  createAgent: vi.fn(),
   fetchAgent: vi.fn(),
   updateAgent: vi.fn(),
   publishAgent: vi.fn(),
@@ -23,6 +24,7 @@ vi.mock('./agent-list.store', () => ({
 }))
 
 import {
+  createAgent as apiCreateAgent,
   fetchAgent,
   updateAgent,
   publishAgent as apiPublishAgent,
@@ -35,6 +37,7 @@ const MOCK_TEMPLATE: AgentTemplate = {
   name: 'Customer Support',
   emoji: '💬',
   category: 'support',
+  agentType: 'support',
   description: 'FAQ, order tracking, and escalation',
   identity: { name: 'Support Bot', welcomeMessage: 'Hi!', tone: 'professional', language: 'en-US' },
   behaviour: {
@@ -68,6 +71,7 @@ const MOCK_TEMPLATE_LEGACY: AgentTemplate = {
   name: 'Legacy',
   emoji: '📦',
   category: 'support',
+  agentType: 'support',
   description: 'Legacy template without new behaviour fields',
   identity: { name: 'Legacy Bot', welcomeMessage: 'Hi!', tone: 'professional', language: 'en-US' },
   behaviour: {
@@ -83,6 +87,7 @@ const MOCK_TEMPLATE_LEGACY: AgentTemplate = {
 const MOCK_AGENT: Agent = {
   id: '42',
   name: 'Existing Bot',
+  agentType: 'support',
   channels: ['Web', 'WhatsApp'],
   conversations: 500,
   resolution: 80,
@@ -94,6 +99,15 @@ const MOCK_AGENT: Agent = {
 beforeEach(() => {
   vi.clearAllMocks()
   useAgentBuilderStore.getState().resetDraft()
+  vi.mocked(apiCreateAgent).mockResolvedValue({
+    ...MOCK_AGENT,
+    id: 'created-agent',
+    name: 'Draft Bot',
+    agentType: 'custom',
+    channels: [],
+    status: 'draft',
+    shareToken: null,
+  })
 })
 
 describe('agent-builder.store', () => {
@@ -106,6 +120,7 @@ describe('agent-builder.store', () => {
       expect(draftAgent.behaviour.showSourceLinks).toBe(true)
       expect(draftAgent.behaviour.guidanceRules).toEqual([])
       expect(draftAgent.actions).toEqual([])
+      expect(draftAgent.agentType).toBe('custom')
       expect(draftAgent.channels).toEqual([])
     })
 
@@ -155,6 +170,7 @@ describe('agent-builder.store', () => {
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBe('42')
       expect(state.draftAgent.identity.name).toBe('Existing Bot')
+      expect(state.draftAgent.agentType).toBe('support')
     })
 
     it('sets agentStatus from existing agent', () => {
@@ -188,6 +204,7 @@ describe('agent-builder.store', () => {
       useAgentBuilderStore.getState().applyTemplate(MOCK_TEMPLATE)
       const { draftAgent } = useAgentBuilderStore.getState()
       expect(draftAgent.templateId).toBe('customer-support')
+      expect(draftAgent.agentType).toBe('support')
       expect(draftAgent.identity.name).toBe('Support Bot')
       expect(draftAgent.behaviour.systemPrompt).toBe('You are a support bot.')
       expect(draftAgent.behaviour.tonePreset).toBe('friendly')
@@ -533,6 +550,91 @@ describe('agent-builder.store', () => {
       vi.mocked(fetchAgent).mockRejectedValue(new Error('Network error'))
       await useAgentBuilderStore.getState().loadAgent('42')
       expect(useAgentBuilderStore.getState().error).toBe('Network error')
+    })
+  })
+
+  describe('ensureDraftAgent', () => {
+    it('returns the current agent when one already exists', async () => {
+      useAgentBuilderStore.setState({
+        agentId: '42',
+        agentStatus: 'draft',
+        agentShareToken: 'share-token',
+      })
+
+      const agent = await useAgentBuilderStore.getState().ensureDraftAgent()
+
+      expect(agent.id).toBe('42')
+      expect(agent.status).toBe('draft')
+      expect(agent.shareToken).toBe('share-token')
+      expect(apiCreateAgent).not.toHaveBeenCalled()
+    })
+
+    it('creates a draft agent from the current builder state', async () => {
+      vi.mocked(apiCreateAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        id: 'created-agent',
+        name: 'Order Bot',
+        agentType: 'ecommerce',
+        channels: ['Web'],
+        status: 'draft',
+        shareToken: 'share-token-created',
+      })
+      useAgentBuilderStore.setState((state) => ({
+        draftAgent: {
+          ...state.draftAgent,
+          templateId: 'order-template',
+          agentType: 'ecommerce',
+          identity: { ...state.draftAgent.identity, name: 'Order Bot' },
+          channels: ['web'],
+          knowledge: ['product-overview', 'return-policy'],
+        },
+      }))
+
+      const agent = await useAgentBuilderStore.getState().ensureDraftAgent()
+
+      expect(apiCreateAgent).toHaveBeenCalledWith({
+        name: 'Order Bot',
+        templateId: 'order-template',
+        agentType: 'ecommerce',
+        uiConfig: { channels: ['web'] },
+        knowledgeSourceSlugs: ['product-overview', 'return-policy'],
+      })
+      expect(agent.id).toBe('created-agent')
+      expect(useAgentBuilderStore.getState().agentId).toBe('created-agent')
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('draft')
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('share-token-created')
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
+    it('uses Untitled Agent when the draft has no name', async () => {
+      await useAgentBuilderStore.getState().ensureDraftAgent()
+
+      expect(apiCreateAgent).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Untitled Agent' })
+      )
+    })
+
+    it('reuses an in-flight create request', async () => {
+      const first = useAgentBuilderStore.getState().ensureDraftAgent()
+      const second = useAgentBuilderStore.getState().ensureDraftAgent()
+
+      await Promise.all([first, second])
+
+      expect(apiCreateAgent).toHaveBeenCalledOnce()
+    })
+
+    it('sets error and clears saving state when create fails', async () => {
+      vi.mocked(apiCreateAgent).mockRejectedValue(new Error('Create failed'))
+
+      await expect(useAgentBuilderStore.getState().ensureDraftAgent()).rejects.toThrow(
+        'Create failed'
+      )
+
+      const state = useAgentBuilderStore.getState()
+      expect(state.agentId).toBeNull()
+      expect(state.error).toBe('Create failed')
+      expect(state.isSaving).toBe(false)
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
     })
   })
 

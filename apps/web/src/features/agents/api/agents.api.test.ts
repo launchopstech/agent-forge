@@ -42,6 +42,7 @@ const MOCK_AGENTS: Agent[] = [
   {
     id: '1',
     name: 'Customer Bot',
+    agentType: 'support',
     channels: [],
     conversations: 100,
     resolution: 80,
@@ -52,6 +53,7 @@ const MOCK_AGENTS: Agent[] = [
   {
     id: '2',
     name: 'Sales Bot',
+    agentType: 'sales',
     channels: [],
     conversations: 50,
     resolution: 70,
@@ -61,6 +63,7 @@ const MOCK_AGENTS: Agent[] = [
   {
     id: '3',
     name: 'Support Bot',
+    agentType: 'support',
     channels: [],
     conversations: 30,
     resolution: 60,
@@ -70,6 +73,7 @@ const MOCK_AGENTS: Agent[] = [
   {
     id: '4',
     name: 'HR Bot',
+    agentType: 'onboarding',
     channels: [],
     conversations: 20,
     resolution: 55,
@@ -97,6 +101,17 @@ describe('fetchAgents', () => {
     )
   })
 
+  it('passes filters as API query params', async () => {
+    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
+
+    await fetchAgents({ search: 'support', status: 'draft', agentType: 'support' })
+
+    expect(apiClient.get).toHaveBeenCalledWith(
+      '/api/agents?search=support&status=draft&agentType=support',
+      expect.objectContaining({ getToken: expect.any(Function), cache: 'no-store' })
+    )
+  })
+
   it('returns paginated response shape', async () => {
     vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
     const result = await fetchAgents()
@@ -115,25 +130,11 @@ describe('fetchAgents', () => {
     expect(page1.data[0]?.id).not.toBe(page2.data[0]?.id)
   })
 
-  it('filters by status client-side', async () => {
+  it('paginates the returned agent rows', async () => {
     vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
-    const result = await fetchAgents({ status: 'draft' })
-    expect(result.data.every((a) => a.status === 'draft')).toBe(true)
-    expect(result.total).toBe(2)
-  })
-
-  it('filters by search client-side', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
-    const result = await fetchAgents({ search: 'customer' })
-    expect(result.data).toHaveLength(1)
-    expect(result.data[0]?.name).toBe('Customer Bot')
-  })
-
-  it('returns empty data for non-matching search', async () => {
-    vi.mocked(apiClient.get).mockResolvedValue(MOCK_AGENTS)
-    const result = await fetchAgents({ search: 'zzz-no-match-zzz' })
-    expect(result.data).toHaveLength(0)
-    expect(result.total).toBe(0)
+    const result = await fetchAgents({ page: 1, pageSize: 3, agentType: 'support' })
+    expect(result.data).toHaveLength(3)
+    expect(result.total).toBe(4)
   })
 
   it('redirects to /login on 401', async () => {

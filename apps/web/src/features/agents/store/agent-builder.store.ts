@@ -10,6 +10,7 @@ import type {
   AgentStatus,
 } from '../types'
 import {
+  createAgent as apiCreateAgent,
   fetchAgent,
   updateAgent,
   publishAgent as apiPublishAgent,
@@ -31,6 +32,7 @@ const DEFAULT_BEHAVIOUR: TemplateBehaviour = {
 
 const DEFAULT_DRAFT: DraftAgent = {
   templateId: null,
+  agentType: 'custom',
   identity: {
     name: '',
     welcomeMessage: '',
@@ -73,6 +75,7 @@ interface AgentBuilderState {
   clearTestMessages: () => void
   resetDraft: () => void
   loadAgent: (id: string) => Promise<void>
+  ensureDraftAgent: () => Promise<Agent>
   saveDraft: () => Promise<void>
   publishAgent: () => Promise<void>
   pauseAgent: () => Promise<void>
@@ -80,6 +83,7 @@ interface AgentBuilderState {
 }
 
 let _saveTimeout: ReturnType<typeof setTimeout> | null = null
+let _ensureDraftPromise: Promise<Agent> | null = null
 
 export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   agentId: null,
@@ -105,6 +109,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
       agentShareToken: agent.shareToken ?? null,
       draftAgent: {
         ...DEFAULT_DRAFT,
+        agentType: agent.agentType,
         identity: {
           ...DEFAULT_DRAFT.identity,
           name: agent.name,
@@ -120,6 +125,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     set({
       draftAgent: {
         templateId: template.id,
+        agentType: template.agentType ?? template.category ?? 'custom',
         identity: { ...template.identity },
         behaviour: {
           ...DEFAULT_BEHAVIOUR,
@@ -129,7 +135,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
             : [],
         },
         actions: [...template.actions],
-        knowledge: [...template.knowledge],
+        knowledge: [...(template.knowledgeSourceSlugs ?? template.knowledge)],
         channels: [...template.channels],
       },
     })
@@ -297,6 +303,7 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
       clearTimeout(_saveTimeout)
       _saveTimeout = null
     }
+    _ensureDraftPromise = null
     set({
       agentId: null,
       agentStatus: null,
@@ -324,6 +331,57 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
     } catch (err) {
       set({ isLoading: false, error: err instanceof Error ? err.message : 'Failed to load agent' })
     }
+  },
+
+  ensureDraftAgent: async () => {
+    const { agentId, agentStatus, agentShareToken, draftAgent } = get()
+    if (agentId) {
+      return {
+        id: agentId,
+        name: draftAgent.identity.name || 'Untitled Agent',
+        agentType: draftAgent.agentType,
+        channels: draftAgent.channels as Agent['channels'],
+        conversations: 0,
+        resolution: null,
+        csat: null,
+        status: agentStatus ?? 'draft',
+        shareToken: agentShareToken,
+      }
+    }
+
+    if (_ensureDraftPromise) return _ensureDraftPromise
+
+    set({ isSaving: true, error: null })
+    _ensureDraftPromise = apiCreateAgent({
+      name: draftAgent.identity.name || 'Untitled Agent',
+      templateId: draftAgent.templateId ?? undefined,
+      agentType: draftAgent.agentType,
+      uiConfig: { channels: draftAgent.channels },
+      knowledgeSourceSlugs: draftAgent.knowledge,
+    })
+      .then((agent) => {
+        if (!agent.id) throw new Error('Failed to create draft agent')
+        set({
+          agentId: agent.id,
+          agentStatus: agent.status,
+          agentShareToken: agent.shareToken ?? null,
+          isSaving: false,
+        })
+        void useAgentListStore.getState().refreshDashboardData()
+        return agent
+      })
+      .catch((err) => {
+        set({
+          isSaving: false,
+          error: err instanceof Error ? err.message : 'Failed to create draft agent',
+        })
+        throw err
+      })
+      .finally(() => {
+        _ensureDraftPromise = null
+      })
+
+    return _ensureDraftPromise
   },
 
   saveDraft: async () => {

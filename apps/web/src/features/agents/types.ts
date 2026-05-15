@@ -5,6 +5,7 @@ export type AgentChannel = 'Web' | 'WhatsApp' | 'Slack' | 'Email' | 'SMS'
 export interface Agent {
   id: string
   name: string
+  agentType: string
   channels: AgentChannel[]
   conversations: number
   resolution: number | null
@@ -51,12 +52,43 @@ export interface AgentTemplate {
   name: string
   emoji: string
   category: string
+  agentType: string
   description: string
   identity: TemplateIdentity
   behaviour: TemplateBehaviour
   actions: string[]
   knowledge: string[]
+  knowledgeSourceSlugs?: string[]
+  knowledgeSources?: KnowledgeSourceOption[]
   channels: string[]
+}
+
+export interface AgentType {
+  id: string
+  slug: string
+  name: string
+  emoji: string
+  description: string
+  enabled: boolean
+  position: number
+}
+
+export interface KnowledgeSourceUiSchema {
+  setupMode?: 'qa' | 'document' | 'integration'
+  integrationProvider?: string
+  [key: string]: unknown
+}
+
+export interface KnowledgeSourceOption {
+  id: string
+  slug: string
+  name: string
+  emoji: string
+  description: string
+  category: string
+  uiSchema: KnowledgeSourceUiSchema
+  enabled: boolean
+  position: number
 }
 
 export interface DashboardMetrics {
@@ -89,6 +121,7 @@ export type BuilderSection = 'identity' | 'behaviour' | 'actions' | 'knowledge' 
 
 export interface DraftAgent {
   templateId: string | null
+  agentType: string
   identity: TemplateIdentity
   behaviour: TemplateBehaviour
   actions: string[]
@@ -117,6 +150,7 @@ export interface AgentListParams {
   pageSize?: number
   search?: string
   status?: AgentStatus
+  agentType?: string
 }
 
 // ─── Chat response from mock engine ──────────────────────────────────────────

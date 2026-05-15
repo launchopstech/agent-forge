@@ -28,6 +28,7 @@ const MOCK_AGENTS: Agent[] = [
   {
     id: '1',
     name: 'Bot A',
+    agentType: 'support',
     channels: [],
     conversations: 100,
     resolution: 80,
@@ -37,6 +38,7 @@ const MOCK_AGENTS: Agent[] = [
   {
     id: '2',
     name: 'Bot B',
+    agentType: 'sales',
     channels: [],
     conversations: 50,
     resolution: 70,
@@ -82,6 +84,7 @@ beforeEach(() => {
     total: 0,
     search: '',
     statusFilter: null,
+    agentTypeFilter: null,
   })
 })
 
@@ -97,13 +100,20 @@ describe('agent-list.store', () => {
 
     it('passes pagination params to API', async () => {
       vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
-      useAgentListStore.setState({ page: 2, pageSize: 5, search: 'Bot', statusFilter: 'live' })
+      useAgentListStore.setState({
+        page: 2,
+        pageSize: 5,
+        search: 'Bot',
+        statusFilter: 'live',
+        agentTypeFilter: 'support',
+      })
       await useAgentListStore.getState().loadAgents()
       expect(fetchAgents).toHaveBeenCalledWith({
         page: 2,
         pageSize: 5,
         search: 'Bot',
         status: 'live',
+        agentType: 'support',
       })
     })
 
@@ -242,6 +252,22 @@ describe('agent-list.store', () => {
       vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
       useAgentListStore.getState().setStatusFilter(null)
       expect(useAgentListStore.getState().statusFilter).toBeNull()
+    })
+  })
+
+  describe('setAgentTypeFilter', () => {
+    it('resets page to 1', () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.setState({ page: 5 })
+      useAgentListStore.getState().setAgentTypeFilter('support')
+      expect(useAgentListStore.getState().agentTypeFilter).toBe('support')
+      expect(useAgentListStore.getState().page).toBe(1)
+    })
+
+    it('accepts null to clear filter', () => {
+      vi.mocked(fetchAgents).mockResolvedValue(MOCK_PAGINATED)
+      useAgentListStore.getState().setAgentTypeFilter(null)
+      expect(useAgentListStore.getState().agentTypeFilter).toBeNull()
     })
   })
 

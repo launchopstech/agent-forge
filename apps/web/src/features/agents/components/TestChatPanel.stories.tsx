@@ -32,6 +32,7 @@ const meta: Meta<typeof TestChatPanel> = {
         testMessages: (ctx.parameters.testMessages as TestMessage[]) ?? [],
         draftAgent: {
           templateId: null,
+          agentType: 'custom',
           identity: {
             name: (ctx.parameters.agentName as string) ?? '',
             welcomeMessage: '',
