@@ -271,7 +271,6 @@
       "knowledge": {
         "title": "Knowledge Base",
         "subtitle": "Add the business facts your agent should use in answers",
-        "saveFirst": "Save your agent first to add knowledge.",
         "loadError": "Failed to load knowledge.",
         "saveError": "Failed to save knowledge.",
         "retry": "Retry",
