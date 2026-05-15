@@ -13,11 +13,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@forge/ui/src/dropdown-menu'
-import type { Agent, AgentStatus } from '../types'
+import type { Agent, AgentStatus, AgentType } from '../types'
 import { AgentTablePagination } from './AgentTablePagination'
 
 interface AgentTableProps {
   agents: Agent[]
+  agentTypes?: AgentType[]
   onDelete?: (id: string) => Promise<void> | void
   title?: string
   page?: number
@@ -35,6 +36,12 @@ function statusBadgeClass(status: AgentStatus): string {
     case 'paused':
       return 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-900/50 dark:bg-yellow-950/40 dark:text-yellow-300'
   }
+}
+
+function agentTypeLabel(agent: Agent, agentTypesBySlug: Map<string, AgentType>): string {
+  const slug = agent.agentType || 'custom'
+  const agentType = agentTypesBySlug.get(slug)
+  return agentType ? `${agentType.emoji} ${agentType.name}` : slug
 }
 
 // ─── Actions cell (extracted to avoid hook rules in column def) ──────────────
@@ -73,9 +80,11 @@ function ActionsCell({
 
 function AgentMobileCard({
   agent,
+  agentTypesBySlug,
   onDelete,
 }: {
   agent: Agent
+  agentTypesBySlug: Map<string, AgentType>
   onDelete?: (id: string) => Promise<void> | void
 }) {
   const t = useTranslations('agentHub.dashboard')
@@ -89,6 +98,9 @@ function AgentMobileCard({
             className={`text-[10px] shrink-0 ${statusBadgeClass(agent.status)}`}
           >
             {agent.status}
+          </Badge>
+          <Badge variant="secondary" className="text-[10px] shrink-0">
+            {agentTypeLabel(agent, agentTypesBySlug)}
           </Badge>
         </div>
         <div className="flex items-center gap-2 mt-1">
@@ -131,6 +143,7 @@ function AgentMobileCard({
 // ─── Column definitions hook ─────────────────────────────────────────────────
 
 function useAgentColumns(
+  agentTypesBySlug: Map<string, AgentType>,
   onDelete?: (id: string) => Promise<void> | void
 ): ColumnDef<Agent, unknown>[] {
   const t = useTranslations('agentHub.dashboard')
@@ -146,6 +159,13 @@ function useAgentColumns(
               {row.original.name}
             </Link>
           </span>
+        ),
+      },
+      {
+        accessorKey: 'agentType',
+        header: () => t('agentType'),
+        cell: ({ row }) => (
+          <Badge variant="secondary">{agentTypeLabel(row.original, agentTypesBySlug)}</Badge>
         ),
       },
       {
@@ -206,7 +226,7 @@ function useAgentColumns(
         meta: { className: 'w-10' },
       },
     ],
-    [t, onDelete]
+    [t, onDelete, agentTypesBySlug]
   )
 }
 
@@ -214,6 +234,7 @@ function useAgentColumns(
 
 export function AgentTable({
   agents,
+  agentTypes = [],
   onDelete,
   title,
   page = 1,
@@ -221,11 +242,17 @@ export function AgentTable({
   total = 0,
   onPageChange,
 }: AgentTableProps) {
-  const columns = useAgentColumns(onDelete)
+  const agentTypesBySlug = useMemo(
+    () => new Map(agentTypes.map((agentType) => [agentType.slug, agentType])),
+    [agentTypes]
+  )
+  const columns = useAgentColumns(agentTypesBySlug, onDelete)
 
   const renderMobileCard = useCallback(
-    (agent: Agent) => <AgentMobileCard agent={agent} onDelete={onDelete} />,
-    [onDelete]
+    (agent: Agent) => (
+      <AgentMobileCard agent={agent} agentTypesBySlug={agentTypesBySlug} onDelete={onDelete} />
+    ),
+    [agentTypesBySlug, onDelete]
   )
 
   return (

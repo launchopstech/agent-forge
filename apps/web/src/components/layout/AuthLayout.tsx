@@ -1,7 +1,17 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { siteConfig } from '@/config'
+import { siteConfig, activeBrand } from '@/config'
+
+function splitName(name: string, accent?: string): [string, string] {
+  if (!accent) return [name.toLowerCase(), '']
+  const lower = name.toLowerCase()
+  const accentLower = accent.toLowerCase()
+  const idx = lower.lastIndexOf(accentLower)
+  if (idx === -1) return [lower, '']
+  return [lower.slice(0, idx), lower.slice(idx)]
+}
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 
 interface AuthLayoutProps {
@@ -20,6 +30,7 @@ export function AuthLayout({
   className,
 }: AuthLayoutProps) {
   const name = logoText ?? siteConfig.name
+  const [prefix, accent] = splitName(name, logoText ? undefined : siteConfig.nameAccent)
 
   return (
     <div
@@ -34,8 +45,18 @@ export function AuthLayout({
       </div>
       {showLogo && (
         <Link href="/" className="flex items-center gap-2 mb-8">
-          <div className="h-8 w-8 rounded-lg bg-primary" />
-          <span className="text-xl font-bold text-foreground">{name}</span>
+          <Image
+            src={activeBrand.assets.logoIconPath ?? activeBrand.assets.logoPath}
+            alt={name}
+            width={32}
+            height={32}
+            priority
+            className="h-8 w-8"
+          />
+          <span className="text-xl font-bold tracking-tight">
+            <span className="text-foreground">{prefix}</span>
+            {accent && <span className="text-primary">{accent}</span>}
+          </span>
         </Link>
       )}
       {children}

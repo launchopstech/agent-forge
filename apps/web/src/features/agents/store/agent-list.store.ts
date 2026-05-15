@@ -29,6 +29,7 @@ interface AgentListState {
   total: number
   search: string
   statusFilter: AgentStatus | null
+  agentTypeFilter: string | null
 
   // Actions
   loadAgents: () => Promise<void>
@@ -40,6 +41,7 @@ interface AgentListState {
   setPage: (page: number) => void
   setSearch: (search: string) => void
   setStatusFilter: (status: AgentStatus | null) => void
+  setAgentTypeFilter: (agentType: string | null) => void
 }
 
 export const useAgentListStore = create<AgentListState>((set, get) => ({
@@ -54,9 +56,10 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
   total: 0,
   search: '',
   statusFilter: null,
+  agentTypeFilter: null,
 
   loadAgents: async () => {
-    const { page, pageSize, search, statusFilter } = get()
+    const { page, pageSize, search, statusFilter, agentTypeFilter } = get()
     set({ error: null })
     try {
       const result = await fetchAgents({
@@ -64,6 +67,7 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
         pageSize,
         search: search || undefined,
         status: statusFilter ?? undefined,
+        agentType: agentTypeFilter ?? undefined,
       })
       set({ agents: result.data, total: result.total })
     } catch (err) {
@@ -94,7 +98,7 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
   },
 
   loadAll: async () => {
-    const { page, pageSize, search, statusFilter } = get()
+    const { page, pageSize, search, statusFilter, agentTypeFilter } = get()
     set({ isLoading: true, error: null })
 
     const [agentsResult, metricsResult, intentsResult] = await Promise.allSettled([
@@ -103,6 +107,7 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
         pageSize,
         search: search || undefined,
         status: statusFilter ?? undefined,
+        agentType: agentTypeFilter ?? undefined,
       }),
       fetchMetrics(),
       fetchUnresolvedIntents(),
@@ -136,13 +141,14 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
   },
 
   refreshDashboardData: async () => {
-    const { page, pageSize, search, statusFilter } = get()
+    const { page, pageSize, search, statusFilter, agentTypeFilter } = get()
     const [agentsResult, metricsResult] = await Promise.allSettled([
       fetchAgents({
         page,
         pageSize,
         search: search || undefined,
         status: statusFilter ?? undefined,
+        agentType: agentTypeFilter ?? undefined,
       }),
       fetchMetrics(),
     ])
@@ -182,12 +188,13 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
       await get().refreshDashboardData()
     } catch (err) {
       // Rollback on failure by reloading
-      const { page, pageSize, search, statusFilter } = get()
+      const { page, pageSize, search, statusFilter, agentTypeFilter } = get()
       const result = await fetchAgents({
         page,
         pageSize,
         search: search || undefined,
         status: statusFilter ?? undefined,
+        agentType: agentTypeFilter ?? undefined,
       })
       const message = err instanceof Error ? err.message : 'Failed to delete agent'
       set({ agents: result.data, total: result.total, error: message })
@@ -207,6 +214,11 @@ export const useAgentListStore = create<AgentListState>((set, get) => ({
 
   setStatusFilter: (status) => {
     set({ statusFilter: status, page: 1 })
+    void get().loadAgents()
+  },
+
+  setAgentTypeFilter: (agentType) => {
+    set({ agentTypeFilter: agentType, page: 1 })
     void get().loadAgents()
   },
 }))

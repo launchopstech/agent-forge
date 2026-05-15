@@ -6,6 +6,7 @@ const agents: Agent[] = [
   {
     id: 'agent-live',
     name: 'Support Concierge',
+    agentType: 'support',
     channels: ['Web', 'Email'],
     conversations: 1240,
     resolution: 82,
@@ -15,6 +16,7 @@ const agents: Agent[] = [
   {
     id: 'agent-draft',
     name: 'Sales Qualifier',
+    agentType: 'sales',
     channels: ['Web'],
     conversations: 0,
     resolution: null,
@@ -24,6 +26,7 @@ const agents: Agent[] = [
   {
     id: 'agent-paused',
     name: 'Returns Assistant',
+    agentType: 'ecommerce',
     channels: ['WhatsApp', 'Email'],
     conversations: 318,
     resolution: 71,

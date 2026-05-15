@@ -59,6 +59,10 @@ vi.mock('@/hooks/use-user', () => ({
   useUser: () => mockUseUser(),
 }))
 
+vi.mock('../api/agent-types.api', () => ({
+  fetchAgentTypes: vi.fn().mockResolvedValue([]),
+}))
+
 const mockLoadAll = vi.fn().mockResolvedValue(undefined)
 vi.mock('../store/agent-list.store', () => ({
   useAgentListStore: () => ({
@@ -73,11 +77,13 @@ vi.mock('../store/agent-list.store', () => ({
     total: 0,
     search: '',
     statusFilter: null,
+    agentTypeFilter: null,
     loadAll: mockLoadAll,
     removeAgent: vi.fn(),
     setPage: vi.fn(),
     setSearch: vi.fn(),
     setStatusFilter: vi.fn(),
+    setAgentTypeFilter: vi.fn(),
   }),
 }))
 

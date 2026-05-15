@@ -11,24 +11,22 @@ function redirect401(err: unknown): boolean {
 }
 
 export async function fetchAgents(params?: AgentListParams): Promise<PaginatedResponse<Agent>> {
-  const { page = 1, pageSize = 10, search, status } = params ?? {}
+  const { page = 1, pageSize = 10, search, status, agentType } = params ?? {}
+  const searchParams = new URLSearchParams()
+  if (search) searchParams.set('search', search)
+  if (status) searchParams.set('status', status)
+  if (agentType) searchParams.set('agentType', agentType)
+  const query = searchParams.toString()
   let agents: Agent[]
   try {
-    agents = await apiClient.get<Agent[]>('/api/agents', {
+    const rows = await apiClient.get<AgentRow[]>(`/api/agents${query ? `?${query}` : ''}`, {
       getToken: getAccessToken,
       cache: 'no-store',
     })
+    agents = rows.map(mapAgentRow)
   } catch (err) {
     if (redirect401(err)) return { data: [], total: 0, page, pageSize }
     throw err
-  }
-
-  if (status) {
-    agents = agents.filter((a) => a.status === status)
-  }
-  if (search) {
-    const q = search.toLowerCase()
-    agents = agents.filter((a) => a.name.toLowerCase().includes(q))
   }
 
   const total = agents.length
@@ -43,6 +41,8 @@ interface AgentRow {
   id: string
   name: string
   status: string
+  agentType?: string
+  agentTypeSlug?: string
   shareToken?: string | null
   uiConfig?: { channels?: string[] } | null
   channels?: Agent['channels']
@@ -55,6 +55,7 @@ function mapAgentRow(row: AgentRow): Agent {
   return {
     id: row.id,
     name: row.name,
+    agentType: row.agentType ?? row.agentTypeSlug ?? 'custom',
     status: row.status as Agent['status'],
     channels: (row.channels ?? row.uiConfig?.channels ?? []) as Agent['channels'],
     conversations: row.conversations ?? 0,
@@ -82,13 +83,16 @@ export async function fetchAgent(id: string): Promise<Agent | null> {
 export interface CreateAgentPayload {
   name: string
   templateId?: string
+  agentType?: string
   uiConfig?: Record<string, unknown>
   aiConfig?: Record<string, unknown>
+  knowledgeSourceSlugs?: string[]
 }
 
 export async function createAgent(data: CreateAgentPayload): Promise<Agent> {
   try {
-    return await apiClient.post<Agent>('/api/agents', data, { getToken: getAccessToken })
+    const row = await apiClient.post<AgentRow>('/api/agents', data, { getToken: getAccessToken })
+    return mapAgentRow(row)
   } catch (err) {
     if (redirect401(err)) return {} as Agent
     throw err
@@ -99,13 +103,17 @@ export async function createAgent(data: CreateAgentPayload): Promise<Agent> {
 export interface UpdateAgentPayload {
   name?: string
   templateId?: string
+  agentType?: string
   uiConfig?: Record<string, unknown>
   aiConfig?: Record<string, unknown>
 }
 
 export async function updateAgent(id: string, data: UpdateAgentPayload): Promise<Agent> {
   try {
-    return await apiClient.patch<Agent>(`/api/agents/${id}`, data, { getToken: getAccessToken })
+    const row = await apiClient.patch<AgentRow>(`/api/agents/${id}`, data, {
+      getToken: getAccessToken,
+    })
+    return mapAgentRow(row)
   } catch (err) {
     if (redirect401(err)) return {} as Agent
     throw err

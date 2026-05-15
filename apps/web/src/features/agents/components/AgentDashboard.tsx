@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Plus, AlertCircle, RefreshCw } from 'lucide-react'
@@ -10,7 +10,9 @@ import { Skeleton } from '@forge/ui/src/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@forge/ui/src/select'
 import { siteConfig } from '@/config'
 import { useUser } from '@/hooks/use-user'
+import { fetchAgentTypes } from '../api/agent-types.api'
 import { useAgentListStore } from '../store/agent-list.store'
+import type { AgentType } from '../types'
 import { MetricsGrid } from './MetricsGrid'
 import { AgentTable } from './AgentTable'
 import { UnresolvedIntents } from './UnresolvedIntents'
@@ -38,12 +40,15 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
     total,
     search,
     statusFilter,
+    agentTypeFilter,
     loadAll,
     removeAgent,
     setPage,
     setSearch,
     setStatusFilter,
+    setAgentTypeFilter,
   } = useAgentListStore()
+  const [agentTypes, setAgentTypes] = useState<AgentType[]>([])
 
   useEffect(() => {
     // authLoading stays true until AuthHandlerProvider confirms the session (active or expired).
@@ -51,6 +56,7 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
     // No isAuthenticated guard needed — unauthenticated users are redirected by signOut() → /login.
     if (authLoading) return
     void loadAll()
+    void fetchAgentTypes().then(setAgentTypes)
   }, [authLoading, loadAll])
 
   const tSidebar = useTranslations('sidebar')
@@ -69,6 +75,13 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
       setStatusFilter(value === 'all' ? null : (value as 'live' | 'draft' | 'paused'))
     },
     [setStatusFilter]
+  )
+
+  const handleAgentTypeChange = useCallback(
+    (value: string) => {
+      setAgentTypeFilter(value === 'all' ? null : value)
+    },
+    [setAgentTypeFilter]
   )
 
   const handleRetry = useCallback(() => {
@@ -149,6 +162,19 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
             <SelectItem value="paused">{t('statusPaused')}</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={agentTypeFilter ?? 'all'} onValueChange={handleAgentTypeChange}>
+          <SelectTrigger className="sm:w-48">
+            <SelectValue placeholder={t('filterByType')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('allTypes')}</SelectItem>
+            {agentTypes.map((agentType) => (
+              <SelectItem key={agentType.slug} value={agentType.slug}>
+                {agentType.emoji} {agentType.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* ── Scrollable main zone — fills remaining viewport ── */}
@@ -160,6 +186,7 @@ export const AgentDashboard = React.memo(function AgentDashboard() {
           ) : (
             <AgentTable
               agents={agents}
+              agentTypes={agentTypes}
               onDelete={removeAgent}
               title={t('yourAgents')}
               page={page}
