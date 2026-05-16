@@ -21,6 +21,23 @@ export default async function HomePage() {
     { icon: MessagesSquare, title: t('feature2Title'), desc: t('feature2Description') },
     { icon: Rocket, title: t('feature3Title'), desc: t('feature3Description') },
   ]
+  const problemCards = [
+    {
+      label: t('problemExternalLabel'),
+      title: t('problemExternalTitle'),
+      desc: t('problemExternalDesc'),
+    },
+    {
+      label: t('problemInternalLabel'),
+      title: t('problemInternalTitle'),
+      desc: t('problemInternalDesc'),
+    },
+    {
+      label: t('problemPhilosophicalLabel'),
+      title: t('problemPhilosophicalTitle'),
+      desc: t('problemPhilosophicalDesc'),
+    },
+  ]
   const features = [
     { title: t('featureBuilderTitle'), desc: t('featureBuilderDesc') },
     { title: t('featureReviewTitle'), desc: t('featureReviewDesc') },
@@ -99,7 +116,28 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="features" className="border-t border-border bg-muted/30 px-6 py-20 sm:px-8">
+      <section id="problem" className="border-t border-border bg-muted/30 px-6 py-20 sm:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold text-primary">{t('problemEyebrow')}</p>
+            <h2 className="mt-3 text-3xl font-bold text-foreground">{t('problemTitle')}</h2>
+            <p className="mt-4 text-lg text-muted-foreground">{t('problemSubtitle')}</p>
+          </div>
+          <div className="mt-12 grid gap-4 md:grid-cols-3">
+            {problemCards.map((problem) => (
+              <div key={problem.title} className="rounded-lg border border-border bg-card p-6">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                  {problem.label}
+                </p>
+                <h3 className="mt-4 text-xl font-semibold text-foreground">{problem.title}</h3>
+                <p className="mt-3 text-sm text-muted-foreground">{problem.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="features" className="border-t border-border bg-background px-6 py-20 sm:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold text-primary">{t('featuresEyebrow')}</p>
@@ -117,7 +155,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="ownership" className="px-6 py-20 sm:px-8">
+      <section id="ownership" className="border-t border-border px-6 py-20 sm:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold text-primary">{t('proofEyebrow')}</p>

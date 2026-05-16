@@ -18,7 +18,7 @@ const pages: Page[] = [
   {
     slug: 'about',
     title: 'About Us',
-    body: 'MindRithm helps businesses deploy AI agents they own, control, and can prove, powered by AgentForge.',
+    body: 'MindRithm helps businesses launch AI agents they own, control, and can prove, so they can serve customers faster without risking data or trust.',
   },
   {
     slug: 'privacy',
@@ -36,9 +36,9 @@ const posts: Post[] = [
   {
     slug: 'introducing-agent-forge',
     title: 'Introducing MindRithm',
-    excerpt: 'Learn how MindRithm helps businesses deploy AI agents they own and control.',
+    excerpt: 'Learn how MindRithm helps businesses launch AI agents they own and control.',
     publishedAt: '2025-01-15',
-    body: 'MindRithm brings agent building, testing, publishing, audit trails, and client delivery into one owned workflow.',
+    body: 'MindRithm brings agent building, knowledge setup, testing, publishing, audit trails, and client delivery into one owned workflow.',
   },
   {
     slug: 'building-with-next-js',

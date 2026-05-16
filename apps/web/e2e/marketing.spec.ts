@@ -4,8 +4,16 @@ test.describe('Marketing landing page', () => {
   test('renders ownership-led copy and signup CTA', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.getByRole('heading', { name: 'AI your business owns.' })).toBeVisible()
-    await expect(page.getByText('Deploy AI agents you control')).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'AI agents your business actually owns.' })
+    ).toBeVisible()
+    await expect(page.getByText('Launch a customer support agent in minutes')).toBeVisible()
+    await expect(page.getByRole('heading', { name: /You need control/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /owned agent in three steps/i })).toBeVisible()
+    await expect(page.getByRole('navigation').getByText('mindrithm')).toBeVisible()
+    await expect(
+      page.getByRole('navigation').getByRole('img', { name: 'MindRithm' })
+    ).toHaveAttribute('src', /\/brands\/mindrithm\/logo-icon\.svg/)
 
     const signupLinks = page.getByRole('link', { name: /get started free/i })
     await expect(signupLinks.first()).toHaveAttribute('href', '/signup')
@@ -59,7 +67,9 @@ test.describe('Marketing landing page', () => {
     await page.setViewportSize({ width: 375, height: 812 })
     await page.goto('/')
 
-    await expect(page.getByRole('heading', { name: 'AI your business owns.' })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'AI agents your business actually owns.' })
+    ).toBeVisible()
     await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible()
   })
 })
