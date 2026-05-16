@@ -59,6 +59,7 @@
   "sidebar": {
     "overview": "Overview",
     "agents": "Agents",
+    "channels": "Channels",
     "workflows": "Workflows",
     "manage": "Manage",
     "analytics": "Analytics",
@@ -312,7 +313,10 @@
         "embedCodeHint": "Add this snippet to your website to activate the web widget",
         "active": "Active",
         "copy": "Copy code",
-        "finish": "Finish & Save"
+        "finish": "Finish & Save",
+        "emptyTitle": "No channels connected",
+        "emptyDescription": "Create a channel in the Channels page, then add a routing rule pointing to this agent.",
+        "goToChannels": "Go to Channels"
       }
     },
     "testChat": {
