@@ -8,7 +8,7 @@ export const mindRithmBrand: BrandConfig = {
   site: {
     name: 'MindRithm',
     description:
-      'MindRithm helps businesses deploy AI agents they own, control, and can prove, powered by AgentForge.',
+      'MindRithm helps businesses launch AI agents they own, control, and can prove, so they can serve customers faster without risking data or trust.',
     url: process.env.NEXT_PUBLIC_APP_URL,
     ogImage: '/brands/mindrithm/og.png',
   },

@@ -60,7 +60,10 @@ export function UserMenu({ initialUser }: UserMenuProps = {}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+        <button
+          suppressHydrationWarning
+          className="flex items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        >
           <Avatar className="h-8 w-8 cursor-pointer">
             <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? 'User'} />
             <AvatarFallback>{initials}</AvatarFallback>

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@forge/ui/src/button'
@@ -10,16 +10,19 @@ import { Sheet, SheetContent, SheetTrigger } from '@forge/ui/src/sheet'
 import { cn } from '@/lib/utils'
 import { siteConfig, marketingNavItems, activeBrand } from '@/config'
 
+import type { NavItem } from '@forge/config/src/types'
+import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+
 function splitName(name: string, accent?: string): [string, string] {
   if (!accent) return [name.toLowerCase(), '']
+
   const lower = name.toLowerCase()
   const accentLower = accent.toLowerCase()
   const idx = lower.lastIndexOf(accentLower)
+
   if (idx === -1) return [lower, '']
   return [lower.slice(0, idx), lower.slice(idx)]
 }
-import type { NavItem } from '@forge/config/src/types'
-import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 
 interface NavbarProps {
   navItems?: NavItem[]
