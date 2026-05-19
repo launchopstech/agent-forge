@@ -8,6 +8,7 @@ import {
   Check,
   CheckCircle2,
   Copy,
+  Hash,
   Pause,
   Play,
   Radio,
@@ -53,7 +54,9 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
     resumeAgent,
   } = useAgentBuilderStore()
   const [copied, setCopied] = useState(false)
+  const [copiedId, setCopiedId] = useState(false)
   const copyResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const copyIdResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const progressPercent = Math.round((completedSections.length / SECTIONS.length) * 100)
   const canChangeStatus = agentId !== 'new' && agentStatus !== null
@@ -118,9 +121,23 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
     }
   }, [shareUrl, t])
 
+  const handleCopyAgentId = useCallback(async () => {
+    if (agentId === 'new') return
+    try {
+      await navigator.clipboard.writeText(agentId)
+      setCopiedId(true)
+      toast({ title: 'Agent ID copied' })
+      if (copyIdResetTimeout.current) clearTimeout(copyIdResetTimeout.current)
+      copyIdResetTimeout.current = setTimeout(() => setCopiedId(false), 2000)
+    } catch {
+      toast({ title: 'Failed to copy agent ID', variant: 'destructive' })
+    }
+  }, [agentId])
+
   useEffect(() => {
     return () => {
       if (copyResetTimeout.current) clearTimeout(copyResetTimeout.current)
+      if (copyIdResetTimeout.current) clearTimeout(copyIdResetTimeout.current)
     }
   }, [])
 
@@ -192,6 +209,23 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
               {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
             </Button>
           )}
+          {agentId !== 'new' && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-11 w-11"
+                  onClick={() => void handleCopyAgentId()}
+                  aria-label="Copy agent ID"
+                >
+                  {copiedId ? <Check className="size-4" /> : <Hash className="size-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Copy agent ID</TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         {/* Status, share link, and progress — desktop only (no room in horizontal mobile strip) */}
@@ -213,6 +247,30 @@ export function BuilderNav({ agentId }: BuilderNavProps) {
                 {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
               </Button>
             </div>
+          )}
+
+          {agentId !== 'new' && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyAgentId()}
+                  className="flex w-full items-center gap-1.5 rounded-md border bg-background px-2 py-1.5 text-left hover:bg-muted/50 transition-colors"
+                  aria-label="Copy agent ID"
+                >
+                  <Hash className="size-3 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 flex-1 truncate text-[11px] font-mono text-muted-foreground">
+                    {agentId}
+                  </span>
+                  {copiedId ? (
+                    <Check className="size-3 shrink-0 text-green-600" />
+                  ) : (
+                    <Copy className="size-3 shrink-0 text-muted-foreground" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Copy agent ID</TooltipContent>
+            </Tooltip>
           )}
 
           <div className="space-y-1.5">

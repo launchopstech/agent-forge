@@ -272,7 +272,6 @@
       "knowledge": {
         "title": "Base de connaissances",
         "subtitle": "Ajoutez les informations métier que l'agent doit utiliser dans ses réponses",
-        "saveFirst": "Enregistrez d'abord votre agent pour ajouter des connaissances.",
         "loadError": "Impossible de charger les connaissances.",
         "saveError": "Impossible d'enregistrer les connaissances.",
         "retry": "Réessayer",

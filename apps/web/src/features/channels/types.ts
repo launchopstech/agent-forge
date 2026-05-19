@@ -30,6 +30,15 @@ export interface WorkspaceChannel {
   updatedAt: string
 }
 
+export interface WebsiteChannelConfig {
+  agentId?: string
+  brandName?: string
+  brandColor?: string
+  mode?: 'floating' | 'inline'
+  position?: 'bottom-right' | 'bottom-left'
+  allowedDomains?: string[]
+}
+
 export interface CreateChannelPayload {
   channelType: ChannelType
   name: string

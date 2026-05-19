@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useCallback } from 'react'
-import { ArrowLeft, Settings, Zap } from 'lucide-react'
+import { ArrowLeft, Code2, Settings, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { Skeleton } from '@forge/ui/src/skeleton'
 import { fetchChannel } from '../api/channels.api'
@@ -10,6 +10,7 @@ import type { WorkspaceChannel } from '../types'
 import type { Agent } from '@/features/agents/types'
 import { RoutingRulesEditor } from './RoutingRulesEditor'
 import { TestConsole } from './TestConsole'
+import { EmbedSection } from './EmbedSection'
 
 interface ChannelSetupPageProps {
   channelId: string
@@ -19,7 +20,7 @@ export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
   const [channel, setChannel] = useState<WorkspaceChannel | null>(null)
   const [agents, setAgents] = useState<Agent[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'routing' | 'test'>('routing')
+  const [activeTab, setActiveTab] = useState<'routing' | 'test' | 'embed'>('routing')
 
   const load = useCallback(async () => {
     setIsLoading(true)
@@ -61,11 +62,13 @@ export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
     )
   }
 
+  const isWebsiteChannel = channel.channelType === 'website'
   const tabs = [
     { id: 'routing' as const, label: 'Routing Rules', icon: Settings },
     ...(channel.channelType === 'test'
       ? [{ id: 'test' as const, label: 'Test Console', icon: Zap }]
       : []),
+    ...(isWebsiteChannel ? [{ id: 'embed' as const, label: 'Embed', icon: Code2 }] : []),
   ]
 
   return (
@@ -124,6 +127,10 @@ export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
         <div className="max-w-xl">
           <TestConsole channelId={channel.id} channelName={channel.name} />
         </div>
+      )}
+
+      {activeTab === 'embed' && isWebsiteChannel && (
+        <EmbedSection channel={channel} agents={agents} onConfigSaved={load} />
       )}
     </div>
   )

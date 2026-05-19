@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { ClientInit } from '@/features/marketing/components/ClientInit'
@@ -49,6 +50,19 @@ const jsonLd = {
   },
 }
 
+const widgetUrl =
+  process.env.NODE_ENV === 'development' &&
+  (!process.env.NEXT_PUBLIC_WIDGET_URL ||
+    process.env.NEXT_PUBLIC_WIDGET_URL === 'http://localhost:3000/widget.js')
+    ? '/widget.js'
+    : (process.env.NEXT_PUBLIC_WIDGET_URL ?? 'https://mindrithm.ai/widget.js')
+const demoAgentId = process.env.NEXT_PUBLIC_DEMO_AGENT_ID?.trim()
+const demoShareToken = process.env.NEXT_PUBLIC_DEMO_SHARE_TOKEN?.trim()
+const forgeApiUrl =
+  process.env.NEXT_PUBLIC_FORGE_API_BASE_URL ??
+  process.env.NEXT_PUBLIC_FORGE_API_URL ??
+  'https://api.mindrithm.ai'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={fontSans.variable}>
@@ -63,6 +77,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClientInit />
         <Analytics />
         <SpeedInsights />
+        {demoAgentId && demoShareToken && (
+          <Script
+            id="mindrithm-chat"
+            src={widgetUrl}
+            data-agent-id={demoAgentId}
+            data-share-token={demoShareToken}
+            data-api-url={forgeApiUrl}
+            data-brand-color="#4f2edc"
+            data-mode="floating"
+            data-position="bottom-right"
+            strategy="lazyOnload"
+          />
+        )}
       </body>
     </html>
   )
