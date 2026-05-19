@@ -59,6 +59,7 @@
   "sidebar": {
     "overview": "Vue d'ensemble",
     "agents": "Agents",
+    "channels": "Canaux",
     "workflows": "Flux de travail",
     "manage": "Gérer",
     "analytics": "Analytique",
@@ -313,7 +314,10 @@
         "embedCodeHint": "Ajoutez ce code sur votre site pour activer le widget web",
         "active": "Actif",
         "copy": "Copier le code",
-        "finish": "Terminer et enregistrer"
+        "finish": "Terminer et enregistrer",
+        "emptyTitle": "Aucun canal connecté",
+        "emptyDescription": "Créez un canal dans la page Canaux, puis ajoutez une règle de routage pointant vers cet agent.",
+        "goToChannels": "Aller aux canaux"
       }
     },
     "testChat": {

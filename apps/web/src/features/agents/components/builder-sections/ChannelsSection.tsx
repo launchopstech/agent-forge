@@ -1,117 +1,198 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Monitor, MessageCircle, Mail, Hash, ClipboardCopy, Check } from 'lucide-react'
+import { Radio, ExternalLink, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { Badge } from '@forge/ui/src/badge'
-import { cn } from '@forge/ui/src/utils'
+import { Skeleton } from '@forge/ui/src/skeleton'
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from '@forge/ui/src/empty'
 import { useAgentBuilderStore } from '../../store/agent-builder.store'
+import { fetchChannels, fetchRoutingRules } from '@/features/channels/api/channels.api'
+import type {
+  WorkspaceChannel,
+  RoutingRule,
+  KeywordConditionValue,
+} from '@/features/channels/types'
 
-const AVAILABLE_CHANNELS = [
-  {
-    id: 'web',
-    labelKey: 'channelWeb',
-    Icon: Monitor,
-    iconBg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-  },
-  {
-    id: 'whatsapp',
-    labelKey: 'channelWhatsApp',
-    Icon: MessageCircle,
-    iconBg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-  },
-  {
-    id: 'email',
-    labelKey: 'channelEmail',
-    Icon: Mail,
-    iconBg: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-  },
-  {
-    id: 'slack',
-    labelKey: 'channelSlack',
-    Icon: Hash,
-    iconBg: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-  },
-]
+interface ChannelWithRules extends WorkspaceChannel {
+  agentRules: RoutingRule[]
+}
+
+function displayKeywords(cv: unknown): string {
+  const value = cv as KeywordConditionValue | undefined
+  if (!value?.keywords?.length) return ''
+  return value.keywords.join(', ')
+}
 
 export function ChannelsSection() {
   const t = useTranslations('agentHub.builder.channels')
-  const { draftAgent, toggleChannel } = useAgentBuilderStore()
-  const { channels, identity } = draftAgent
-  const [copied, setCopied] = useState(false)
+  const { agentId } = useAgentBuilderStore()
+  const [channels, setChannels] = useState<ChannelWithRules[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const embedCode = `<script src="https://cdn.agentforge.io/widget.js"
-  data-agent="${identity.name || 'my-agent'}"
-  data-channels="${channels.join(',')}"
-></script>`
+  const load = useCallback(async () => {
+    if (!agentId) return
+    setIsLoading(true)
+    try {
+      const allChannels = await fetchChannels()
 
-  const handleCopy = useCallback(() => {
-    void navigator.clipboard.writeText(embedCode).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }, [embedCode])
+      const enriched = await Promise.all(
+        allChannels.map(async (ch) => {
+          try {
+            const rules = await fetchRoutingRules(ch.id)
+            return { ...ch, agentRules: rules.filter((r) => r.agentId === agentId) }
+          } catch {
+            return { ...ch, agentRules: [] }
+          }
+        })
+      )
+      setChannels(enriched)
+    } catch {
+      // silent fail — channels are optional
+    } finally {
+      setIsLoading(false)
+    }
+  }, [agentId])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  const connected = channels.filter((c) => c.agentRules.length > 0)
+  const available = channels.filter((c) => c.agentRules.length === 0)
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold">{t('title')}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">{t('title')}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
+        <Link
+          href="/dashboard/channels"
+          className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+        >
+          <Settings className="h-3.5 w-3.5" />
+          Manage Channels
+          <ExternalLink className="h-3 w-3" />
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
-        {AVAILABLE_CHANNELS.map(({ id, labelKey, Icon, iconBg }) => {
-          const isActive = channels.includes(id)
-          return (
-            <button
-              key={id}
-              type="button"
-              onClick={() => toggleChannel(id)}
-              className={cn(
-                'flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all',
-                isActive
-                  ? 'border-primary bg-primary/5 shadow-sm'
-                  : 'border-border hover:border-primary/50 hover:shadow-sm bg-card'
-              )}
+      {isLoading ? (
+        <div className="space-y-2 max-w-lg">
+          <Skeleton className="h-14 rounded-xl" />
+          <Skeleton className="h-14 rounded-xl" />
+        </div>
+      ) : channels.length === 0 ? (
+        <Empty className="max-w-lg">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Radio className="h-6 w-6" />
+            </EmptyMedia>
+            <EmptyTitle>{t('emptyTitle')}</EmptyTitle>
+            <EmptyDescription>{t('emptyDescription')}</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link
+              href="/dashboard/channels"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
             >
-              <span
-                className={cn(
-                  'size-9 rounded-lg flex items-center justify-center flex-shrink-0',
-                  iconBg
-                )}
-              >
-                <Icon className="size-4" />
-              </span>
-              <div className="flex-1 min-w-0">
-                <span className="font-medium text-sm block">{t(labelKey as 'channelWeb')}</span>
-                {isActive && (
-                  <Badge variant="default" className="mt-0.5 text-[10px] h-4 px-1">
-                    {t('active')}
-                  </Badge>
-                )}
-              </div>
-            </button>
-          )
-        })}
-      </div>
+              <Radio className="h-3.5 w-3.5" />
+              {t('goToChannels')}
+            </Link>
+          </EmptyContent>
+        </Empty>
+      ) : (
+        <div className="space-y-4 max-w-lg">
+          {connected.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Connected ({connected.length})
+              </p>
+              {connected.map((ch) => (
+                <ChannelRow key={ch.id} channel={ch} agentRules={ch.agentRules} connected />
+              ))}
+            </div>
+          )}
 
-      {channels.includes('web') && (
-        <div className="max-w-lg space-y-2">
-          <h3 className="text-sm font-medium">{t('embedCode')}</h3>
-          <p className="text-xs text-muted-foreground">{t('embedCodeHint')}</p>
-          <div className="relative">
-            <pre className="bg-[#1e1e2e] text-[#cdd6f4] rounded-xl p-4 text-xs font-mono leading-relaxed overflow-x-auto">
-              {embedCode}
-            </pre>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="absolute top-2 right-2 p-1.5 rounded-md bg-white/10 hover:bg-white/20 text-[#cdd6f4] transition-colors"
-              title={t('copy')}
-            >
-              {copied ? <Check className="size-3.5" /> : <ClipboardCopy className="size-3.5" />}
-            </button>
+          {available.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Available — add a routing rule to connect
+              </p>
+              {available.map((ch) => (
+                <ChannelRow key={ch.id} channel={ch} agentRules={[]} connected={false} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ChannelRow({
+  channel,
+  agentRules,
+  connected,
+}: {
+  channel: WorkspaceChannel
+  agentRules: RoutingRule[]
+  connected: boolean
+}) {
+  return (
+    <div className="rounded-lg border bg-card px-4 py-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <Radio className="h-4 w-4 text-muted-foreground" />
+          <div>
+            <p className="text-sm font-medium">{channel.name}</p>
+            <p className="text-xs capitalize text-muted-foreground">{channel.channelType}</p>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {connected ? (
+            <Badge variant="default" className="text-xs">
+              Connected
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-xs text-muted-foreground">
+              Not connected
+            </Badge>
+          )}
+          <Link
+            href={`/dashboard/channels/${channel.channelType}/setup?id=${channel.id}`}
+            className="inline-flex items-center gap-1 rounded-md p-1 text-muted-foreground hover:text-foreground"
+            title="Edit routing rules"
+          >
+            <Settings className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Display routing rules for this agent */}
+      {agentRules.length > 0 && (
+        <div className="ml-7 space-y-1">
+          {agentRules.map((rule) => (
+            <div key={rule.id} className="text-xs text-muted-foreground flex flex-col gap-0.5">
+              <span>
+                {rule.conditionType === 'always'
+                  ? 'Condition: Always'
+                  : `Keywords: ${displayKeywords(rule.conditionValue)}`}
+              </span>
+              {rule.agentInstructions && (
+                <span className="italic">Instructions: {rule.agentInstructions}</span>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

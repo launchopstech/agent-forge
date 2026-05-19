@@ -8,6 +8,7 @@ import {
   Settings,
   HelpCircle,
   Paintbrush,
+  Radio,
 } from 'lucide-react'
 import type { NavGroup, NavItem } from './types'
 
@@ -22,6 +23,7 @@ export const dashboardNavGroups: NavGroup[] = [
     items: [
       { label: 'Overview', labelKey: 'overview', href: '/dashboard', icon: LayoutDashboard },
       { label: 'Agents', labelKey: 'agents', href: '/agents', icon: Bot },
+      { label: 'Channels', labelKey: 'channels', href: '/dashboard/channels', icon: Radio },
       { label: 'Workflows', labelKey: 'workflows', href: '/dashboard/workflows', icon: GitBranch },
     ],
   },

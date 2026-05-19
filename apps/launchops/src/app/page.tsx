@@ -11,6 +11,7 @@ import { TechStack } from '@/features/marketing/components/TechStack'
 import { Pricing } from '@/features/marketing/components/Pricing'
 import { Faq } from '@/features/marketing/components/Faq'
 import { CtaBand } from '@/features/marketing/components/CtaBand'
+import { AiDemoSection } from '@/features/marketing/components/AiDemoSection'
 import { Contact } from '@/features/marketing/components/Contact'
 import { Footer } from '@/features/marketing/components/Footer'
 
@@ -31,6 +32,7 @@ export default function HomePage() {
         <Pricing />
         <Faq />
         <CtaBand />
+        <AiDemoSection />
         <Contact />
       </main>
       <Footer />

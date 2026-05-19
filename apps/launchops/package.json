@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001",
-    "build": "next build",
+    "prepare:widget": "pnpm --dir ../.. --filter=@forge/chat-widget build && cp ../../packages/chat-widget/dist/widget.js public/widget.js",
+    "dev": "pnpm run prepare:widget && next dev --port 3003",
+    "build": "pnpm run prepare:widget && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@forge/chat-widget": "workspace:*",
     "@forge/tsconfig": "workspace:*",
     "@forge/ui": "workspace:*",
     "@hookform/resolvers": "catalog:",

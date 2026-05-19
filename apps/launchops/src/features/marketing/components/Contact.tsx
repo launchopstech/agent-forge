@@ -2,11 +2,7 @@
 
 import { useState } from 'react'
 
-const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID
-
-if (!FORMSPREE_ID) {
-  throw new Error('Missing NEXT_PUBLIC_FORMSPREE_ID')
-}
+const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID ?? ''
 export function Contact() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState(false)
@@ -17,6 +13,11 @@ export function Contact() {
     setSubmitting(true)
     setError(false)
     try {
+      if (!FORMSPREE_ID) {
+        console.warn('Contact form: NEXT_PUBLIC_FORMSPREE_ID is not set')
+        setError(true)
+        return
+      }
       const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: 'POST',
         headers: { Accept: 'application/json' },
