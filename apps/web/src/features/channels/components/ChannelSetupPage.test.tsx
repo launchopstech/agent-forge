@@ -67,13 +67,15 @@ describe('ChannelSetupPage tabs', () => {
     vi.mocked(fetchAgents).mockResolvedValue({ data: [], page: 1, pageSize: 100, total: 0 })
   })
 
-  it('shows the embed tab for website channels', async () => {
+  it('opens the embed panel by default for website channels', async () => {
     vi.mocked(fetchChannel).mockResolvedValue(makeChannel({ channelType: 'website' }))
 
     render(<ChannelSetupPage channelId="ch_1" />)
 
     await waitFor(() => expect(screen.getByText('Support Channel')).toBeInTheDocument())
     expect(screen.getByRole('button', { name: /embed/i })).toBeInTheDocument()
+    expect(screen.getByTestId('embed-section')).toBeInTheDocument()
+    expect(screen.queryByTestId('routing-editor')).not.toBeInTheDocument()
   })
 
   it('hides the embed tab for non-website channels', async () => {

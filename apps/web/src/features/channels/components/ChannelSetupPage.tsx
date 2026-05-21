@@ -12,15 +12,21 @@ import { RoutingRulesEditor } from './RoutingRulesEditor'
 import { TestConsole } from './TestConsole'
 import { EmbedSection } from './EmbedSection'
 
+type SetupTab = 'routing' | 'test' | 'embed'
+
 interface ChannelSetupPageProps {
   channelId: string
+}
+
+function defaultTabForChannel(channel: WorkspaceChannel): SetupTab {
+  return channel.channelType === 'website' ? 'embed' : 'routing'
 }
 
 export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
   const [channel, setChannel] = useState<WorkspaceChannel | null>(null)
   const [agents, setAgents] = useState<Agent[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'routing' | 'test' | 'embed'>('routing')
+  const [activeTab, setActiveTab] = useState<SetupTab>('routing')
 
   const load = useCallback(async () => {
     setIsLoading(true)
@@ -29,6 +35,7 @@ export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
         fetchChannel(channelId),
         fetchAgents({ page: 1, pageSize: 100 }),
       ])
+      setActiveTab(defaultTabForChannel(ch))
       setChannel(ch)
       setAgents(agentResult.data)
     } catch {
