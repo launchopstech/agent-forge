@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useEffect, useState, useCallback } from 'react'
-import { Plus, Radio, ExternalLink, Trash2, AlertCircle } from 'lucide-react'
+import { Plus, Radio, ExternalLink, Trash2, AlertCircle, Code2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@forge/ui/src/button'
 import { Badge } from '@forge/ui/src/badge'
 import { Skeleton } from '@forge/ui/src/skeleton'
@@ -27,6 +28,10 @@ const STATUS_COLORS: Record<string, string> = {
   active: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
   paused: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
   error: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+}
+
+function getChannelSetupHref(channel: Pick<WorkspaceChannel, 'channelType' | 'id'>): string {
+  return `/dashboard/channels/${channel.channelType}/setup?id=${encodeURIComponent(channel.id)}`
 }
 
 // ─── Create Channel Modal ──────────────────────────────────────────────────────
@@ -114,7 +119,16 @@ function CreateChannelModal({ catalog, onCreated, onClose }: CreateChannelModalP
               <p className="text-sm text-muted-foreground">{selected.setupInstructions}</p>
             )}
 
-            {selected.type !== 'test' && (
+            {selected.type === 'website' && (
+              <div className="rounded-md bg-muted/50 p-3">
+                <p className="text-xs text-muted-foreground">
+                  Create this Website channel to configure the embed snippet, allowed domains, and
+                  the agent that answers visitors.
+                </p>
+              </div>
+            )}
+
+            {selected.type !== 'test' && selected.type !== 'website' && (
               <div className="rounded-md bg-muted/50 p-3">
                 <p className="text-xs text-muted-foreground">
                   Full setup for {selected.name} is coming in Phase 2. Create the channel now and
@@ -149,6 +163,10 @@ interface ChannelCardProps {
 }
 
 function ChannelCard({ channel, href, onDelete }: ChannelCardProps) {
+  const isWebsiteChannel = channel.channelType === 'website'
+  const ActionIcon = isWebsiteChannel ? Code2 : ExternalLink
+  const actionLabel = isWebsiteChannel ? 'Embed' : 'Open'
+
   return (
     <div className="group relative flex flex-col gap-3 rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
@@ -168,8 +186,8 @@ function ChannelCard({ channel, href, onDelete }: ChannelCardProps) {
           href={href}
           className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
         >
-          <ExternalLink className="h-3 w-3" />
-          Open
+          <ActionIcon className="h-3 w-3" />
+          {actionLabel}
         </a>
         <button
           onClick={() => onDelete(channel.id)}
@@ -186,6 +204,7 @@ function ChannelCard({ channel, href, onDelete }: ChannelCardProps) {
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
 export function ChannelsDashboard() {
+  const router = useRouter()
   const [channels, setChannels] = useState<WorkspaceChannel[]>([])
   const [catalog, setCatalog] = useState<ChannelCatalogItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -211,6 +230,12 @@ export function ChannelsDashboard() {
   }, [load])
 
   const handleCreated = (channel: WorkspaceChannel) => {
+    if (channel.channelType === 'website') {
+      setShowCreate(false)
+      router.push(getChannelSetupHref(channel))
+      return
+    }
+
     setChannels((prev) => [channel, ...prev])
     setShowCreate(false)
   }
@@ -274,7 +299,7 @@ export function ChannelsDashboard() {
             <ChannelCard
               key={ch.id}
               channel={ch}
-              href={`/dashboard/channels/${ch.channelType}/setup?id=${ch.id}`}
+              href={getChannelSetupHref(ch)}
               onDelete={handleDelete}
             />
           ))}

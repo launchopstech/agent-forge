@@ -4,8 +4,16 @@ import React from 'react'
 
 // ── Dependency mocks ────────────────────────────────────────────────────────
 
+const pushMock = vi.hoisted(() => vi.fn())
+
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
+}))
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: pushMock,
+  }),
 }))
 
 vi.mock('next/link', () => ({
@@ -18,6 +26,7 @@ vi.mock('lucide-react', () => ({
   Plus: () => <span data-testid="icon-plus">+</span>,
   Radio: () => <span data-testid="icon-radio">📡</span>,
   ExternalLink: () => <span data-testid="icon-external">↗</span>,
+  Code2: () => <span data-testid="icon-code">&lt;/&gt;</span>,
   Trash2: () => <span data-testid="icon-trash">🗑</span>,
   AlertCircle: () => <span data-testid="icon-alert">⚠</span>,
 }))
@@ -127,12 +136,21 @@ const testCatalogItem: ChannelCatalogItem = {
   setupInstructions: 'No config needed.',
 }
 
+const websiteCatalogItem: ChannelCatalogItem = {
+  type: 'website',
+  name: 'Website Widget',
+  iconSlug: 'globe',
+  capabilities: ['send', 'receive'],
+  configSchema: {},
+  setupInstructions: 'Add the embed snippet to your website.',
+}
+
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 describe('ChannelsDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(fetchChannelCatalog).mockResolvedValue([testCatalogItem])
+    vi.mocked(fetchChannelCatalog).mockResolvedValue([testCatalogItem, websiteCatalogItem])
   })
 
   // CD1 ─ Loading state ────────────────────────────────────────────────────────
@@ -166,6 +184,19 @@ describe('ChannelsDashboard', () => {
 
     await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument())
     expect(screen.getByText('Beta')).toBeInTheDocument()
+  })
+
+  it('shows an Embed action for website channels', async () => {
+    vi.mocked(fetchChannels).mockResolvedValue([
+      makeChannel({ id: 'ch_site', channelType: 'website', name: 'Website Support' }),
+    ])
+
+    render(<ChannelsDashboard />)
+
+    await waitFor(() => expect(screen.getByText('Website Support')).toBeInTheDocument())
+    const embedLink = screen.getByRole('link', { name: /embed/i })
+    expect(embedLink).toHaveAttribute('href', '/dashboard/channels/website/setup?id=ch_site')
+    expect(screen.queryByRole('link', { name: /open/i })).not.toBeInTheDocument()
   })
 
   // CD4 ─ Status badge ─────────────────────────────────────────────────────────
@@ -247,5 +278,39 @@ describe('ChannelsDashboard', () => {
     expect(toast).toHaveBeenCalledWith(
       expect.objectContaining({ title: expect.stringContaining('created') })
     )
+    expect(pushMock).not.toHaveBeenCalled()
+  })
+
+  it('routes directly to embed setup after creating a website channel', async () => {
+    vi.mocked(fetchChannels).mockResolvedValue([])
+    const newChannel = makeChannel({
+      id: 'ch_site',
+      channelType: 'website',
+      name: 'My Website Widget',
+    })
+    vi.mocked(createChannel).mockResolvedValue(newChannel)
+
+    render(<ChannelsDashboard />)
+
+    await waitFor(() => expect(screen.getByText(/no channels connected yet/i)).toBeInTheDocument())
+
+    fireEvent.click(screen.getAllByText(/connect channel/i)[0]!)
+    await waitFor(() => expect(screen.getByTestId('dialog')).toBeInTheDocument())
+
+    fireEvent.click(screen.getByText('Website Widget'))
+    await waitFor(() =>
+      expect(screen.getByText(/configure the embed snippet/i)).toBeInTheDocument()
+    )
+
+    fireEvent.click(screen.getByText(/create channel/i))
+
+    await waitFor(() =>
+      expect(pushMock).toHaveBeenCalledWith('/dashboard/channels/website/setup?id=ch_site')
+    )
+    expect(createChannel).toHaveBeenCalledWith({
+      channelType: 'website',
+      name: 'My Website Widget',
+    })
+    expect(screen.queryByText('My Website Widget')).not.toBeInTheDocument()
   })
 })
