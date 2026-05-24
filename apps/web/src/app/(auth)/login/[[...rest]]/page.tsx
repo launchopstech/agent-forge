@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-// App-owned login page — email/password form for auth-handler credential flow.
+// App-owned login page — email/password form plus hosted provider redirect.
 // Submits to /api/auth/credentials which calls auth-handler POST /auth/login,
 // then follows the PKCE callback flow to /dashboard.
 
@@ -29,6 +29,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(urlError)
   const [loading, setLoading] = useState(false)
+  const [providerLoading, setProviderLoading] = useState(false)
+
+  const startHostedLogin = useCallback(() => {
+    setProviderLoading(true)
+    const params = new URLSearchParams({ intent: 'login', returnTo })
+    window.location.href = `/api/auth/login?${params.toString()}`
+  }, [returnTo])
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -106,12 +113,28 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || providerLoading}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+        <div className="relative py-1">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">or</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={startHostedLogin}
+          disabled={loading || providerLoading}
+          className="w-full rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+        >
+          {providerLoading ? 'Redirecting…' : 'Continue with Google'}
+        </button>
         <div className="text-center text-sm text-muted-foreground">
           <Link href="/signup" className="text-primary hover:underline">
             Sign up
