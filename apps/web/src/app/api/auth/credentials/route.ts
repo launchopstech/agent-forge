@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
   const scope = process.env.AUTH_HANDLER_SCOPE
   const connection = process.env.AUTH_HANDLER_CONNECTION
   const sessionSecret = process.env.AUTH_HANDLER_SESSION_SECRET
+  const orgId = process.env.AUTH_HANDLER_ORG_ID?.trim() || process.env.NEXT_PUBLIC_ORG_ID?.trim()
 
   if (!issuer || !clientId || !redirectUri || !scope || !connection || !sessionSecret) {
     console.error('[auth] Missing AUTH_HANDLER_* environment variables')
@@ -78,6 +79,7 @@ export async function POST(request: NextRequest) {
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
         connection,
+        ...(orgId ? { org_id: orgId } : {}),
       }),
     })
 
