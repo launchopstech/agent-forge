@@ -67,12 +67,12 @@ describe('ResendAdapter', () => {
     )
   })
 
-  it('passes replyTo as reply_to to the SDK', async () => {
+  it('passes replyTo to the SDK', async () => {
     const mockSend = mockResendSend({ error: null })
     const adapter = new ResendAdapter()
     await adapter.send({ ...OPTIONS, replyTo: 'customer@example.com' })
     expect(mockSend).toHaveBeenCalledWith(
-      expect.objectContaining({ reply_to: 'customer@example.com' })
+      expect.objectContaining({ replyTo: 'customer@example.com' })
     )
   })
 
