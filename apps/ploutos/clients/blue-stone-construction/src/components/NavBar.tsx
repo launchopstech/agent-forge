@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Menu, X, Phone } from 'lucide-react'
 
 const NAV_LINKS = [
@@ -39,29 +40,16 @@ export function NavBar() {
         }}
       >
         {/* Logo */}
-        <a href="#home" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-          <span
-            style={{
-              fontSize: '1.1rem',
-              fontWeight: 800,
-              color: 'var(--navy)',
-              fontFamily: 'var(--font-heading), sans-serif',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Blue Stone Construction
-          </span>
-          <span
-            style={{
-              fontSize: '0.65rem',
-              color: 'var(--text-sub)',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-            }}
-          >
-            LLC · Lake Hiawatha, NJ
-          </span>
+        <a href="#home" style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'relative', height: 54, width: 130 }}>
+            <Image
+              src="/brands/blue-stone-construction/logo.png"
+              alt="Blue Stone Construction"
+              fill
+              priority
+              style={{ objectFit: 'contain', objectPosition: 'left center' }}
+            />
+          </div>
         </a>
 
         {/* Desktop nav */}
