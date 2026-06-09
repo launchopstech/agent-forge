@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Menu, X, Phone } from 'lucide-react'
 
 const NAV_LINKS = [
@@ -13,14 +13,7 @@ const NAV_LINKS = [
 ]
 
 export function NavBar() {
-  const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   return (
     <header
@@ -30,10 +23,8 @@ export function NavBar() {
         left: 0,
         right: 0,
         zIndex: 100,
-        transition: 'background 0.3s, box-shadow 0.3s',
-        background: scrolled ? 'rgba(255,255,255,0.97)' : 'transparent',
-        boxShadow: scrolled ? '0 1px 0 rgba(0,0,0,0.08)' : 'none',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        background: '#fff',
+        boxShadow: '0 1px 0 rgba(0,0,0,0.08)',
       }}
     >
       <div
@@ -53,7 +44,7 @@ export function NavBar() {
             style={{
               fontSize: '1.1rem',
               fontWeight: 800,
-              color: 'var(--green)',
+              color: 'var(--navy)',
               fontFamily: 'var(--font-heading), sans-serif',
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
@@ -64,7 +55,7 @@ export function NavBar() {
           <span
             style={{
               fontSize: '0.65rem',
-              color: scrolled ? 'var(--text-sub)' : 'rgba(255,255,255,0.5)',
+              color: 'var(--text-sub)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
             }}
@@ -85,14 +76,12 @@ export function NavBar() {
               style={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: scrolled ? 'var(--text-sub)' : 'rgba(255,255,255,0.8)',
+                color: 'var(--text-sub)',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#7ECFA0')}
+              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = 'var(--green)')}
               onMouseLeave={(e) =>
-                ((e.target as HTMLAnchorElement).style.color = scrolled
-                  ? 'var(--text-sub)'
-                  : 'rgba(255,255,255,0.8)')
+                ((e.target as HTMLAnchorElement).style.color = 'var(--text-sub)')
               }
             >
               {l.label}
@@ -115,7 +104,7 @@ export function NavBar() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: scrolled ? 'var(--text)' : '#fff',
+            color: 'var(--text)',
           }}
           aria-label="Toggle menu"
         >

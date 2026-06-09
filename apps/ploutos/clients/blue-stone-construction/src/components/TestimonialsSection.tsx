@@ -122,9 +122,9 @@ export function TestimonialsSection() {
           }}
         >
           {[
-            { label: '4.9 / 5 on Google', detail: '⭐ Google Reviews' },
-            { label: 'Licensed & Insured', detail: '✅ NJ State Certified' },
-            { label: '200+ Happy Clients', detail: '🏗️ Morris County & NJ' },
+            { label: '4.9 / 5 on Google', detail: 'Google Reviews' },
+            { label: 'Licensed & Insured', detail: 'NJ State Certified' },
+            { label: '200+ Happy Clients', detail: 'Morris County & NJ' },
           ].map((item) => (
             <div key={item.label} style={{ textAlign: 'center' }}>
               <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text)' }}>

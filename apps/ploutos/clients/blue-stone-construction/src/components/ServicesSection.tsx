@@ -1,35 +1,44 @@
 'use client'
 
-import { ChevronRight } from 'lucide-react'
+import { type ReactNode } from 'react'
+import {
+  ChevronRight,
+  ClipboardList,
+  Home,
+  Layers,
+  HardHat,
+  Paintbrush,
+  Building2,
+} from 'lucide-react'
 
-const SERVICES = [
+const SERVICES: { icon: ReactNode; title: string; desc: string }[] = [
   {
-    icon: '🏗️',
+    icon: <ClipboardList size={24} />,
     title: 'General Contracting',
     desc: "Full project management from permits to final walkthrough. We coordinate everything so you don't have to.",
   },
   {
-    icon: '🏠',
+    icon: <Home size={24} />,
     title: 'Home Remodels',
     desc: 'Kitchen, bathroom, basement, and whole-home renovations built to your vision and budget.',
   },
   {
-    icon: '🏡',
+    icon: <Layers size={24} />,
     title: 'Room Additions',
     desc: "Expand your living space with seamlessly integrated additions that match your home's existing style.",
   },
   {
-    icon: '🔨',
+    icon: <HardHat size={24} />,
     title: 'New Construction',
     desc: 'Ground-up residential and commercial builds, from foundation to roof.',
   },
   {
-    icon: '🔧',
+    icon: <Paintbrush size={24} />,
     title: 'Exterior Work',
     desc: 'Siding, roofing, decks, patios, and curb appeal improvements that last.',
   },
   {
-    icon: '🏢',
+    icon: <Building2 size={24} />,
     title: 'Commercial Projects',
     desc: 'Light commercial construction for small businesses, offices, and investment properties across NJ.',
   },
@@ -95,7 +104,7 @@ export function ServicesSection() {
                 el.style.transform = 'translateY(0)'
               }}
             >
-              <div style={{ fontSize: '2rem', marginBottom: 16 }}>{s.icon}</div>
+              <div style={{ color: '#7ECFA0', marginBottom: 16 }}>{s.icon}</div>
               <h3
                 style={{
                   fontFamily: 'var(--font-heading), sans-serif',
