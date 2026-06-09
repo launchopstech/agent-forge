@@ -22,7 +22,7 @@ export function AboutSection() {
         }}
       >
         {/* Text */}
-        <div>
+        <div className="reveal">
           <div className="eyebrow">Who We Are</div>
           <h2 className="section-heading">New Jersey&apos;s Trusted General Contractor</h2>
           <p style={{ color: 'var(--text-sub)', lineHeight: 1.8, marginBottom: 20 }}>
@@ -38,6 +38,7 @@ export function AboutSection() {
 
           {/* Stats grid */}
           <div
+            className="about-stats"
             style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 36 }}
           >
             {STATS.map((s) => (
@@ -80,7 +81,7 @@ export function AboutSection() {
 
         {/* Photo */}
         <div
-          className="photo-placeholder"
+          className="photo-placeholder reveal d1"
           style={{ height: 480, fontSize: '0.85rem' }}
           aria-label="Team photo / job site photo"
         >
@@ -92,6 +93,9 @@ export function AboutSection() {
         @media (max-width: 900px) {
           .about-grid { grid-template-columns: 1fr !important; }
           .about-grid .photo-placeholder { height: 280px !important; }
+        }
+        @media (max-width: 480px) {
+          .about-stats { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>

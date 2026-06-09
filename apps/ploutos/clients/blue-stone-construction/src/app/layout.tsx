@@ -38,14 +38,6 @@ export const metadata: Metadata = {
       'Trusted general contracting in Lake Hiawatha, NJ. Remodels, additions, new builds. Licensed & insured. Free estimates.',
     url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://bluestoneconstruction.com',
     siteName: 'Blue Stone Construction LLC',
-    images: [
-      {
-        url: '/brands/blue-stone-construction/og.png',
-        width: 1200,
-        height: 630,
-        alt: 'Blue Stone Construction LLC',
-      },
-    ],
     type: 'website',
     locale: 'en_US',
   },
@@ -53,7 +45,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Blue Stone Construction LLC | General Contractor NJ',
     description: 'Trusted general contracting in Lake Hiawatha, NJ. Free estimates.',
-    images: ['/brands/blue-stone-construction/og.png'],
   },
 }
 

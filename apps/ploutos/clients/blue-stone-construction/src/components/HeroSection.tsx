@@ -20,6 +20,7 @@ export function HeroSection() {
         alt=""
         fill
         priority
+        sizes="100vw"
         style={{ objectFit: 'cover', objectPosition: 'center 60%' }}
       />
 
@@ -38,7 +39,7 @@ export function HeroSection() {
         style={{
           maxWidth: 'var(--max)',
           margin: '0 auto',
-          padding: '140px 24px 80px',
+          padding: 'clamp(100px, 15vw, 140px) 20px 64px',
           position: 'relative',
           zIndex: 1,
           textAlign: 'center',
@@ -143,6 +144,7 @@ export function HeroSection() {
           ].map((item, i) => (
             <div
               key={i}
+              className={`hero-stat-item hero-stat-${i}`}
               style={{
                 flex: '1 1 200px',
                 padding: '20px 28px',
@@ -164,6 +166,12 @@ export function HeroSection() {
           ))}
         </div>
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          .hero-stat-item { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); }
+          .hero-stat-2 { border-bottom: none !important; }
+        }
+      `}</style>
     </section>
   )
 }

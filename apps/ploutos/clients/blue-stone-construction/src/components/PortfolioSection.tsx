@@ -165,7 +165,10 @@ export function PortfolioSection() {
         @media (max-width: 1024px) {
           .portfolio-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
+          .portfolio-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 540px) {
           .portfolio-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>

@@ -235,10 +235,11 @@ export function Footer() {
 
       <style>{`
         @media (max-width: 1024px) {
-          .footer-grid { grid-template-columns: 1fr 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
         }
         @media (max-width: 640px) {
-          .footer-grid { grid-template-columns: 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+          footer { padding-left: 20px !important; padding-right: 20px !important; padding-top: 48px !important; }
         }
       `}</style>
     </footer>

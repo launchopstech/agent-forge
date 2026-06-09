@@ -49,7 +49,7 @@ export function ServicesSection() {
     <section id="services" style={{ padding: '96px 24px', background: 'var(--navy)' }}>
       <div style={{ maxWidth: 'var(--max)', margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
           <div
             className="eyebrow"
             style={{
@@ -81,9 +81,10 @@ export function ServicesSection() {
             marginBottom: 48,
           }}
         >
-          {SERVICES.map((s) => (
+          {SERVICES.map((s, i) => (
             <div
               key={s.title}
+              className={`reveal d${(i % 4) + 1}`}
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.07)',
@@ -145,6 +146,7 @@ export function ServicesSection() {
 
         {/* CTA band */}
         <div
+          className="svc-cta"
           style={{
             background: 'var(--green)',
             borderRadius: 'var(--r-xl)',
@@ -183,6 +185,7 @@ export function ServicesSection() {
         }
         @media (max-width: 640px) {
           .svc-grid { grid-template-columns: 1fr !important; }
+          .svc-cta { padding: 24px 20px !important; }
         }
       `}</style>
     </section>

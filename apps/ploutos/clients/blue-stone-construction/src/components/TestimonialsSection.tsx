@@ -39,7 +39,7 @@ export function TestimonialsSection() {
     <section id="testimonials" style={{ padding: '96px 24px', background: 'var(--bg-alt)' }}>
       <div style={{ maxWidth: 'var(--max)', margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
           <div className="eyebrow">What Clients Say</div>
           <h2 className="section-heading">Don&apos;t Take Our Word For It</h2>
         </div>
@@ -54,9 +54,10 @@ export function TestimonialsSection() {
             marginBottom: 48,
           }}
         >
-          {TESTIMONIALS.map((t) => (
+          {TESTIMONIALS.map((t, i) => (
             <div
               key={t.name}
+              className={`reveal d${i + 1} testimonials-card`}
               style={{
                 background: '#fff',
                 borderRadius: 'var(--r-xl)',
@@ -109,6 +110,7 @@ export function TestimonialsSection() {
 
         {/* Social proof bar */}
         <div
+          className="testimonials-proof"
           style={{
             display: 'flex',
             justifyContent: 'center',
@@ -137,8 +139,15 @@ export function TestimonialsSection() {
       </div>
 
       <style>{`
+        @media (max-width: 1024px) {
+          .testimonials-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
         @media (max-width: 768px) {
           .testimonials-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .testimonials-card { padding: 20px 16px !important; }
+          .testimonials-proof { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
         }
       `}</style>
     </section>

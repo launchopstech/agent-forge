@@ -1,11 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-
-// TODO: Wire up your preferred email service (Resend, Postmark, etc.)
-// Example with Resend:
-//   import { Resend } from 'resend'
-//   const resend = new Resend(process.env.RESEND_API_KEY)
-//   await resend.emails.send({ from: '...', to: 'hello@ploutos.dev', subject: '...', html: '...' })
+import { sendEmail } from '@forge/email'
+import '@forge/email/templates'
 
 const RATE_LIMIT_WINDOW_MS = 60_000
 const RATE_LIMIT_MAX_REQUESTS = 5
@@ -47,6 +43,22 @@ export async function POST(req: NextRequest) {
     if (!name || !email || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
+
+    const companyLine = company ? ` (${company as string})` : ''
+    const result = await sendEmail(
+      'launchops-contact',
+      { name, company: company ?? '', email, message, engagement: engagement ?? '', companyLine },
+      {
+        from: 'Ploutos Solutions <noreply@ploutossolutions.com>',
+        to: ['hello@ploutossolutions.com'],
+        replyTo: email as string,
+      }
+    )
+
+    if (!result.ok) {
+      return NextResponse.json({ error: 'Failed to send' }, { status: 500 })
+    }
+
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })

@@ -117,7 +117,11 @@ export function NavBar() {
             </a>
           ))}
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <a href="tel:8621234567" className="btn-outline" style={{ justifyContent: 'center' }}>
+            <a
+              href={`tel:${process.env.NEXT_PUBLIC_PHONE ?? ''}`}
+              className="btn-outline"
+              style={{ justifyContent: 'center' }}
+            >
               <Phone size={16} /> Call Now
             </a>
             <a

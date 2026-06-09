@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@forge/chat-widget": "workspace:*",
+    "@forge/email": "workspace:*",
     "@forge/tsconfig": "workspace:*",
     "@forge/ui": "workspace:*",
     "@hookform/resolvers": "catalog:",

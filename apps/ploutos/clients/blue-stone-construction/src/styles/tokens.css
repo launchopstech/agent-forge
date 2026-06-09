@@ -22,7 +22,7 @@
   --text-inv: #ffffff;
 
   /* Borders */
-  --border: rgba(27, 111, 171, 0.18);
+  --border-brand: rgba(27, 111, 171, 0.18);
   --border-sub: rgba(0, 0, 0, 0.08);
 
   /* Layout */

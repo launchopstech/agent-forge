@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Phone, Mail, MapPin, Clock, Shield } from 'lucide-react'
+import { Phone, Mail, MapPin, Clock, Shield, Loader2 } from 'lucide-react'
 
 const SERVICES_OPTIONS = [
   'General Contracting',
@@ -15,15 +15,34 @@ const SERVICES_OPTIONS = [
 
 export function ContactSection() {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
-    const data = new FormData(form)
-    // In production: POST to a Resend API route or forward to Formspree
-    const mailto = `mailto:bluestonegcllc@gmail.com?subject=Quote Request from ${data.get('name')}&body=Name: ${data.get('name')}%0APhone: ${data.get('phone')}%0AEmail: ${data.get('email')}%0AService: ${data.get('service')}%0A%0A${data.get('description')}`
-    window.location.href = mailto
-    setSubmitted(true)
+    setLoading(true)
+    setError(null)
+    const data = new FormData(e.currentTarget)
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.get('name'),
+          phone: data.get('phone'),
+          email: data.get('email'),
+          service: data.get('service'),
+          description: data.get('description'),
+        }),
+      })
+      if (!res.ok) throw new Error('send failed')
+      setSubmitted(true)
+    } catch {
+      setError('Something went wrong. Please email us directly at bluestonegcllc@gmail.com.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -39,7 +58,7 @@ export function ContactSection() {
         }}
       >
         {/* Left: contact info */}
-        <div>
+        <div className="reveal">
           <div
             className="eyebrow"
             style={{
@@ -135,6 +154,7 @@ export function ContactSection() {
 
         {/* Right: form */}
         <div
+          className="reveal d1 contact-form-card"
           style={{
             background: '#fff',
             borderRadius: 'var(--r-xl)',
@@ -300,11 +320,36 @@ export function ContactSection() {
 
               <button
                 type="submit"
+                disabled={loading}
                 className="btn-primary"
-                style={{ justifyContent: 'center', fontSize: '1rem', padding: '16px' }}
+                style={{
+                  justifyContent: 'center',
+                  fontSize: '1rem',
+                  padding: '16px',
+                  opacity: loading ? 0.75 : 1,
+                }}
               >
-                Get My Free Quote
+                {loading ? (
+                  <>
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> Sending…
+                  </>
+                ) : (
+                  'Get My Free Quote'
+                )}
               </button>
+
+              {error && (
+                <p
+                  style={{
+                    fontSize: '0.82rem',
+                    color: '#dc2626',
+                    textAlign: 'center',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {error}
+                </p>
+              )}
 
               <p
                 style={{
@@ -319,6 +364,7 @@ export function ContactSection() {
               >
                 <Shield size={12} /> We respect your privacy. Your info is never shared or sold.
               </p>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </form>
           )}
         </div>
@@ -327,6 +373,9 @@ export function ContactSection() {
       <style>{`
         @media (max-width: 768px) {
           #contact > div { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          .contact-form-card { padding: 24px 20px !important; }
         }
       `}</style>
     </section>

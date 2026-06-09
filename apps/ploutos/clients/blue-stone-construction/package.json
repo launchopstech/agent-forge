@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@forge/email": "workspace:*",
     "@forge/tsconfig": "workspace:*",
     "@forge/ui": "workspace:*",
     "@vercel/analytics": "catalog:",
@@ -30,7 +31,6 @@
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
     "postcss": "catalog:",
-    "potrace": "^2.1.8",
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:",
     "typescript": "catalog:"
