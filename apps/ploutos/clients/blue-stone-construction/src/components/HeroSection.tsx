@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { ChevronRight, Star, MapPin, HardHat } from 'lucide-react'
 
 export function HeroSection() {
@@ -6,7 +7,6 @@ export function HeroSection() {
       id="home"
       style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, var(--navy) 0%, #1E3A5F 60%, #2D4A6B 100%)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -14,15 +14,23 @@ export function HeroSection() {
         overflow: 'hidden',
       }}
     >
-      {/* Subtle texture overlay */}
+      {/* Background photo */}
+      <Image
+        src="/hero-bg.jpg"
+        alt=""
+        fill
+        priority
+        style={{ objectFit: 'cover', objectPosition: 'center 60%' }}
+      />
+
+      {/* Dark overlay for text contrast */}
       <div
         aria-hidden
         style={{
           position: 'absolute',
           inset: 0,
           background:
-            "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-          opacity: 0.4,
+            'linear-gradient(to bottom, rgba(10,20,10,0.6) 0%, rgba(10,20,10,0.45) 55%, rgba(10,20,10,0.75) 100%)',
         }}
       />
 
@@ -42,8 +50,8 @@ export function HeroSection() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            background: 'rgba(45,122,79,0.2)',
-            border: '1px solid rgba(45,122,79,0.4)',
+            background: 'rgba(45,122,79,0.25)',
+            border: '1px solid rgba(45,122,79,0.5)',
             borderRadius: 99,
             padding: '6px 18px',
             marginBottom: 32,
@@ -80,7 +88,7 @@ export function HeroSection() {
         <p
           style={{
             fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-            color: 'rgba(255,255,255,0.72)',
+            color: 'rgba(255,255,255,0.82)',
             marginBottom: 40,
             lineHeight: 1.7,
           }}
@@ -104,7 +112,7 @@ export function HeroSection() {
             className="btn-outline"
             style={{
               color: '#fff',
-              borderColor: 'rgba(255,255,255,0.3)',
+              borderColor: 'rgba(255,255,255,0.35)',
               fontSize: '1rem',
               padding: '16px 32px',
             }}
@@ -120,10 +128,10 @@ export function HeroSection() {
             justifyContent: 'center',
             gap: 0,
             marginTop: 64,
-            background: 'rgba(0,0,0,0.35)',
+            background: 'rgba(0,0,0,0.4)',
             backdropFilter: 'blur(8px)',
             borderRadius: 'var(--r-lg)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.1)',
             overflow: 'hidden',
             flexWrap: 'wrap',
           }}
@@ -141,14 +149,14 @@ export function HeroSection() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                borderRight: i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
                 justifyContent: 'center',
               }}
             >
               <span style={{ color: '#7ECFA0' }}>{item.icon}</span>
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>{item.stat}</div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.55)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}>
                   {item.label}
                 </div>
               </div>
