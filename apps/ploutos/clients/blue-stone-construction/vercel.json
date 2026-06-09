@@ -1,0 +1,4 @@
+{
+  "buildCommand": "cd ../../.. && pnpm turbo build --filter=@ploutos/blue-stone-construction",
+  "framework": "nextjs"
+}

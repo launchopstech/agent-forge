@@ -1,0 +1,56 @@
+/* Blue Stone Construction — Design Tokens (DR-001 Option B: white/green) */
+
+:root {
+  /* Brand palette */
+  --green: #2d7a4f;
+  --green-dark: #1a5c38;
+  --green-light: #e8f5ee;
+  --green-glow: rgba(45, 122, 79, 0.2);
+  --navy: #1a1a2e;
+  --gold: #c8972b;
+
+  /* Backgrounds */
+  --bg: #ffffff;
+  --bg-alt: #f8f9fa;
+  --bg-dark: #1a1a2e;
+  --surface: #f0f4f2;
+
+  /* Text */
+  --text: #1f2937;
+  --text-sub: #6b7280;
+  --text-muted: #9ca3af;
+  --text-inv: #ffffff;
+
+  /* Borders */
+  --border: rgba(45, 122, 79, 0.18);
+  --border-sub: rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --max: 1160px;
+  --r: 8px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Tailwind / shadcn semantic aliases */
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
+  --primary: #2d7a4f;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f4f2;
+  --secondary-foreground: #1f2937;
+  --muted: #f8f9fa;
+  --muted-foreground: #6b7280;
+  --accent: #e8f5ee;
+  --accent-foreground: #1a5c38;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --input: #f8f9fa;
+  --ring: #2d7a4f;
+  --radius: 8px;
+}
