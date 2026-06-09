@@ -1,4 +1,6 @@
 {
-  "buildCommand": "cd ../.. && pnpm turbo build --filter=@forge/web",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" = \"feat/ploutos-client-sites\" ]",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm turbo build --filter=@forge/web"
 }
