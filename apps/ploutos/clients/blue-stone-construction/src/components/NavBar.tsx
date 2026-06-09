@@ -64,7 +64,7 @@ export function NavBar() {
           <span
             style={{
               fontSize: '0.65rem',
-              color: 'var(--text-sub)',
+              color: scrolled ? 'var(--text-sub)' : 'rgba(255,255,255,0.5)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
             }}
@@ -74,7 +74,10 @@ export function NavBar() {
         </a>
 
         {/* Desktop nav */}
-        <nav className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+        <nav
+          className="nav-links"
+          style={{ display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'nowrap' }}
+        >
           {NAV_LINKS.map((l) => (
             <a
               key={l.href}
@@ -82,12 +85,14 @@ export function NavBar() {
               style={{
                 fontSize: '0.875rem',
                 fontWeight: 500,
-                color: 'var(--text-sub)',
+                color: scrolled ? 'var(--text-sub)' : 'rgba(255,255,255,0.8)',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = 'var(--green)')}
+              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#7ECFA0')}
               onMouseLeave={(e) =>
-                ((e.target as HTMLAnchorElement).style.color = 'var(--text-sub)')
+                ((e.target as HTMLAnchorElement).style.color = scrolled
+                  ? 'var(--text-sub)'
+                  : 'rgba(255,255,255,0.8)')
               }
             >
               {l.label}
@@ -102,16 +107,15 @@ export function NavBar() {
           </a>
         </nav>
 
-        {/* Mobile hamburger */}
+        {/* Mobile hamburger — shown via CSS @media, not inline style */}
         <button
-          className="mobile-ham hide-desktop"
+          className="mobile-ham"
           onClick={() => setOpen(!open)}
           style={{
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: 'var(--text)',
-            display: 'none',
+            color: scrolled ? 'var(--text)' : '#fff',
           }}
           aria-label="Toggle menu"
         >

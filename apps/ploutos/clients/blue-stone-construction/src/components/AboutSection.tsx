@@ -11,6 +11,7 @@ export function AboutSection() {
   return (
     <section id="about" style={{ padding: '96px 24px', background: 'var(--bg)' }}>
       <div
+        className="about-grid"
         style={{
           maxWidth: 'var(--max)',
           margin: '0 auto',
@@ -88,8 +89,9 @@ export function AboutSection() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          #about > div { grid-template-columns: 1fr !important; }
+        @media (max-width: 900px) {
+          .about-grid { grid-template-columns: 1fr !important; }
+          .about-grid .photo-placeholder { height: 280px !important; }
         }
       `}</style>
     </section>

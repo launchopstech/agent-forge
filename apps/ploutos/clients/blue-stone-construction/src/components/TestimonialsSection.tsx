@@ -46,6 +46,7 @@ export function TestimonialsSection() {
 
         {/* Cards */}
         <div
+          className="testimonials-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
@@ -137,7 +138,7 @@ export function TestimonialsSection() {
 
       <style>{`
         @media (max-width: 768px) {
-          #testimonials > div > div:nth-child(2) { grid-template-columns: 1fr !important; }
+          .testimonials-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>

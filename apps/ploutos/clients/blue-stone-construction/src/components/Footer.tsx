@@ -25,6 +25,7 @@ export function Footer() {
   return (
     <footer style={{ background: '#111827', padding: '64px 24px 0' }}>
       <div
+        className="footer-grid"
         style={{
           maxWidth: 'var(--max)',
           margin: '0 auto',
@@ -234,10 +235,10 @@ export function Footer() {
 
       <style>{`
         @media (max-width: 1024px) {
-          footer > div:first-child { grid-template-columns: 1fr 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; }
         }
         @media (max-width: 640px) {
-          footer > div:first-child { grid-template-columns: 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </footer>

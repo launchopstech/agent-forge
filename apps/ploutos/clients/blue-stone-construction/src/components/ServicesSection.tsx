@@ -64,6 +64,7 @@ export function ServicesSection() {
 
         {/* Cards grid */}
         <div
+          className="svc-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
@@ -169,10 +170,10 @@ export function ServicesSection() {
 
       <style>{`
         @media (max-width: 1024px) {
-          #services .svc-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .svc-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 640px) {
-          #services .svc-grid { grid-template-columns: 1fr !important; }
+          .svc-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
