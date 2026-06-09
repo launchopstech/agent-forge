@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { Menu, X, Phone } from 'lucide-react'
+import { NavLogo } from './NavLogo'
 
 const NAV_LINKS = [
   { label: 'Home', href: '#home' },
@@ -40,17 +40,7 @@ export function NavBar() {
         }}
       >
         {/* Logo */}
-        <a href="#home" style={{ display: 'flex', alignItems: 'center' }}>
-          <div style={{ position: 'relative', height: 54, width: 130 }}>
-            <Image
-              src="/brands/blue-stone-construction/logo.png"
-              alt="Blue Stone Construction"
-              fill
-              priority
-              style={{ objectFit: 'contain', objectPosition: 'left center' }}
-            />
-          </div>
-        </a>
+        <NavLogo />
 
         {/* Desktop nav */}
         <nav

@@ -30,6 +30,7 @@
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
     "postcss": "catalog:",
+    "potrace": "^2.1.8",
     "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:",
     "typescript": "catalog:"
