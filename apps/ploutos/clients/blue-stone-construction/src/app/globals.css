@@ -35,7 +35,7 @@
     scroll-behavior: smooth;
   }
   section[id] {
-    scroll-margin-top: 70px;
+    scroll-margin-top: 90px;
   }
   body {
     background: var(--bg);

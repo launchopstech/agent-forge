@@ -33,7 +33,7 @@ export function NavBar() {
           maxWidth: 'var(--max)',
           margin: '0 auto',
           padding: '0 24px',
-          height: 70,
+          height: 90,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

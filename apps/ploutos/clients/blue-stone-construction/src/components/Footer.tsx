@@ -43,7 +43,7 @@ export function Footer() {
               fontFamily: 'var(--font-heading), sans-serif',
               fontSize: '1.15rem',
               fontWeight: 700,
-              color: '#7ECFA0',
+              color: '#7BC4EE',
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
               marginBottom: 4,
@@ -95,7 +95,7 @@ export function Footer() {
                   color: 'rgba(255,255,255,0.5)',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#7ECFA0')}
+                onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#7BC4EE')}
                 onMouseLeave={(e) =>
                   ((e.target as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.5)')
                 }
@@ -130,7 +130,7 @@ export function Footer() {
                   color: 'rgba(255,255,255,0.5)',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#7ECFA0')}
+                onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = '#7BC4EE')}
                 onMouseLeave={(e) =>
                   ((e.target as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.5)')
                 }

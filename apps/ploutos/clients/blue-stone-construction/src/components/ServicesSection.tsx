@@ -53,9 +53,9 @@ export function ServicesSection() {
           <div
             className="eyebrow"
             style={{
-              background: 'rgba(45,122,79,0.2)',
-              borderColor: 'rgba(45,122,79,0.3)',
-              color: '#7ECFA0',
+              background: 'rgba(27,111,171,0.2)',
+              borderColor: 'rgba(27,111,171,0.3)',
+              color: '#7BC4EE',
             }}
           >
             What We Do
@@ -95,7 +95,7 @@ export function ServicesSection() {
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLDivElement
-                el.style.background = 'rgba(45,122,79,0.1)'
+                el.style.background = 'rgba(27,111,171,0.1)'
                 el.style.transform = 'translateY(-3px)'
               }}
               onMouseLeave={(e) => {
@@ -104,7 +104,7 @@ export function ServicesSection() {
                 el.style.transform = 'translateY(0)'
               }}
             >
-              <div style={{ color: '#7ECFA0', marginBottom: 16 }}>{s.icon}</div>
+              <div style={{ color: '#7BC4EE', marginBottom: 16 }}>{s.icon}</div>
               <h3
                 style={{
                   fontFamily: 'var(--font-heading), sans-serif',
@@ -131,7 +131,7 @@ export function ServicesSection() {
                 style={{
                   fontSize: '0.8rem',
                   fontWeight: 700,
-                  color: '#7ECFA0',
+                  color: '#7BC4EE',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 4,

@@ -43,9 +43,9 @@ export function ContactSection() {
           <div
             className="eyebrow"
             style={{
-              background: 'rgba(45,122,79,0.2)',
-              borderColor: 'rgba(45,122,79,0.3)',
-              color: '#7ECFA0',
+              background: 'rgba(27,111,171,0.2)',
+              borderColor: 'rgba(27,111,171,0.3)',
+              color: '#7BC4EE',
             }}
           >
             Get In Touch
@@ -92,12 +92,12 @@ export function ContactSection() {
                   style={{
                     width: 44,
                     height: 44,
-                    background: 'rgba(45,122,79,0.2)',
+                    background: 'rgba(27,111,171,0.2)',
                     borderRadius: 'var(--r)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#7ECFA0',
+                    color: '#7BC4EE',
                     flexShrink: 0,
                   }}
                 >

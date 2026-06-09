@@ -7,29 +7,29 @@ export function NavLogo() {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
+        gap: 12,
         textDecoration: 'none',
       }}
     >
       {/* Construction icon — SVG scales cleanly */}
-      <div style={{ flexShrink: 0, width: 52, height: 52 }}>
+      <div style={{ flexShrink: 0, width: 152, height: 68 }}>
         <Image
           src="/brands/blue-stone-construction/logo-icon.svg"
           alt=""
-          width={52}
-          height={52}
+          width={152}
+          height={68}
           priority
           style={{ objectFit: 'contain', objectPosition: 'center' }}
         />
       </div>
 
       {/* Text stack */}
-      <div style={{ lineHeight: 1.1 }}>
+      <div style={{ lineHeight: 1.15 }}>
         <div
           style={{
-            fontSize: '0.55rem',
+            fontSize: '0.65rem',
             fontWeight: 600,
-            color: 'var(--text-sub)',
+            color: 'var(--green)',
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
           }}
@@ -38,7 +38,7 @@ export function NavLogo() {
         </div>
         <div
           style={{
-            fontSize: '1.05rem',
+            fontSize: '1.25rem',
             fontWeight: 800,
             color: 'var(--navy)',
             fontFamily: 'var(--font-heading), sans-serif',
@@ -50,7 +50,7 @@ export function NavLogo() {
         </div>
         <div
           style={{
-            fontSize: '0.6rem',
+            fontSize: '0.7rem',
             fontWeight: 700,
             color: 'var(--navy)',
             letterSpacing: '0.18em',

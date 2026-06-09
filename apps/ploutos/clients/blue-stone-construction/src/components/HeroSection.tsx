@@ -38,7 +38,7 @@ export function HeroSection() {
         style={{
           maxWidth: 'var(--max)',
           margin: '0 auto',
-          padding: '120px 24px 80px',
+          padding: '140px 24px 80px',
           position: 'relative',
           zIndex: 1,
           textAlign: 'center',
@@ -50,8 +50,8 @@ export function HeroSection() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            background: 'rgba(45,122,79,0.25)',
-            border: '1px solid rgba(45,122,79,0.5)',
+            background: 'rgba(27,111,171,0.25)',
+            border: '1px solid rgba(27,111,171,0.5)',
             borderRadius: 99,
             padding: '6px 18px',
             marginBottom: 32,
@@ -59,7 +59,7 @@ export function HeroSection() {
             fontWeight: 700,
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            color: '#7ECFA0',
+            color: '#7BC4EE',
           }}
         >
           <Star size={12} fill="currentColor" />
@@ -81,7 +81,7 @@ export function HeroSection() {
         >
           Built Right.
           <br />
-          <span style={{ color: '#7ECFA0' }}>Built to Last.</span>
+          <span style={{ color: '#7BC4EE' }}>Built to Last.</span>
         </h1>
 
         {/* Subheadline */}
@@ -153,7 +153,7 @@ export function HeroSection() {
                 justifyContent: 'center',
               }}
             >
-              <span style={{ color: '#7ECFA0' }}>{item.icon}</span>
+              <span style={{ color: '#7BC4EE' }}>{item.icon}</span>
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>{item.stat}</div>
                 <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}>
