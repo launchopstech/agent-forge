@@ -1,0 +1,58 @@
+name: 'Multi-Project Vercel Deploy'
+description: 'Fire Vercel deploy hooks for all configured projects in parallel'
+
+inputs:
+  hook_forge_web:
+    description: 'Deploy hook for @forge/web (agent-forge-web)'
+    required: false
+    default: ''
+  hook_launchops:
+    description: 'Deploy hook for @forge/launchops — requires vercel link first'
+    required: false
+    default: ''
+  hook_blue_stone:
+    description: 'Deploy hook for ploutos-blue-stone'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Fire deploy hooks in parallel
+      shell: bash
+      env:
+        HOOK_FORGE_WEB: ${{ inputs.hook_forge_web }}
+        HOOK_LAUNCHOPS: ${{ inputs.hook_launchops }}
+        HOOK_BLUE_STONE: ${{ inputs.hook_blue_stone }}
+      run: |
+        declare -A HOOKS=(
+          [forge-web]="$HOOK_FORGE_WEB"
+          [launchops]="$HOOK_LAUNCHOPS"
+          [ploutos-blue-stone]="$HOOK_BLUE_STONE"
+        )
+
+        PIDS=()
+        NAMES=()
+
+        for name in "${!HOOKS[@]}"; do
+          hook="${HOOKS[$name]}"
+          if [ -z "$hook" ]; then
+            echo "⏭  Skipping $name (no hook configured)"
+          else
+            echo "🚀 Deploying $name..."
+            curl -sf -X POST "$hook" &
+            PIDS+=($!)
+            NAMES+=("$name")
+          fi
+        done
+
+        EXIT=0
+        for i in "${!PIDS[@]}"; do
+          if ! wait "${PIDS[$i]}"; then
+            echo "❌ ${NAMES[$i]} hook failed"
+            EXIT=1
+          else
+            echo "✅ ${NAMES[$i]} hook accepted"
+          fi
+        done
+        exit $EXIT

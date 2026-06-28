@@ -33,9 +33,14 @@ jobs:
   # ============================================================
   deploy-development:
     name: Deploy to Development
+    runs-on: ubuntu-latest
     needs: [checks]
-    uses: ./.github/workflows/shared-deploy.yml
     environment: development
-    with:
-      environment: development
-    secrets: inherit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy all projects
+        uses: ./.github/actions/multi-deploy
+        with:
+          hook_forge_web: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          hook_launchops: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
+          hook_blue_stone: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
