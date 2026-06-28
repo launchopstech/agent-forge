@@ -36,12 +36,17 @@ jobs:
   # ============================================================
   deploy-staging:
     name: Deploy to Staging
+    runs-on: ubuntu-latest
     needs: [checks]
-    uses: ./.github/workflows/shared-deploy.yml
     environment: staging
-    with:
-      environment: staging
-    secrets: inherit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy all projects
+        uses: ./.github/actions/multi-deploy
+        with:
+          hook_forge_web: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          hook_launchops: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
+          hook_blue_stone: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
 
   # ============================================================
   # Phase 3: Post-deploy E2E on Staging
@@ -74,12 +79,17 @@ jobs:
   # ============================================================
   deploy-production:
     name: Deploy to Production
+    runs-on: ubuntu-latest
     needs: [approval]
-    uses: ./.github/workflows/shared-deploy.yml
     environment: production
-    with:
-      environment: production
-    secrets: inherit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy all projects
+        uses: ./.github/actions/multi-deploy
+        with:
+          hook_forge_web: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          hook_launchops: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
+          hook_blue_stone: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
 
   # ============================================================
   # Phase 6: Post-deploy Smoke Tests on Production
