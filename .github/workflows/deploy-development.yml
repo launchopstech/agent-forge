@@ -35,9 +35,7 @@ jobs:
     name: Deploy to Development
     needs: [checks]
     uses: ./.github/workflows/shared-deploy.yml
+    environment: development
     with:
       environment: development
-    secrets:
-      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
-      VERCEL_DEPLOY_HOOK_LAUNCHOPS: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
-      VERCEL_DEPLOY_HOOK_BLUE_STONE: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
+    secrets: inherit

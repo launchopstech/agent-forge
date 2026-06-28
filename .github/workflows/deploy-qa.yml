@@ -36,12 +36,10 @@ jobs:
     name: Deploy to QA
     needs: [checks]
     uses: ./.github/workflows/shared-deploy.yml
+    environment: qa
     with:
       environment: qa
-    secrets:
-      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
-      VERCEL_DEPLOY_HOOK_LAUNCHOPS: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
-      VERCEL_DEPLOY_HOOK_BLUE_STONE: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
+    secrets: inherit
 
   # ============================================================
   # Phase 3: Post-deploy E2E on QA
