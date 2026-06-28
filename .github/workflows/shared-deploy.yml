@@ -1,0 +1,83 @@
+name: Shared — Multi-Project Deploy
+
+# Reusable workflow: fires Vercel deploy hooks for every configured project
+# in parallel. Skip a project by leaving its secret empty — no registry edits,
+# no flags needed.
+#
+# Adding a new project:
+#   1. Create a Vercel deploy hook for each environment
+#   2. Add VERCEL_DEPLOY_HOOK_<PROJECT> to each GitHub Environment
+#   3. Add the secret to the `secrets:` block below
+#   4. Add an entry to the HOOKS map in the bash step
+#
+# Environments: development | qa | staging | production
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (development | qa | staging | production)'
+        type: string
+        required: true
+    secrets:
+      VERCEL_DEPLOY_HOOK:
+        description: 'Deploy hook for @forge/web (agent-forge-web)'
+        required: false
+      VERCEL_DEPLOY_HOOK_LAUNCHOPS:
+        description: 'Deploy hook for @forge/launchops — requires vercel link first'
+        required: false
+      VERCEL_DEPLOY_HOOK_BLUE_STONE:
+        description: 'Deploy hook for ploutos-blue-stone'
+        required: false
+
+jobs:
+  deploy:
+    name: Deploy all projects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire deploy hooks in parallel
+        env:
+          HOOK_FORGE_WEB: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          HOOK_LAUNCHOPS: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
+          HOOK_BLUE_STONE: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
+        run: |
+          # Map: display name → hook env var value
+          declare -A HOOKS=(
+            [forge-web]="$HOOK_FORGE_WEB"
+            [launchops]="$HOOK_LAUNCHOPS"
+            [ploutos-blue-stone]="$HOOK_BLUE_STONE"
+          )
+
+          PIDS=()
+          NAMES=()
+
+          for name in "${!HOOKS[@]}"; do
+            hook="${HOOKS[$name]}"
+            if [ -z "$hook" ]; then
+              echo "⏭  Skipping $name (no hook configured)"
+            else
+              echo "🚀 Deploying $name..."
+              curl -sf -X POST "$hook" &
+              PIDS+=($!)
+              NAMES+=("$name")
+            fi
+          done
+
+          # Collect exit codes — fail if any hook curl failed
+          EXIT=0
+          for i in "${!PIDS[@]}"; do
+            if ! wait "${PIDS[$i]}"; then
+              echo "❌ ${NAMES[$i]} hook failed"
+              EXIT=1
+            else
+              echo "✅ ${NAMES[$i]} hook accepted"
+            fi
+          done
+          exit $EXIT
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "### Deploy — ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
