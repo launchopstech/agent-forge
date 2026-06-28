@@ -1,4 +1,6 @@
 {
+  "framework": "nextjs",
+  "installCommand": "cd ../../.. && pnpm install --frozen-lockfile",
   "buildCommand": "cd ../../.. && pnpm turbo build --filter=@ploutos/blue-stone-construction",
-  "framework": "nextjs"
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- apps/ploutos/clients/blue-stone-construction/ packages/"
 }
