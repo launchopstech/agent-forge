@@ -16,6 +16,7 @@ export default defineConfig({
         'src/**/*.test.tsx',
         'src/**/index.ts',
         'src/config/types.ts', // pure TypeScript interfaces — no runtime code to cover
+        'src/config/blue-stone-construction.ts', // static brand config data — no logic to test
         'src/config/client-b.ts', // static brand config data — no logic to test
         'src/config/client-a.ts', // static brand config data — no logic to test
         'src/config/default.ts', // static brand config data — no logic to test

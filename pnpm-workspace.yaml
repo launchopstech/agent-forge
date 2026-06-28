@@ -1,5 +1,6 @@
 packages:
   - 'apps/*'
+  - 'apps/ploutos/clients/*'
   - 'packages/*'
 
 catalog:
@@ -98,3 +99,4 @@ catalog:
   'typescript-eslint': '^8.56.1'
   '@commitlint/cli': '^20.4.3'
   '@commitlint/config-conventional': '^20.4.3'
+  resend: '^4.0.0'
