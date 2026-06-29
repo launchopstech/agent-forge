@@ -38,6 +38,8 @@ jobs:
     environment: development
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Deploy all projects
         uses: ./.github/actions/multi-deploy
         with:
