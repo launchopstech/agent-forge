@@ -4,19 +4,20 @@
       "dir": "apps/ploutos/clients/blue-stone-construction",
       "domains": {
         "development": "dev.bluestoneconstruction.llc",
-        "preview": "preview.bluestoneconstruction.llc",
+        "qa": "qa.bluestoneconstruction.llc",
         "staging": "staging.bluestoneconstruction.llc",
         "production": "bluestoneconstruction.llc"
       },
       "gitBranches": {
         "development": "develop",
+        "qa": "qa",
         "staging": "staging"
       },
       "envVars": {
         "NEXT_PUBLIC_BRAND": "blue-stone-construction",
         "NEXT_PUBLIC_APP_ENV": {
           "development": "development",
-          "preview": "staging",
+          "qa": "qa",
           "staging": "staging",
           "production": "production"
         }
