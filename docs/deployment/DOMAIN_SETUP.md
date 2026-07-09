@@ -2,9 +2,40 @@
 
 ## Overview
 
-Each client brand is deployed to its own Vercel project. Connect a custom domain by adding DNS records in GoDaddy pointing to Vercel's servers.
+Each client brand is deployed to its own Vercel project. Custom domains per environment are registered in `scripts/domains.json` and applied with `scripts/setup-domain.mjs`.
 
-## Steps
+## Automated setup (recommended)
+
+Add the client's domain to `scripts/domains.json`, then run:
+
+```bash
+# One project, one environment
+node scripts/setup-domain.mjs --project ploutos-blue-stone --env preview
+
+# All environments for a project
+node scripts/setup-domain.mjs --project ploutos-blue-stone --all-envs
+
+# All projects, one environment (e.g. wire up preview for every client at once)
+node scripts/setup-domain.mjs --env preview --all-projects
+
+# Dry-run (prints what would happen, makes no changes)
+node scripts/setup-domain.mjs --project ploutos-blue-stone --env preview --dry-run
+
+# List all registered projects and their domains
+node scripts/setup-domain.mjs --list
+```
+
+The script:
+
+1. Adds the domain to the Vercel project via CLI
+2. Sets `NEXT_PUBLIC_APP_URL` for the correct Vercel environment tier
+3. Prints the exact DNS record to add in GoDaddy
+
+**Adding a new client:** edit `scripts/domains.json` only — no script changes needed.
+
+---
+
+## Manual steps
 
 ### 1. Add the domain to Vercel
 
