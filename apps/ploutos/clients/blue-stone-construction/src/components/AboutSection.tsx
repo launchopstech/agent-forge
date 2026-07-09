@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Home, Calendar, Shield, Star } from 'lucide-react'
 
 const STATS = [
@@ -81,11 +82,21 @@ export function AboutSection() {
 
         {/* Photo */}
         <div
-          className="photo-placeholder reveal d1"
-          style={{ height: 480, fontSize: '0.85rem' }}
-          aria-label="Team photo / job site photo"
+          className="reveal d1"
+          style={{
+            position: 'relative',
+            height: 480,
+            borderRadius: 'var(--r-lg)',
+            overflow: 'hidden',
+          }}
         >
-          Team Photo / Job Site Photo
+          <Image
+            src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&q=80"
+            alt="Blue Stone Construction team on job site"
+            fill
+            sizes="(max-width: 900px) 100vw, 50vw"
+            style={{ objectFit: 'cover' }}
+          />
         </div>
       </div>
 

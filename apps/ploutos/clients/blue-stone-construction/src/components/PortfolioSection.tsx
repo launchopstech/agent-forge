@@ -1,22 +1,83 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 const FILTERS = ['All', 'Remodels', 'Additions', 'New Construction', 'Exterior', 'Commercial']
 
 const PROJECTS = [
-  { title: 'Kitchen Remodel', location: 'Parsippany, NJ', category: 'Remodels' },
-  { title: 'Master Suite Addition', location: 'Rockaway, NJ', category: 'Additions' },
-  { title: 'Full Home Renovation', location: 'Denville, NJ', category: 'Remodels' },
-  { title: 'Deck & Patio Build', location: 'Mount Olive, NJ', category: 'Exterior' },
-  { title: 'Basement Finishing', location: 'Lake Hiawatha, NJ', category: 'Remodels' },
-  { title: 'Commercial Office Build-Out', location: 'Morristown, NJ', category: 'Commercial' },
-  { title: 'Bathroom Remodel', location: 'Jefferson Township, NJ', category: 'Remodels' },
-  { title: 'Two-Story Addition', location: 'Randolph, NJ', category: 'Additions' },
-  { title: 'New Home Construction', location: 'Wharton, NJ', category: 'New Construction' },
-  { title: 'Exterior Siding & Roofing', location: 'Dover, NJ', category: 'Exterior' },
-  { title: 'Garage Conversion', location: 'Boonton, NJ', category: 'Additions' },
-  { title: 'Restaurant Renovation', location: 'Netcong, NJ', category: 'Commercial' },
+  {
+    title: 'Kitchen Remodel',
+    location: 'Parsippany, NJ',
+    category: 'Remodels',
+    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80',
+  },
+  {
+    title: 'Master Suite Addition',
+    location: 'Rockaway, NJ',
+    category: 'Additions',
+    image: 'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=800&q=80',
+  },
+  {
+    title: 'Full Home Renovation',
+    location: 'Denville, NJ',
+    category: 'Remodels',
+    image: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80',
+  },
+  {
+    title: 'Deck & Patio Build',
+    location: 'Mount Olive, NJ',
+    category: 'Exterior',
+    image: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&q=80',
+  },
+  {
+    title: 'Basement Finishing',
+    location: 'Lake Hiawatha, NJ',
+    category: 'Remodels',
+    image: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=800&q=80',
+  },
+  {
+    title: 'Commercial Office Build-Out',
+    location: 'Morristown, NJ',
+    category: 'Commercial',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
+  },
+  {
+    title: 'Bathroom Remodel',
+    location: 'Jefferson Township, NJ',
+    category: 'Remodels',
+    image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80',
+  },
+  {
+    title: 'Two-Story Addition',
+    location: 'Randolph, NJ',
+    category: 'Additions',
+    image: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800&q=80',
+  },
+  {
+    title: 'New Home Construction',
+    location: 'Wharton, NJ',
+    category: 'New Construction',
+    image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
+  },
+  {
+    title: 'Exterior Siding & Roofing',
+    location: 'Dover, NJ',
+    category: 'Exterior',
+    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
+  },
+  {
+    title: 'Garage Conversion',
+    location: 'Boonton, NJ',
+    category: 'Additions',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  },
+  {
+    title: 'Restaurant Renovation',
+    location: 'Netcong, NJ',
+    category: 'Commercial',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
+  },
 ]
 
 export function PortfolioSection() {
@@ -89,14 +150,13 @@ export function PortfolioSection() {
                 aspectRatio: '4/3',
               }}
             >
-              {/* Photo placeholder — replace with next/image when real photos available */}
-              <div
-                className="photo-placeholder"
-                style={{ position: 'absolute', inset: 0 }}
-                aria-label={`${p.title} — ${p.location}`}
-              >
-                {p.category}
-              </div>
+              <Image
+                src={p.image}
+                alt={`${p.title} — ${p.location}`}
+                fill
+                sizes="(max-width: 540px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                style={{ objectFit: 'cover' }}
+              />
 
               {/* Hover overlay */}
               <div
