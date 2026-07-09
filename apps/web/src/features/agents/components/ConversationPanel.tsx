@@ -18,11 +18,11 @@ import {
   type PromptInputMessage,
 } from '@forge/ai-ui'
 import {
-  createConversation,
-  deleteConversation,
-  fetchConversation,
-  fetchConversations,
-  sendMessage,
+  createConversation as _createConversation,
+  deleteConversation as _deleteConversation,
+  fetchConversation as _fetchConversation,
+  fetchConversations as _fetchConversations,
+  sendMessage as _sendMessage,
   type ConversationMessage,
   type ConversationSummary,
 } from '../api/conversations.api'
@@ -32,6 +32,11 @@ import {
 interface ConversationPanelProps {
   agentId: string
   className?: string
+  fetchConversations?: typeof _fetchConversations
+  fetchConversation?: typeof _fetchConversation
+  createConversation?: typeof _createConversation
+  deleteConversation?: typeof _deleteConversation
+  sendMessage?: typeof _sendMessage
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -39,6 +44,11 @@ interface ConversationPanelProps {
 export const ConversationPanel = React.memo(function ConversationPanel({
   agentId,
   className,
+  fetchConversations = _fetchConversations,
+  fetchConversation = _fetchConversation,
+  createConversation = _createConversation,
+  deleteConversation = _deleteConversation,
+  sendMessage = _sendMessage,
 }: ConversationPanelProps) {
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [activeConvId, setActiveConvId] = useState<string | null>(null)

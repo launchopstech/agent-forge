@@ -10,7 +10,11 @@ import { Skeleton } from '@forge/ui/src/skeleton'
 import { Textarea } from '@forge/ui/src/textarea'
 import { Card, CardContent } from '@forge/ui/src/card'
 import { toast } from '@/hooks/use-toast'
-import { fetchRoutingRules, createRoutingRule, deleteRoutingRule } from '../api/channels.api'
+import {
+  fetchRoutingRules as _fetchRoutingRules,
+  createRoutingRule as _createRoutingRule,
+  deleteRoutingRule as _deleteRoutingRule,
+} from '../api/channels.api'
 import type { RoutingRule, CreateRoutingRulePayload, KeywordConditionValue } from '../types'
 
 interface Agent {
@@ -22,6 +26,9 @@ interface RoutingRulesEditorProps {
   channelId: string
   /** Available agents to route to */
   agents: Agent[]
+  fetchRoutingRules?: typeof _fetchRoutingRules
+  createRoutingRule?: typeof _createRoutingRule
+  deleteRoutingRule?: typeof _deleteRoutingRule
 }
 
 /** Parse a comma-separated keyword string into a string[] for the API. */
@@ -39,7 +46,13 @@ function displayKeywords(conditionValue: unknown): string {
   return cv.keywords.join(', ')
 }
 
-export function RoutingRulesEditor({ channelId, agents }: RoutingRulesEditorProps) {
+export function RoutingRulesEditor({
+  channelId,
+  agents,
+  fetchRoutingRules = _fetchRoutingRules,
+  createRoutingRule = _createRoutingRule,
+  deleteRoutingRule = _deleteRoutingRule,
+}: RoutingRulesEditorProps) {
   const [rules, setRules] = useState<RoutingRule[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isAdding, setIsAdding] = useState(false)

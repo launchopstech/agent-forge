@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { Send, Trash2, Bot, User } from 'lucide-react'
 import { Button } from '@forge/ui/src/button'
 import { Input } from '@forge/ui/src/input'
-import { triggerTest } from '../api/channels.api'
+import { triggerTest as _triggerTest } from '../api/channels.api'
 import type { ConsoleMessage } from '../types'
 
 function formatTime(iso: string) {
@@ -15,9 +15,14 @@ interface TestConsoleProps {
   channelId: string
   /** Display name of the channel (e.g. "Dev Test") */
   channelName?: string
+  triggerTest?: typeof _triggerTest
 }
 
-export function TestConsole({ channelId, channelName = 'Test Channel' }: TestConsoleProps) {
+export function TestConsole({
+  channelId,
+  channelName = 'Test Channel',
+  triggerTest = _triggerTest,
+}: TestConsoleProps) {
   const [messages, setMessages] = useState<ConsoleMessage[]>([])
   const [input, setInput] = useState('')
   const [isSending, setIsSending] = useState(false)

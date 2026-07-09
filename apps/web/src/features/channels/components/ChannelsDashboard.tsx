@@ -17,10 +17,10 @@ import { Input } from '@forge/ui/src/input'
 import { Label } from '@forge/ui/src/label'
 import { toast } from '@/hooks/use-toast'
 import {
-  fetchChannels,
-  fetchChannelCatalog,
-  createChannel,
-  deleteChannel,
+  fetchChannels as _fetchChannels,
+  fetchChannelCatalog as _fetchChannelCatalog,
+  createChannel as _createChannel,
+  deleteChannel as _deleteChannel,
 } from '../api/channels.api'
 import type { WorkspaceChannel, ChannelCatalogItem, CreateChannelPayload } from '../types'
 
@@ -40,9 +40,15 @@ interface CreateChannelModalProps {
   catalog: ChannelCatalogItem[]
   onCreated: (channel: WorkspaceChannel) => void
   onClose: () => void
+  createChannel?: typeof _createChannel
 }
 
-function CreateChannelModal({ catalog, onCreated, onClose }: CreateChannelModalProps) {
+function CreateChannelModal({
+  catalog,
+  onCreated,
+  onClose,
+  createChannel = _createChannel,
+}: CreateChannelModalProps) {
   const [step, setStep] = useState<'pick' | 'configure'>('pick')
   const [selected, setSelected] = useState<ChannelCatalogItem | null>(null)
   const [name, setName] = useState('')
@@ -203,7 +209,19 @@ function ChannelCard({ channel, href, onDelete }: ChannelCardProps) {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
-export function ChannelsDashboard() {
+interface ChannelsDashboardProps {
+  fetchChannels?: typeof _fetchChannels
+  fetchChannelCatalog?: typeof _fetchChannelCatalog
+  createChannel?: typeof _createChannel
+  deleteChannel?: typeof _deleteChannel
+}
+
+export function ChannelsDashboard({
+  fetchChannels = _fetchChannels,
+  fetchChannelCatalog = _fetchChannelCatalog,
+  createChannel = _createChannel,
+  deleteChannel = _deleteChannel,
+}: ChannelsDashboardProps = {}) {
   const router = useRouter()
   const [channels, setChannels] = useState<WorkspaceChannel[]>([])
   const [catalog, setCatalog] = useState<ChannelCatalogItem[]>([])
@@ -311,6 +329,7 @@ export function ChannelsDashboard() {
           catalog={catalog}
           onCreated={handleCreated}
           onClose={() => setShowCreate(false)}
+          createChannel={createChannel}
         />
       )}
     </div>

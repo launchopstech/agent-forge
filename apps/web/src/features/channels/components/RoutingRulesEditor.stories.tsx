@@ -19,6 +19,8 @@ const meta: Meta<typeof RoutingRulesEditor> = {
   args: {
     channelId: 'ch_preview',
     agents: MOCK_AGENTS,
+    createRoutingRule: fn(),
+    deleteRoutingRule: fn(),
   },
 }
 
@@ -27,64 +29,41 @@ type Story = StoryObj<typeof RoutingRulesEditor>
 
 export const Empty: Story = {
   name: 'No rules',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        fetchRoutingRules: fn().mockResolvedValue([]),
-        createRoutingRule: fn(),
-        deleteRoutingRule: fn(),
-      })
-      return {}
-    },
-  ],
+  args: {
+    fetchRoutingRules: fn().mockResolvedValue([]),
+  },
 }
 
 export const WithRules: Story = {
   name: 'Existing rules',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        fetchRoutingRules: fn().mockResolvedValue([
-          {
-            id: 'rule_1',
-            workspaceChannelId: 'ch_preview',
-            agentId: 'agent_1',
-            priority: 1,
-            condition: { type: 'always' },
-            createdAt: '2025-01-15T10:00:00Z',
-            updatedAt: '2025-01-15T10:00:00Z',
-          },
-          {
-            id: 'rule_2',
-            workspaceChannelId: 'ch_preview',
-            agentId: 'agent_2',
-            priority: 0,
-            condition: { type: 'keyword', value: ['billing', 'invoice'] },
-            createdAt: '2025-01-15T10:00:00Z',
-            updatedAt: '2025-01-15T10:00:00Z',
-          },
-        ]),
-        createRoutingRule: fn(),
-        deleteRoutingRule: fn().mockResolvedValue(undefined),
-      })
-      return {}
-    },
-  ],
+  args: {
+    fetchRoutingRules: fn().mockResolvedValue([
+      {
+        id: 'rule_1',
+        workspaceChannelId: 'ch_preview',
+        agentId: 'agent_1',
+        priority: 1,
+        condition: { type: 'always' },
+        createdAt: '2025-01-15T10:00:00Z',
+        updatedAt: '2025-01-15T10:00:00Z',
+      },
+      {
+        id: 'rule_2',
+        workspaceChannelId: 'ch_preview',
+        agentId: 'agent_2',
+        priority: 0,
+        condition: { type: 'keyword', value: ['billing', 'invoice'] },
+        createdAt: '2025-01-15T10:00:00Z',
+        updatedAt: '2025-01-15T10:00:00Z',
+      },
+    ]),
+    deleteRoutingRule: fn().mockResolvedValue(undefined),
+  },
 }
 
 export const Loading: Story = {
   name: 'Loading state',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        fetchRoutingRules: fn().mockReturnValue(new Promise(() => {})),
-        createRoutingRule: fn(),
-        deleteRoutingRule: fn(),
-      })
-      return {}
-    },
-  ],
+  args: {
+    fetchRoutingRules: fn().mockReturnValue(new Promise(() => {})),
+  },
 }
