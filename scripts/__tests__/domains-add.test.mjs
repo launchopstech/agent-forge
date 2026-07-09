@@ -51,10 +51,10 @@ function run(args, env = {}) {
 describe('buildProjectEntry()', () => {
   it('returns correct 4-env domain structure', () => {
     const entry = buildProjectEntry('acme', 'apps/acme', 'acme.com', 'acme')
-    assert.equal(entry.domains.production,  'acme.com')
+    assert.equal(entry.domains.production, 'acme.com')
     assert.equal(entry.domains.development, 'dev.acme.com')
-    assert.equal(entry.domains.preview,     'preview.acme.com')
-    assert.equal(entry.domains.staging,     'staging.acme.com')
+    assert.equal(entry.domains.preview, 'preview.acme.com')
+    assert.equal(entry.domains.staging, 'staging.acme.com')
   })
 
   it('sets NEXT_PUBLIC_BRAND from brand arg', () => {
@@ -66,9 +66,9 @@ describe('buildProjectEntry()', () => {
     const entry = buildProjectEntry('acme', 'apps/acme', 'acme.com', 'acme')
     const envMap = entry.envVars['NEXT_PUBLIC_APP_ENV']
     assert.equal(envMap.development, 'development')
-    assert.equal(envMap.preview,     'staging')
-    assert.equal(envMap.staging,     'staging')
-    assert.equal(envMap.production,  'production')
+    assert.equal(envMap.preview, 'staging')
+    assert.equal(envMap.staging, 'staging')
+    assert.equal(envMap.production, 'production')
   })
 
   it('includes default secrets list', () => {
@@ -84,7 +84,7 @@ describe('buildProjectEntry()', () => {
 
   it('works with non-.com TLDs (.llc, .io)', () => {
     const entry = buildProjectEntry('bs', 'apps/bs', 'bluestoneconstruction.llc', 'blue-stone')
-    assert.equal(entry.domains.production,  'bluestoneconstruction.llc')
+    assert.equal(entry.domains.production, 'bluestoneconstruction.llc')
     assert.equal(entry.domains.development, 'dev.bluestoneconstruction.llc')
   })
 })
@@ -110,14 +110,34 @@ describe('--list', () => {
 
 describe('--dry-run', () => {
   it('exits 0 and prints [DRY RUN]', () => {
-    const { code, stdout } = run(['--dry-run', '--alias', 'test-co', '--dir', 'apps/test', '--domain', 'test.com', '--brand', 'test'])
+    const { code, stdout } = run([
+      '--dry-run',
+      '--alias',
+      'test-co',
+      '--dir',
+      'apps/test',
+      '--domain',
+      'test.com',
+      '--brand',
+      'test',
+    ])
     assert.equal(code, 0)
     assert.ok(stdout.includes('[DRY RUN]'))
   })
 
   it('prints the entry JSON without writing to file', () => {
     freshRegistry()
-    const { stdout } = run(['--dry-run', '--alias', 'test-co', '--dir', 'apps/test', '--domain', 'test.com', '--brand', 'test'])
+    const { stdout } = run([
+      '--dry-run',
+      '--alias',
+      'test-co',
+      '--dir',
+      'apps/test',
+      '--domain',
+      'test.com',
+      '--brand',
+      'test',
+    ])
     assert.ok(stdout.includes('test-co'))
     assert.ok(stdout.includes('dev.test.com'))
     // File should be unchanged
@@ -131,7 +151,16 @@ describe('--dry-run', () => {
 describe('adding a new project', () => {
   it('exits 0 and writes to domains.json', () => {
     freshRegistry()
-    const { code } = run(['--alias', 'new-client', '--dir', 'apps/new', '--domain', 'newclient.com', '--brand', 'new'])
+    const { code } = run([
+      '--alias',
+      'new-client',
+      '--dir',
+      'apps/new',
+      '--domain',
+      'newclient.com',
+      '--brand',
+      'new',
+    ])
     assert.equal(code, 0)
     const updated = JSON.parse(readFileSync(tmpRegistry, 'utf8'))
     assert.ok(updated.projects['new-client'])
@@ -142,9 +171,9 @@ describe('adding a new project', () => {
     run(['--alias', 'acme-co', '--dir', 'apps/acme', '--domain', 'acme.io', '--brand', 'acme'])
     const updated = JSON.parse(readFileSync(tmpRegistry, 'utf8'))
     const entry = updated.projects['acme-co']
-    assert.equal(entry.domains.production,  'acme.io')
+    assert.equal(entry.domains.production, 'acme.io')
     assert.equal(entry.domains.development, 'dev.acme.io')
-    assert.equal(entry.domains.staging,     'staging.acme.io')
+    assert.equal(entry.domains.staging, 'staging.acme.io')
   })
 
   it('default brand is alias when --brand omitted', () => {
@@ -159,7 +188,10 @@ describe('adding a new project', () => {
     run(['--alias', 'extra-co', '--dir', 'apps/extra', '--domain', 'extra.com', '--brand', 'extra'])
     const updated = JSON.parse(readFileSync(tmpRegistry, 'utf8'))
     assert.ok(updated.projects['ploutos-blue-stone'])
-    assert.equal(updated.projects['ploutos-blue-stone'].domains.production, 'bluestoneconstruction.llc')
+    assert.equal(
+      updated.projects['ploutos-blue-stone'].domains.production,
+      'bluestoneconstruction.llc'
+    )
   })
 })
 
@@ -197,7 +229,14 @@ describe('validation errors', () => {
   })
 
   it('exits 1 when alias already exists (idempotency guard)', () => {
-    const { code, stderr } = run(['--alias', 'ploutos-blue-stone', '--dir', 'apps/x', '--domain', 'x.com'])
+    const { code, stderr } = run([
+      '--alias',
+      'ploutos-blue-stone',
+      '--dir',
+      'apps/x',
+      '--domain',
+      'x.com',
+    ])
     assert.equal(code, 1)
     assert.ok(stderr.includes('already exists'))
   })

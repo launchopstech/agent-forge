@@ -18,27 +18,29 @@
 import { execFileSync } from 'node:child_process'
 
 export const BASE_URLS = {
-  ote:  'https://api.ote-godaddy.com',
+  ote: 'https://api.ote-godaddy.com',
   prod: 'https://api.godaddy.com',
 }
 
 const KEYCHAIN_NAMES = {
-  ote:  { key: 'godaddy-ote-key',  secret: 'godaddy-ote-secret'  },
+  ote: { key: 'godaddy-ote-key', secret: 'godaddy-ote-secret' },
   prod: { key: 'godaddy-prod-key', secret: 'godaddy-prod-secret' },
 }
 
 const ENV_VAR_NAMES = {
-  ote:  { key: 'GODADDY_OTE_API_KEY', secret: 'GODADDY_OTE_API_SECRET' },
-  prod: { key: 'GODADDY_API_KEY',     secret: 'GODADDY_API_SECRET'     },
+  ote: { key: 'GODADDY_OTE_API_KEY', secret: 'GODADDY_OTE_API_SECRET' },
+  prod: { key: 'GODADDY_API_KEY', secret: 'GODADDY_API_SECRET' },
 }
 
 function keychainGet(service) {
   // SKIP_KEYCHAIN=1 lets tests bypass keychain (agents can't run `security`)
   if (process.env.SKIP_KEYCHAIN === '1') return null
   try {
-    return execFileSync('security', [
-      'find-generic-password', '-s', service, '-a', 'launchops', '-w',
-    ], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim()
+    return execFileSync(
+      'security',
+      ['find-generic-password', '-s', service, '-a', 'launchops', '-w'],
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
+    ).trim()
   } catch {
     return null
   }
@@ -61,7 +63,7 @@ export function loadCredentials(env, { allowMissing = false } = {}) {
   const en = ENV_VAR_NAMES[env]
 
   // Try Keychain first, fall back to env vars
-  const apiKey    = keychainGet(kn.key)    ?? process.env[en.key]    ?? null
+  const apiKey = keychainGet(kn.key) ?? process.env[en.key] ?? null
   const apiSecret = keychainGet(kn.secret) ?? process.env[en.secret] ?? null
 
   if (!allowMissing && (!apiKey || !apiSecret)) {
@@ -69,7 +71,9 @@ export function loadCredentials(env, { allowMissing = false } = {}) {
     console.error(`Error: No ${envLabel} GoDaddy credentials found.`)
     console.error(`  Option 1 — Keychain (recommended):`)
     console.error(`    security add-generic-password -s "${kn.key}"    -a "launchops" -w "<key>"`)
-    console.error(`    security add-generic-password -s "${kn.secret}" -a "launchops" -w "<secret>"`)
+    console.error(
+      `    security add-generic-password -s "${kn.secret}" -a "launchops" -w "<secret>"`
+    )
     console.error(`  Option 2 — env vars:`)
     console.error(`    export ${en.key}=<key>`)
     console.error(`    export ${en.secret}=<secret>`)

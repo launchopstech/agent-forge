@@ -14,14 +14,16 @@ const script = resolve(__dir, '../vercel-project-create.mjs')
 // ── Temp dir setup ────────────────────────────────────────────────────────────
 
 let tmpDir
-let mockVercelBin    // path to the mock `vercel` shell script
+let mockVercelBin // path to the mock `vercel` shell script
 
 before(() => {
   tmpDir = mkdtempSync(resolve(tmpdir(), 'vercel-create-test-'))
 
   // Write a mock `vercel` script that exits 0 and records its args
   mockVercelBin = resolve(tmpDir, 'vercel')
-  writeFileSync(mockVercelBin, `#!/bin/sh\necho "Linked to project via mock"\nexit 0\n`, { mode: 0o755 })
+  writeFileSync(mockVercelBin, `#!/bin/sh\necho "Linked to project via mock"\nexit 0\n`, {
+    mode: 0o755,
+  })
 })
 
 after(() => {
@@ -53,7 +55,10 @@ describe('isLinked()', () => {
   it('returns true when .vercel/project.json exists', () => {
     const dir = resolve(tmpDir, 'linked')
     mkdirSync(resolve(dir, '.vercel'), { recursive: true })
-    writeFileSync(resolve(dir, '.vercel', 'project.json'), '{"projectId":"prj_123","orgId":"team_456"}')
+    writeFileSync(
+      resolve(dir, '.vercel', 'project.json'),
+      '{"projectId":"prj_123","orgId":"team_456"}'
+    )
     assert.equal(isLinked(dir), true)
   })
 
@@ -125,15 +130,27 @@ describe('validation errors', () => {
     const fakeRegistry = resolve(tmpDir, 'fake-registry.json')
     const fakeDir = resolve(tmpDir, 'fake-app')
     mkdirSync(fakeDir, { recursive: true })
-    writeFileSync(fakeRegistry, JSON.stringify({
-      projects: { 'fake-unlinked': { dir: fakeDir, domains: { production: 'fake.com' }, envVars: {}, secrets: [] } }
-    }))
-    const { code, stderr } = run(
-      ['--project', 'fake-unlinked'],
-      { VERCEL_BIN: '/nonexistent-vercel-binary-xyz', DOMAINS_FILE: fakeRegistry }
+    writeFileSync(
+      fakeRegistry,
+      JSON.stringify({
+        projects: {
+          'fake-unlinked': {
+            dir: fakeDir,
+            domains: { production: 'fake.com' },
+            envVars: {},
+            secrets: [],
+          },
+        },
+      })
     )
+    const { code, stderr } = run(['--project', 'fake-unlinked'], {
+      VERCEL_BIN: '/nonexistent-vercel-binary-xyz',
+      DOMAINS_FILE: fakeRegistry,
+    })
     assert.equal(code, 1)
-    assert.ok(stderr.includes('not found') || stderr.includes('ENOENT') || stderr.includes('vercel'))
+    assert.ok(
+      stderr.includes('not found') || stderr.includes('ENOENT') || stderr.includes('vercel')
+    )
   })
 })
 
@@ -201,7 +218,7 @@ describe('successful vercel link', () => {
   it('exits 0 when mock vercel exits 0', () => {
     // Only runs if project is NOT already linked (otherwise 'already linked' path)
     const projDir = resolve(__dir, '../../apps/ploutos/clients/blue-stone-construction')
-    if (isLinked(projDir)) return  // skip gracefully
+    if (isLinked(projDir)) return // skip gracefully
 
     const { code } = run(['--project', 'ploutos-blue-stone'])
     assert.equal(code, 0)

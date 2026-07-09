@@ -42,13 +42,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // VERCEL_BIN lets tests inject a mock binary
   const VERCEL_BIN = process.env.VERCEL_BIN ?? 'vercel'
 
-  const args       = process.argv.slice(2)
-  const get        = f => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : null }
-  const has        = f => args.includes(f)
+  const args = process.argv.slice(2)
+  const get = (f) => {
+    const i = args.indexOf(f)
+    return i !== -1 ? args[i + 1] : null
+  }
+  const has = (f) => args.includes(f)
 
   const projectArg = get('--project')
-  const dryRun     = has('--dry-run')
-  const list       = has('--list')
+  const dryRun = has('--dry-run')
+  const list = has('--list')
 
   if (list) {
     console.log('\nVercel project link status:\n')
@@ -76,7 +79,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const absDir = resolve(__dir, '..', cfg.dir)
 
   if (!dryRun && isLinked(absDir)) {
-    console.log(`✓ "${projectArg}" is already linked (${absDir}/.vercel/project.json exists). Skipping.`)
+    console.log(
+      `✓ "${projectArg}" is already linked (${absDir}/.vercel/project.json exists). Skipping.`
+    )
     console.log(`\nAlready ready for:`)
     console.log(`  node scripts/setup-domain.mjs --project ${projectArg} --all-envs`)
     console.log(`  node scripts/vercel-env-set.mjs --project ${projectArg} --all-envs`)

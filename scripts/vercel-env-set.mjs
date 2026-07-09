@@ -30,9 +30,9 @@ const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
 // Map script env names → Vercel environment tiers
 const VERCEL_ENV = {
   development: 'development',
-  preview:     'preview',
-  staging:     'preview',
-  production:  'production',
+  preview: 'preview',
+  staging: 'preview',
+  production: 'production',
 }
 
 // ── Arg parsing ───────────────────────────────────────────────────────────────
@@ -45,12 +45,12 @@ const get = (flag) => {
 const has = (flag) => args.includes(flag)
 
 const projectArg = get('--project')
-const envArg     = get('--env')
-const allEnvs    = has('--all-envs')
+const envArg = get('--env')
+const allEnvs = has('--all-envs')
 const allProjects = has('--all-projects')
-const dryRun     = has('--dry-run')
-const list       = has('--list')
-const secrets    = parseSecrets(args)
+const dryRun = has('--dry-run')
+const list = has('--list')
+const secrets = parseSecrets(args)
 
 function parseSecrets(argv) {
   const result = {}
@@ -106,22 +106,20 @@ if (projectArg && !registry.projects[projectArg]) {
   process.exit(1)
 }
 if (envArg && !VERCEL_ENV[envArg]) {
-  console.error(`Error: unknown env "${envArg}". Valid values: ${Object.keys(VERCEL_ENV).join(', ')}`)
+  console.error(
+    `Error: unknown env "${envArg}". Valid values: ${Object.keys(VERCEL_ENV).join(', ')}`
+  )
   process.exit(1)
 }
 
 // ── Build work list ───────────────────────────────────────────────────────────
 
-const projectNames = allProjects
-  ? Object.keys(registry.projects)
-  : [projectArg]
+const projectNames = allProjects ? Object.keys(registry.projects) : [projectArg]
 
 const work = []
 for (const name of projectNames) {
   const config = registry.projects[name]
-  const envs = allEnvs || allProjects
-    ? Object.keys(config.domains)
-    : [envArg]
+  const envs = allEnvs || allProjects ? Object.keys(config.domains) : [envArg]
 
   for (const env of envs) {
     const domain = config.domains[env]
@@ -173,9 +171,9 @@ if (dryRun) console.log('\n[DRY RUN] No changes will be made.\n')
 
 for (const { name, config, env, domain } of work) {
   const projectDir = resolve(rootDir, config.dir)
-  const vercelEnv  = VERCEL_ENV[env]
-  const appUrl     = `https://${domain}`
-  const ev         = config.envVars ?? {}
+  const vercelEnv = VERCEL_ENV[env]
+  const appUrl = `https://${domain}`
+  const ev = config.envVars ?? {}
 
   console.log(`\n→ ${name} / ${env}  →  ${appUrl}`)
 
@@ -202,7 +200,7 @@ for (const { name, config, env, domain } of work) {
   }
 
   // 4. Secrets from --secret flags
-  for (const secretKey of (config.secrets ?? [])) {
+  for (const secretKey of config.secrets ?? []) {
     const secretVal = secrets[secretKey]
     if (secretVal !== undefined) {
       console.log(`  Setting ${secretKey}=[secret]...`)

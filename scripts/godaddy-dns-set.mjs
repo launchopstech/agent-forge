@@ -29,9 +29,9 @@ const __dir = dirname(fileURLToPath(import.meta.url))
 const registryPath = resolve(__dir, 'domains.json')
 const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
 
-const VERCEL_A_IP  = '76.76.21.21'
+const VERCEL_A_IP = '76.76.21.21'
 const VERCEL_CNAME = 'cname.vercel-dns.com'
-const DEFAULT_TTL  = 3600
+const DEFAULT_TTL = 3600
 
 // ── Pure helpers (exported for testing) ──────────────────────────────────────
 
@@ -44,7 +44,7 @@ export function buildRecords(domains) {
   const production = domains.production
 
   if (production) {
-    records.push({ type: 'A',     name: '@',   data: VERCEL_A_IP,  ttl: DEFAULT_TTL })
+    records.push({ type: 'A', name: '@', data: VERCEL_A_IP, ttl: DEFAULT_TTL })
     records.push({ type: 'CNAME', name: 'www', data: VERCEL_CNAME, ttl: DEFAULT_TTL })
   }
 
@@ -70,7 +70,7 @@ export async function putRecord(domain, record, apiKey, apiSecret, baseUrl) {
   const res = await fetch(url, {
     method: 'PUT',
     headers: {
-      Authorization:  `sso-key ${apiKey}:${apiSecret}`,
+      Authorization: `sso-key ${apiKey}:${apiSecret}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify([{ data: record.data, ttl: record.ttl }]),
@@ -85,15 +85,18 @@ export async function putRecord(domain, record, apiKey, apiSecret, baseUrl) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2)
-  const get  = f => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : null }
-  const has  = f => args.includes(f)
+  const get = (f) => {
+    const i = args.indexOf(f)
+    return i !== -1 ? args[i + 1] : null
+  }
+  const has = (f) => args.includes(f)
 
-  const projectArg  = get('--project')
-  const domainArg   = get('--domain')
-  const envArg      = get('--env') ?? 'prod'
+  const projectArg = get('--project')
+  const domainArg = get('--domain')
+  const envArg = get('--env') ?? 'prod'
   const allProjects = has('--all-projects')
-  const dryRun      = has('--dry-run')
-  const list        = has('--list')
+  const dryRun = has('--dry-run')
+  const list = has('--list')
 
   if (!['ote', 'prod'].includes(envArg)) {
     console.error(`Error: --env must be "ote" or "prod" (got "${envArg}")`)
@@ -106,7 +109,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const prod = cfg.domains.production ?? Object.values(cfg.domains)[0]
       console.log(`  ${project.padEnd(24)} ${prod}`)
       const records = buildRecords(cfg.domains)
-      records.forEach(r => console.log(`    ${r.type.padEnd(5)} ${r.name.padEnd(12)} → ${r.data}`))
+      records.forEach((r) =>
+        console.log(`    ${r.type.padEnd(5)} ${r.name.padEnd(12)} → ${r.data}`)
+      )
     }
     console.log()
     process.exit(0)
@@ -127,22 +132,41 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (allProjects) {
     for (const [name, cfg] of Object.entries(registry.projects)) {
       const prod = cfg.domains.production
-      if (!prod) { console.warn(`  Warning: no production domain for ${name}, skipping`); continue }
+      if (!prod) {
+        console.warn(`  Warning: no production domain for ${name}, skipping`)
+        continue
+      }
       work.push({ name, root: rootDomain(prod), records: buildRecords(cfg.domains) })
     }
   } else if (projectArg) {
-    const cfg  = registry.projects[projectArg]
+    const cfg = registry.projects[projectArg]
     const prod = cfg.domains.production
-    if (!prod) { console.error(`Error: no production domain for "${projectArg}"`); process.exit(1) }
+    if (!prod) {
+      console.error(`Error: no production domain for "${projectArg}"`)
+      process.exit(1)
+    }
     work.push({ name: projectArg, root: rootDomain(prod), records: buildRecords(cfg.domains) })
   } else {
-    work.push({ name: domainArg, root: rootDomain(domainArg), records: buildRecords({ production: domainArg }) })
+    work.push({
+      name: domainArg,
+      root: rootDomain(domainArg),
+      records: buildRecords({ production: domainArg }),
+    })
   }
 
-  if (work.length === 0) { console.log('Nothing to do.'); process.exit(0) }
+  if (work.length === 0) {
+    console.log('Nothing to do.')
+    process.exit(0)
+  }
 
   const { apiKey, apiSecret, baseUrl } = dryRun
-    ? { apiKey: null, apiSecret: null, baseUrl: process.env.GODADDY_API_BASE_URL ?? `https://api.${envArg === 'ote' ? 'ote-' : ''}godaddy.com` }
+    ? {
+        apiKey: null,
+        apiSecret: null,
+        baseUrl:
+          process.env.GODADDY_API_BASE_URL ??
+          `https://api.${envArg === 'ote' ? 'ote-' : ''}godaddy.com`,
+      }
     : loadCredentials(envArg)
 
   const envLabel = envArg === 'ote' ? ' [OTE sandbox]' : ' [Production]'
@@ -152,11 +176,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log(`\n→ ${name}  (${root})`)
     for (const record of records) {
       if (dryRun) {
-        console.log(`    [dry-run] PUT ${baseUrl}/v1/domains/${root}/records/${record.type}/${record.name}`)
+        console.log(
+          `    [dry-run] PUT ${baseUrl}/v1/domains/${root}/records/${record.type}/${record.name}`
+        )
         console.log(`             data=${record.data}  ttl=${record.ttl}`)
         continue
       }
-      process.stdout.write(`  ${record.type.padEnd(5)} ${record.name.padEnd(12)} → ${record.data} ... `)
+      process.stdout.write(
+        `  ${record.type.padEnd(5)} ${record.name.padEnd(12)} → ${record.data} ... `
+      )
       try {
         await putRecord(root, record, apiKey, apiSecret, baseUrl)
         console.log('✓')

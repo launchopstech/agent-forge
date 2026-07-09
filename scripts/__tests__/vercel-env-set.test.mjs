@@ -160,22 +160,38 @@ describe('--dry-run --all-envs', () => {
 describe('--secret flag', () => {
   it('includes secret in dry-run output when provided', () => {
     const { stdout } = run([
-      '--project', 'ploutos-blue-stone', '--env', 'production', '--dry-run',
-      '--secret', 'RESEND_API_KEY=re_test123',
+      '--project',
+      'ploutos-blue-stone',
+      '--env',
+      'production',
+      '--dry-run',
+      '--secret',
+      'RESEND_API_KEY=re_test123',
     ])
     assert.ok(stdout.includes('vercel env add RESEND_API_KEY'))
   })
 
   it('includes phone secret when provided', () => {
     const { stdout } = run([
-      '--project', 'ploutos-blue-stone', '--env', 'production', '--dry-run',
-      '--secret', 'NEXT_PUBLIC_PHONE=+15550001234',
+      '--project',
+      'ploutos-blue-stone',
+      '--env',
+      'production',
+      '--dry-run',
+      '--secret',
+      'NEXT_PUBLIC_PHONE=+15550001234',
     ])
     assert.ok(stdout.includes('vercel env add NEXT_PUBLIC_PHONE'))
   })
 
   it('still runs when secrets are omitted (just skips them)', () => {
-    const { code, stdout } = run(['--project', 'ploutos-blue-stone', '--env', 'production', '--dry-run'])
+    const { code, stdout } = run([
+      '--project',
+      'ploutos-blue-stone',
+      '--env',
+      'production',
+      '--dry-run',
+    ])
     assert.equal(code, 0)
     assert.ok(stdout.includes('Skipping RESEND_API_KEY'))
     assert.ok(stdout.includes('Skipping NEXT_PUBLIC_PHONE'))

@@ -20,18 +20,20 @@ let baseUrl
 before(async () => {
   server = createServer((req, res) => {
     let body = ''
-    req.on('data', chunk => { body += chunk })
+    req.on('data', (chunk) => {
+      body += chunk
+    })
     req.on('end', () => {
       receivedRequests.push({ method: req.method, url: req.url, body })
       res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify({}))
     })
   })
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
   baseUrl = `http://127.0.0.1:${server.address().port}`
 })
 
-after(() => new Promise(resolve => server.close(resolve)))
+after(() => new Promise((resolve) => server.close(resolve)))
 
 function run(args, env = {}) {
   receivedRequests.length = 0
@@ -63,45 +65,47 @@ describe('rootDomain()', () => {
 describe('buildRecords()', () => {
   const domains = {
     development: 'dev.bluestoneconstruction.llc',
-    preview:     'preview.bluestoneconstruction.llc',
-    staging:     'staging.bluestoneconstruction.llc',
-    production:  'bluestoneconstruction.llc',
+    preview: 'preview.bluestoneconstruction.llc',
+    staging: 'staging.bluestoneconstruction.llc',
+    production: 'bluestoneconstruction.llc',
   }
 
   it('includes A record for root', () => {
     const records = buildRecords(domains)
-    assert.ok(records.some(r => r.type === 'A' && r.name === '@' && r.data === '76.76.21.21'))
+    assert.ok(records.some((r) => r.type === 'A' && r.name === '@' && r.data === '76.76.21.21'))
   })
 
   it('includes www CNAME', () => {
     const records = buildRecords(domains)
-    assert.ok(records.some(r => r.type === 'CNAME' && r.name === 'www'))
+    assert.ok(records.some((r) => r.type === 'CNAME' && r.name === 'www'))
   })
 
   it('includes CNAME for each non-production env', () => {
     const records = buildRecords(domains)
-    assert.ok(records.some(r => r.name === 'dev'))
-    assert.ok(records.some(r => r.name === 'preview'))
-    assert.ok(records.some(r => r.name === 'staging'))
+    assert.ok(records.some((r) => r.name === 'dev'))
+    assert.ok(records.some((r) => r.name === 'preview'))
+    assert.ok(records.some((r) => r.name === 'staging'))
   })
 
   it('does not duplicate www', () => {
     const records = buildRecords(domains)
-    const wwwRecords = records.filter(r => r.name === 'www')
+    const wwwRecords = records.filter((r) => r.name === 'www')
     assert.equal(wwwRecords.length, 1)
   })
 
   it('all CNAMEs point to cname.vercel-dns.com', () => {
     const records = buildRecords(domains)
-    records.filter(r => r.type === 'CNAME').forEach(r => {
-      assert.equal(r.data, 'cname.vercel-dns.com')
-    })
+    records
+      .filter((r) => r.type === 'CNAME')
+      .forEach((r) => {
+        assert.equal(r.data, 'cname.vercel-dns.com')
+      })
   })
 
   it('skips production domain from subdomain list', () => {
     const records = buildRecords(domains)
     // Should not create a CNAME for the root domain itself
-    const names = records.map(r => r.name)
+    const names = records.map((r) => r.name)
     assert.ok(!names.includes('bluestoneconstruction'))
   })
 })
@@ -136,7 +140,7 @@ describe('--dry-run --project', () => {
 
   it('prints all 5 expected PUT calls', () => {
     const { stdout } = run(['--project', 'ploutos-blue-stone', '--dry-run'])
-    const putLines = stdout.split('\n').filter(l => l.includes('[dry-run] PUT'))
+    const putLines = stdout.split('\n').filter((l) => l.includes('[dry-run] PUT'))
     // A @, CNAME www, CNAME dev, CNAME preview, CNAME staging
     assert.equal(putLines.length, 5, `Expected 5 PUT lines, got ${putLines.length}:\n${stdout}`)
   })
@@ -218,10 +222,12 @@ describe('validation errors', () => {
   })
 
   it('exits 1 when API keys missing (non-dry-run)', () => {
-    const { code, stderr } = run(
-      ['--project', 'ploutos-blue-stone'],
-      { GODADDY_API_KEY: '', GODADDY_API_SECRET: '', GODADDY_OTE_API_KEY: '', GODADDY_OTE_API_SECRET: '' }
-    )
+    const { code, stderr } = run(['--project', 'ploutos-blue-stone'], {
+      GODADDY_API_KEY: '',
+      GODADDY_API_SECRET: '',
+      GODADDY_OTE_API_KEY: '',
+      GODADDY_OTE_API_SECRET: '',
+    })
     assert.equal(code, 1)
     assert.ok(stderr.includes('credentials'))
   })
@@ -229,30 +235,36 @@ describe('validation errors', () => {
 
 describe('live PUT with mock server', () => {
   it('sends PUT requests for each record', async () => {
-    run(
-      ['--project', 'ploutos-blue-stone'],
-      { GODADDY_API_KEY: 'test-key', GODADDY_API_SECRET: 'test-secret' }
-    )
+    run(['--project', 'ploutos-blue-stone'], {
+      GODADDY_API_KEY: 'test-key',
+      GODADDY_API_SECRET: 'test-secret',
+    })
     assert.ok(receivedRequests.length > 0, 'should have made API calls')
-    assert.ok(receivedRequests.every(r => r.method === 'PUT'))
+    assert.ok(receivedRequests.every((r) => r.method === 'PUT'))
   })
 
   it('sends correct Authorization header format', () => {
-    run(
-      ['--project', 'ploutos-blue-stone'],
-      { GODADDY_API_KEY: 'test-key', GODADDY_API_SECRET: 'test-secret' }
-    )
+    run(['--project', 'ploutos-blue-stone'], {
+      GODADDY_API_KEY: 'test-key',
+      GODADDY_API_SECRET: 'test-secret',
+    })
     // Can't easily check headers from subprocess — verify URL pattern instead
-    const paths = receivedRequests.map(r => r.url)
-    assert.ok(paths.some(p => p.includes('/v1/domains/')))
-    assert.ok(paths.some(p => p.includes('/records/A/@')))
-    assert.ok(paths.some(p => p.includes('/records/CNAME/')))
+    const paths = receivedRequests.map((r) => r.url)
+    assert.ok(paths.some((p) => p.includes('/v1/domains/')))
+    assert.ok(paths.some((p) => p.includes('/records/A/@')))
+    assert.ok(paths.some((p) => p.includes('/records/CNAME/')))
   })
 
   it('is idempotent — second run succeeds without error', () => {
-    const first  = run(['--project', 'ploutos-blue-stone'], { GODADDY_API_KEY: 'k', GODADDY_API_SECRET: 's' })
-    const second = run(['--project', 'ploutos-blue-stone'], { GODADDY_API_KEY: 'k', GODADDY_API_SECRET: 's' })
-    assert.equal(first.code,  0)
+    const first = run(['--project', 'ploutos-blue-stone'], {
+      GODADDY_API_KEY: 'k',
+      GODADDY_API_SECRET: 's',
+    })
+    const second = run(['--project', 'ploutos-blue-stone'], {
+      GODADDY_API_KEY: 'k',
+      GODADDY_API_SECRET: 's',
+    })
+    assert.equal(first.code, 0)
     assert.equal(second.code, 0)
   })
 })

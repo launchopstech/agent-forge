@@ -29,7 +29,7 @@ const __dir = dirname(fileURLToPath(import.meta.url))
 const registryPath = resolve(__dir, 'domains.json')
 const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
 
-const VERCEL_A_IP  = '76.76.21.21'
+const VERCEL_A_IP = '76.76.21.21'
 const VERCEL_CNAME = 'cname.vercel-dns.com'
 
 // ── Pure helpers (exported for testing) ──────────────────────────────────────
@@ -60,7 +60,7 @@ export function expectedVercelRecords(domains) {
   const records = []
   const production = domains.production
   if (production) {
-    records.push({ type: 'A',     name: '@',   expected: VERCEL_A_IP  })
+    records.push({ type: 'A', name: '@', expected: VERCEL_A_IP })
     records.push({ type: 'CNAME', name: 'www', expected: VERCEL_CNAME })
   }
   for (const [env, domain] of Object.entries(domains)) {
@@ -76,28 +76,28 @@ export function expectedVercelRecords(domains) {
 
 export function formatTable(records) {
   if (records.length === 0) return '  (no records)\n'
-  const rows = records.map(r => ({
+  const rows = records.map((r) => ({
     Type: r.type,
     Name: r.name,
     Value: r.data ?? r.expected ?? '',
     TTL: String(r.ttl ?? ''),
   }))
   const cols = ['Type', 'Name', 'Value', 'TTL']
-  const widths = cols.map(c => Math.max(c.length, ...rows.map(r => r[c].length)))
-  const sep    = '| ' + widths.map(w => '-'.repeat(w)).join(' | ') + ' |'
+  const widths = cols.map((c) => Math.max(c.length, ...rows.map((r) => r[c].length)))
+  const sep = '| ' + widths.map((w) => '-'.repeat(w)).join(' | ') + ' |'
   const header = '| ' + cols.map((c, i) => c.padEnd(widths[i])).join(' | ') + ' |'
-  const lines  = [header, sep, ...rows.map(r =>
-    '| ' + cols.map((c, i) => r[c].padEnd(widths[i])).join(' | ') + ' |'
-  )]
+  const lines = [
+    header,
+    sep,
+    ...rows.map((r) => '| ' + cols.map((c, i) => r[c].padEnd(widths[i])).join(' | ') + ' |'),
+  ]
   return lines.join('\n') + '\n'
 }
 
 // ── API ───────────────────────────────────────────────────────────────────────
 
 export async function fetchRecords(domain, type, apiKey, apiSecret, baseUrl) {
-  const path = type
-    ? `/v1/domains/${domain}/records/${type}`
-    : `/v1/domains/${domain}/records`
+  const path = type ? `/v1/domains/${domain}/records/${type}` : `/v1/domains/${domain}/records`
   const res = await fetch(`${baseUrl}${path}`, {
     headers: { Authorization: `sso-key ${apiKey}:${apiSecret}` },
   })
@@ -126,15 +126,18 @@ export async function checkAuth(apiKey, apiSecret, baseUrl) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2)
-  const get  = f => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : null }
-  const has  = f => args.includes(f)
+  const get = (f) => {
+    const i = args.indexOf(f)
+    return i !== -1 ? args[i + 1] : null
+  }
+  const has = (f) => args.includes(f)
 
   const domainArg = get('--domain')
-  const typeArg   = get('--type')
-  const envArg    = get('--env') ?? 'prod'
-  const dryRun    = has('--dry-run')
-  const list      = has('--list')
-  const check     = has('--check')
+  const typeArg = get('--type')
+  const envArg = get('--env') ?? 'prod'
+  const dryRun = has('--dry-run')
+  const list = has('--list')
+  const check = has('--check')
 
   if (!['ote', 'prod'].includes(envArg)) {
     console.error(`Error: --env must be "ote" or "prod" (got "${envArg}")`)
@@ -178,22 +181,31 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1)
   }
 
-  const project = Object.values(registry.projects)
-    .find(p => Object.values(p.domains).some(d => {
+  const project = Object.values(registry.projects).find((p) =>
+    Object.values(p.domains).some((d) => {
       const parts = d.split('.')
       return parts.slice(-2).join('.') === domainArg || d === domainArg
-    }))
+    })
+  )
 
   const { apiKey, apiSecret, baseUrl } = dryRun
-    ? { apiKey: null, apiSecret: null, baseUrl: process.env.GODADDY_API_BASE_URL ?? `https://api.${envArg === 'ote' ? 'ote-' : ''}godaddy.com` }
+    ? {
+        apiKey: null,
+        apiSecret: null,
+        baseUrl:
+          process.env.GODADDY_API_BASE_URL ??
+          `https://api.${envArg === 'ote' ? 'ote-' : ''}godaddy.com`,
+      }
     : loadCredentials(envArg)
 
   if (dryRun) {
-    console.log(`\n[DRY RUN] Would fetch: GET ${baseUrl}/v1/domains/${domainArg}/records${typeArg ? '/' + typeArg : ''}\n`)
+    console.log(
+      `\n[DRY RUN] Would fetch: GET ${baseUrl}/v1/domains/${domainArg}/records${typeArg ? '/' + typeArg : ''}\n`
+    )
     if (project) {
       const expected = expectedVercelRecords(project.domains)
       console.log('Expected Vercel records:')
-      console.log(formatTable(expected.map(r => ({ ...r, data: r.expected, ttl: 3600 }))))
+      console.log(formatTable(expected.map((r) => ({ ...r, data: r.expected, ttl: 3600 }))))
     }
     process.exit(0)
   }
@@ -208,20 +220,22 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const conflicts = detectConflicts(records)
     if (conflicts.length > 0) {
       console.log('⚠ Conflicts:')
-      conflicts.forEach(c => console.log(`  ${c}`))
+      conflicts.forEach((c) => console.log(`  ${c}`))
       console.log()
     } else {
       console.log('Conflicts: none\n')
     }
 
     if (project) {
-      const expected  = expectedVercelRecords(project.domains)
-      const existingKeys = new Set(records.map(r => `${r.type}:${r.name}`))
-      const missing   = expected.filter(r => !existingKeys.has(`${r.type}:${r.name}`))
+      const expected = expectedVercelRecords(project.domains)
+      const existingKeys = new Set(records.map((r) => `${r.type}:${r.name}`))
+      const missing = expected.filter((r) => !existingKeys.has(`${r.type}:${r.name}`))
       if (missing.length > 0) {
         console.log('Missing Vercel records:')
-        missing.forEach(r => console.log(`  ${r.type.padEnd(5)} ${r.name}`))
-        console.log(`\n  Run: node scripts/godaddy-dns-set.mjs --domain ${domainArg} --env ${envArg}`)
+        missing.forEach((r) => console.log(`  ${r.type.padEnd(5)} ${r.name}`))
+        console.log(
+          `\n  Run: node scripts/godaddy-dns-set.mjs --domain ${domainArg} --env ${envArg}`
+        )
       } else {
         console.log('All expected Vercel records are present ✓')
       }

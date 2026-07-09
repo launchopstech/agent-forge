@@ -27,9 +27,9 @@ const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
 // Map script env names → Vercel environment tiers
 const VERCEL_ENV = {
   development: 'preview',
-  preview:     'preview',
-  staging:     'preview',
-  production:  'production',
+  preview: 'preview',
+  staging: 'preview',
+  production: 'production',
 }
 
 // ── Pure helpers (exported for testing) ──────────────────────────────────────
@@ -70,12 +70,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
   const has = (flag) => args.includes(flag)
 
-  const projectArg  = get('--project')
-  const envArg      = get('--env')
-  const allEnvs     = has('--all-envs')
+  const projectArg = get('--project')
+  const envArg = get('--env')
+  const allEnvs = has('--all-envs')
   const allProjects = has('--all-projects')
-  const dryRun      = has('--dry-run')
-  const list        = has('--list')
+  const dryRun = has('--dry-run')
+  const list = has('--list')
 
   // ── List mode ───────────────────────────────────────────────────────────────
 
@@ -106,22 +106,20 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1)
   }
   if (envArg && !VERCEL_ENV[envArg]) {
-    console.error(`Error: unknown env "${envArg}". Valid values: ${Object.keys(VERCEL_ENV).join(', ')}`)
+    console.error(
+      `Error: unknown env "${envArg}". Valid values: ${Object.keys(VERCEL_ENV).join(', ')}`
+    )
     process.exit(1)
   }
 
   // ── Build work list ─────────────────────────────────────────────────────────
 
-  const projectNames = allProjects
-    ? Object.keys(registry.projects)
-    : [projectArg]
+  const projectNames = allProjects ? Object.keys(registry.projects) : [projectArg]
 
   const work = []
   for (const name of projectNames) {
     const config = registry.projects[name]
-    const envs = allEnvs || allProjects
-      ? Object.keys(config.domains)
-      : [envArg]
+    const envs = allEnvs || allProjects ? Object.keys(config.domains) : [envArg]
 
     for (const env of envs) {
       const domain = config.domains[env]
@@ -154,14 +152,20 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const stderr = err.stderr?.toString().trim() ?? ''
       const combined = stdout + '\n' + stderr
       // Already exists — not a fatal error
-      if (combined.includes('already exists') || combined.includes('already added') ||
-          combined.includes('already assigned') || combined.includes('already in use')) {
+      if (
+        combined.includes('already exists') ||
+        combined.includes('already added') ||
+        combined.includes('already assigned') ||
+        combined.includes('already in use')
+      ) {
         console.log(`    (already linked — skipping)`)
         return ''
       }
       // Vercel requires a branch for preview env vars when branch-specific ones exist
       if (combined.includes('git_branch_required')) {
-        console.log(`    ⚠ Vercel requires a branch for preview env — set manually in dashboard if needed`)
+        console.log(
+          `    ⚠ Vercel requires a branch for preview env — set manually in dashboard if needed`
+        )
         return ''
       }
       throw new Error(stderr || stdout || err.message)
@@ -176,9 +180,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
   for (const { name, config, env, domain } of work) {
     const projectDir = resolve(rootDir, config.dir)
-    const vercelEnv  = VERCEL_ENV[env]
-    const appUrl     = `https://${domain}`
-    const gitBranch  = config.gitBranches?.[env] ?? null
+    const vercelEnv = VERCEL_ENV[env]
+    const appUrl = `https://${domain}`
+    const gitBranch = config.gitBranches?.[env] ?? null
 
     console.log(`\n→ ${name} / ${env}  →  ${appUrl}`)
 
@@ -190,7 +194,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (gitBranch) {
       process.stdout.write(`  2. Setting git branch: ${gitBranch} ...`)
       if (dryRun) {
-        console.log(`\n    [dry-run] PATCH /v9/projects/.../domains/${domain}  gitBranch=${gitBranch}`)
+        console.log(
+          `\n    [dry-run] PATCH /v9/projects/.../domains/${domain}  gitBranch=${gitBranch}`
+        )
       } else if (vercelToken) {
         const { projectId, orgId } = JSON.parse(
           readFileSync(resolve(projectDir, '.vercel/project.json'), 'utf8')
@@ -198,9 +204,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         const payload = JSON.stringify({ gitBranch })
         const result = execSync(
           `curl -s -X PATCH "https://api.vercel.com/v9/projects/${projectId}/domains/${domain}?teamId=${orgId}" ` +
-          `-H "Authorization: Bearer ${vercelToken}" ` +
-          `-H "Content-Type: application/json" ` +
-          `-d '${payload}'`,
+            `-H "Authorization: Bearer ${vercelToken}" ` +
+            `-H "Content-Type: application/json" ` +
+            `-d '${payload}'`,
           { encoding: 'utf8' }
         )
         const parsed = JSON.parse(result)

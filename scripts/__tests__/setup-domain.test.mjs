@@ -76,7 +76,13 @@ describe('--list', () => {
 
 describe('--dry-run', () => {
   it('exits 0 and prints commands without executing', () => {
-    const { code, stdout } = run(['--project', 'ploutos-blue-stone', '--env', 'production', '--dry-run'])
+    const { code, stdout } = run([
+      '--project',
+      'ploutos-blue-stone',
+      '--env',
+      'production',
+      '--dry-run',
+    ])
     assert.equal(code, 0)
     assert.ok(stdout.includes('[DRY RUN]'))
     assert.ok(stdout.includes('vercel domains add bluestoneconstruction.llc'))
@@ -93,13 +99,25 @@ describe('--dry-run', () => {
   })
 
   it('prints GoDaddy DNS instructions', () => {
-    const { code, stdout } = run(['--project', 'ploutos-blue-stone', '--env', 'production', '--dry-run'])
+    const { code, stdout } = run([
+      '--project',
+      'ploutos-blue-stone',
+      '--env',
+      'production',
+      '--dry-run',
+    ])
     assert.equal(code, 0)
     assert.ok(stdout.includes('GoDaddy DNS'))
   })
 
   it('prints [DRY RUN complete]', () => {
-    const { code, stdout } = run(['--project', 'ploutos-blue-stone', '--env', 'production', '--dry-run'])
+    const { code, stdout } = run([
+      '--project',
+      'ploutos-blue-stone',
+      '--env',
+      'production',
+      '--dry-run',
+    ])
     assert.equal(code, 0)
     assert.ok(stdout.includes('[DRY RUN complete]'))
   })

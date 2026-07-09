@@ -36,17 +36,17 @@ export function buildProjectEntry(alias, dir, domain, brand) {
     dir,
     domains: {
       development: `dev.${domain}`,
-      preview:     `preview.${domain}`,
-      staging:     `staging.${domain}`,
-      production:  domain,
+      preview: `preview.${domain}`,
+      staging: `staging.${domain}`,
+      production: domain,
     },
     envVars: {
-      'NEXT_PUBLIC_BRAND': brand,
-      'NEXT_PUBLIC_APP_ENV': {
+      NEXT_PUBLIC_BRAND: brand,
+      NEXT_PUBLIC_APP_ENV: {
         development: 'development',
-        preview:     'staging',
-        staging:     'staging',
-        production:  'production',
+        preview: 'staging',
+        staging: 'staging',
+        production: 'production',
       },
     },
     secrets: ['NEXT_PUBLIC_PHONE', 'RESEND_API_KEY'],
@@ -60,16 +60,19 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const registryPath = process.env.DOMAINS_FILE ?? resolve(__dir, 'domains.json')
   const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
 
-  const args  = process.argv.slice(2)
-  const get   = f => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : null }
-  const has   = f => args.includes(f)
+  const args = process.argv.slice(2)
+  const get = (f) => {
+    const i = args.indexOf(f)
+    return i !== -1 ? args[i + 1] : null
+  }
+  const has = (f) => args.includes(f)
 
-  const alias  = get('--alias')
-  const dir    = get('--dir')
+  const alias = get('--alias')
+  const dir = get('--dir')
   const domain = get('--domain')
-  const brand  = get('--brand') ?? alias
+  const brand = get('--brand') ?? alias
   const dryRun = has('--dry-run')
-  const list   = has('--list')
+  const list = has('--list')
 
   if (list) {
     console.log('\nRegistered projects:\n')
@@ -103,7 +106,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1)
   }
   if (registry.projects[alias]) {
-    console.error(`Error: project "${alias}" already exists in domains.json. Use a different alias.`)
+    console.error(
+      `Error: project "${alias}" already exists in domains.json. Use a different alias.`
+    )
     process.exit(1)
   }
 
