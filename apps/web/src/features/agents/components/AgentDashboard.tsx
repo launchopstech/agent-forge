@@ -9,7 +9,8 @@ import { Input } from '@forge/ui/src/input'
 import { Skeleton } from '@forge/ui/src/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@forge/ui/src/select'
 import { siteConfig } from '@/config'
-import { useUser } from '@/hooks/use-user'
+import { useUser as _useUser } from '@/hooks/use-user'
+import type { UseUserReturn } from '@forge/auth'
 import { fetchAgentTypes } from '../api/agent-types.api'
 import { useAgentListStore } from '../store/agent-list.store'
 import type { AgentType } from '../types'
@@ -25,7 +26,13 @@ function splitName(name: string, accent?: string): [string, string] {
   return idx === -1 ? [lower, ''] : [lower.slice(0, idx), lower.slice(idx)]
 }
 
-export const AgentDashboard = React.memo(function AgentDashboard() {
+interface AgentDashboardProps {
+  useUser?: () => UseUserReturn
+}
+
+export const AgentDashboard = React.memo(function AgentDashboard({
+  useUser = _useUser,
+}: AgentDashboardProps) {
   const t = useTranslations('agentHub.dashboard')
   const { isLoading: authLoading } = useUser()
   const {

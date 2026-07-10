@@ -3,15 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn, userEvent, within, expect } from '@storybook/test'
 import { TestConsole } from './TestConsole'
 
-/**
- * TestConsole Stories
- *
- * The `triggerTest` API function is patched via the `loaders` array before
- * each story renders, so no MSW setup is required.
- */
-
-// ── Meta ─────────────────────────────────────────────────────────────────────
-
 const meta: Meta<typeof TestConsole> = {
   title: 'Features/Channels/TestConsole',
   component: TestConsole,
@@ -25,66 +16,45 @@ const meta: Meta<typeof TestConsole> = {
   args: {
     channelId: 'ch_preview',
     channelName: 'Preview Bot',
+    triggerTest: fn().mockResolvedValue({
+      ok: true,
+      reply: 'Hi! How can I help you today?',
+      conversationId: 'conv_preview_001',
+    }),
   },
 }
 
 export default meta
 type Story = StoryObj<typeof TestConsole>
 
-// ── Default (empty) ───────────────────────────────────────────────────────────
-
 export const Default: Story = {
   name: 'Empty state',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        triggerTest: fn().mockResolvedValue({
-          ok: true,
-          reply: 'Hi! How can I help you today?',
-          conversationId: 'conv_preview_001',
-        }),
-      })
-      return {}
-    },
-  ],
 }
-
-// ── WithConversation (play function) ─────────────────────────────────────────
 
 export const WithConversation: Story = {
   name: 'With conversation (play)',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        triggerTest: fn()
-          .mockResolvedValueOnce({
-            ok: true,
-            reply: 'Hello! How can I assist you today?',
-            conversationId: 'conv_preview_001',
-          })
-          .mockResolvedValueOnce({
-            ok: true,
-            reply: 'Sure, I can help with that. Let me check the details.',
-            conversationId: 'conv_preview_001',
-          }),
+  args: {
+    triggerTest: fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        reply: 'Hello! How can I assist you today?',
+        conversationId: 'conv_preview_001',
       })
-      return {}
-    },
-  ],
+      .mockResolvedValueOnce({
+        ok: true,
+        reply: 'Sure, I can help with that. Let me check the details.',
+        conversationId: 'conv_preview_001',
+      }),
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
-    // First message
     const input = canvas.getByPlaceholderText(/type a message/i)
     await userEvent.type(input, 'Hello there')
     await userEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    // Wait for assistant reply
     await expect(canvas.findByText(/hello! how can I assist/i)).resolves.toBeTruthy()
 
-    // Second message
     await userEvent.type(input, 'Can you help me with my order?')
     await userEvent.click(canvas.getByRole('button', { name: /send/i }))
 
@@ -92,22 +62,14 @@ export const WithConversation: Story = {
   },
 }
 
-// ── RoutingRuleError ──────────────────────────────────────────────────────────
-
 export const RoutingRuleError: Story = {
   name: 'No routing rule matched',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        triggerTest: fn().mockResolvedValue({
-          ok: false,
-          reason: 'No routing rule matched this sender ID',
-        }),
-      })
-      return {}
-    },
-  ],
+  args: {
+    triggerTest: fn().mockResolvedValue({
+      ok: false,
+      reason: 'No routing rule matched this sender ID',
+    }),
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText(/type a message/i)
@@ -117,19 +79,11 @@ export const RoutingRuleError: Story = {
   },
 }
 
-// ── NetworkError ─────────────────────────────────────────────────────────────
-
 export const NetworkError: Story = {
   name: 'Network error',
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        triggerTest: fn().mockRejectedValue(new Error('Failed to fetch')),
-      })
-      return {}
-    },
-  ],
+  args: {
+    triggerTest: fn().mockRejectedValue(new Error('Failed to fetch')),
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText(/type a message/i)
@@ -139,25 +93,15 @@ export const NetworkError: Story = {
   },
 }
 
-// ── CustomChannelName ─────────────────────────────────────────────────────────
-
 export const CustomChannelName: Story = {
   name: 'Custom channel name',
   args: {
     channelId: 'ch_slack_001',
     channelName: 'Slack Support',
+    triggerTest: fn().mockResolvedValue({
+      ok: true,
+      reply: 'How can I help you via Slack?',
+      conversationId: 'conv_slack_001',
+    }),
   },
-  loaders: [
-    async () => {
-      const api = await import('../api/channels.api')
-      Object.assign(api, {
-        triggerTest: fn().mockResolvedValue({
-          ok: true,
-          reply: 'How can I help you via Slack?',
-          conversationId: 'conv_slack_001',
-        }),
-      })
-      return {}
-    },
-  ],
 }
