@@ -176,6 +176,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
           NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
       - name: Run Chromatic
-        run: pnpm --filter=@forge/web exec chromatic --exit-zero-on-changes --exit-zero-on-errors --build-script-name=storybook:build
+        run: pnpm --filter=@forge/web exec chromatic --exit-zero-on-changes --build-script-name=storybook:build
+        continue-on-error: true
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

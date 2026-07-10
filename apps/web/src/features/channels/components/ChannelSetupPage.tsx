@@ -4,8 +4,8 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { ArrowLeft, Code2, Settings, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { Skeleton } from '@forge/ui/src/skeleton'
-import { fetchChannel } from '../api/channels.api'
-import { fetchAgents } from '@/features/agents/api/agents.api'
+import { fetchChannel as _fetchChannel } from '../api/channels.api'
+import { fetchAgents as _fetchAgents } from '@/features/agents/api/agents.api'
 import type { WorkspaceChannel } from '../types'
 import type { Agent } from '@/features/agents/types'
 import { RoutingRulesEditor } from './RoutingRulesEditor'
@@ -16,13 +16,19 @@ type SetupTab = 'routing' | 'test' | 'embed'
 
 interface ChannelSetupPageProps {
   channelId: string
+  fetchChannel?: typeof _fetchChannel
+  fetchAgents?: typeof _fetchAgents
 }
 
 function defaultTabForChannel(channel: WorkspaceChannel): SetupTab {
   return channel.channelType === 'website' ? 'embed' : 'routing'
 }
 
-export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
+export function ChannelSetupPage({
+  channelId,
+  fetchChannel = _fetchChannel,
+  fetchAgents = _fetchAgents,
+}: ChannelSetupPageProps) {
   const [channel, setChannel] = useState<WorkspaceChannel | null>(null)
   const [agents, setAgents] = useState<Agent[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -43,7 +49,7 @@ export function ChannelSetupPage({ channelId }: ChannelSetupPageProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [channelId])
+  }, [channelId, fetchChannel, fetchAgents])
 
   useEffect(() => {
     void load()
