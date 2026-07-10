@@ -31,6 +31,7 @@ const registry = JSON.parse(readFileSync(registryPath, 'utf8'))
 const VERCEL_ENV = {
   development: 'development',
   preview: 'preview',
+  qa: 'preview',
   staging: 'preview',
   production: 'production',
 }
@@ -158,9 +159,9 @@ function run(cmd, cwd) {
 }
 
 function setVar(key, value, vercelEnvTier, projectDir) {
-  const displayVal = dryRun ? value : value
+  const escaped = value.replace(/'/g, "'\\''")
   run(
-    `printf '%s' '${displayVal.replace(/'/g, "'\\''")}' | vercel env add ${key} ${vercelEnvTier}`,
+    `vercel env add ${key} ${vercelEnvTier} --value '${escaped}' --yes`,
     projectDir
   )
 }

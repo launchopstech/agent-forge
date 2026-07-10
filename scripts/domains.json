@@ -25,14 +25,14 @@
       "secrets": ["NEXT_PUBLIC_PHONE", "RESEND_API_KEY"]
     },
     "agent-forge-web": {
-      "dir": "apps/web",
+      "dir": ".",
       "domains": {
         "preview": "preview.mindrithm.app",
         "staging": "staging.mindrithm.app",
         "production": "mindrithm.app"
       },
       "envVars": {
-        "NEXT_PUBLIC_BRAND": "default",
+        "NEXT_PUBLIC_BRAND": "mindrithm",
         "NEXT_PUBLIC_APP_ENV": {
           "preview": "staging",
           "staging": "staging",
@@ -41,7 +41,7 @@
       },
       "secrets": []
     },
-    "launchops": {
+    "agent-forge-web-launchops": {
       "dir": "apps/launchops",
       "domains": {
         "preview": "preview.launchops.ai",
