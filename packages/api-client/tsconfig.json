@@ -1,0 +1,8 @@
+{
+  "extends": "@forge/tsconfig/react-library.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "coverage"]
+}

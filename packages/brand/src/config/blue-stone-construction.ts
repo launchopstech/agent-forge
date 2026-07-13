@@ -1,0 +1,58 @@
+import type { BrandConfig } from './types'
+
+export const blueStoneConstructionBrand: BrandConfig = {
+  key: 'blue-stone-construction',
+  site: {
+    name: 'Blue Stone Construction LLC',
+    description:
+      'General contractor in Lake Hiawatha, NJ. Home remodels, additions, new construction, and commercial projects. Licensed & insured. Free estimates.',
+    url: process.env.NEXT_PUBLIC_APP_URL,
+    ogImage: '/brands/blue-stone-construction/og.png',
+  },
+  colors: {
+    light: {
+      '--color-brand-50': 'oklch(0.97 0.02 155)',
+      '--color-brand-100': 'oklch(0.93 0.05 155)',
+      '--color-brand-200': 'oklch(0.86 0.08 155)',
+      '--color-brand-300': 'oklch(0.76 0.11 155)',
+      '--color-brand-400': 'oklch(0.64 0.13 155)',
+      '--color-brand-500': 'oklch(0.52 0.14 155)',
+      '--color-brand-600': 'oklch(0.43 0.13 155)',
+      '--color-brand-700': 'oklch(0.37 0.12 155)',
+      '--color-brand-800': 'oklch(0.31 0.10 155)',
+      '--color-brand-900': 'oklch(0.22 0.08 155)',
+      '--primary': 'oklch(0.43 0.13 155)',
+      '--primary-foreground': 'oklch(1 0 0)',
+      '--ring': 'oklch(0.43 0.13 155)',
+      '--accent': 'oklch(0.93 0.05 155)',
+      '--sidebar-primary': 'oklch(0.43 0.13 155)',
+      '--sidebar-primary-foreground': 'oklch(1 0 0)',
+      '--sidebar-ring': 'oklch(0.43 0.13 155)',
+      '--radius': '0.5rem',
+    },
+    dark: {
+      '--color-brand-50': 'oklch(0.14 0.03 155)',
+      '--color-brand-100': 'oklch(0.19 0.05 155)',
+      '--color-brand-200': 'oklch(0.25 0.07 155)',
+      '--color-brand-300': 'oklch(0.34 0.10 155)',
+      '--color-brand-400': 'oklch(0.46 0.12 155)',
+      '--color-brand-500': 'oklch(0.52 0.14 155)',
+      '--color-brand-600': 'oklch(0.61 0.12 155)',
+      '--color-brand-700': 'oklch(0.70 0.10 155)',
+      '--color-brand-800': 'oklch(0.80 0.07 155)',
+      '--color-brand-900': 'oklch(0.92 0.03 155)',
+      '--primary': 'oklch(0.61 0.12 155)',
+      '--primary-foreground': 'oklch(0.12 0 0)',
+      '--ring': 'oklch(0.61 0.12 155)',
+      '--accent': 'oklch(0.19 0.05 155)',
+      '--sidebar-primary': 'oklch(0.61 0.12 155)',
+      '--sidebar-primary-foreground': 'oklch(0.12 0 0)',
+      '--sidebar-ring': 'oklch(0.61 0.12 155)',
+      '--radius': '0.5rem',
+    },
+  },
+  assets: {
+    logoPath: '/brands/blue-stone-construction/logo.svg',
+    faviconPath: '/brands/blue-stone-construction/favicon.ico',
+  },
+}

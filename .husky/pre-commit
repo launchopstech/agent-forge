@@ -1,1 +1,10 @@
 pnpm lint-staged
+pnpm typecheck
+
+# Run storybook build only when story files are staged (catches broken imports/compile errors).
+# Skips the ~30-60 s build on non-story commits.
+STAGED_STORIES=$(git diff --cached --name-only | grep '\.stories\.tsx$' || true)
+if [ -n "$STAGED_STORIES" ]; then
+  echo "📚 Story files staged — verifying storybook build..."
+  pnpm --filter=@forge/web storybook:build
+fi

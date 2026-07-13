@@ -1,0 +1,50 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "inputs": ["src/**", "tsconfig.json"]
+    },
+    "lint": {
+      "inputs": ["src/**", "eslint.config.mjs", "../../eslint.config.mjs"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "vitest.config.mts"],
+      "outputs": ["coverage/**"]
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "vitest.config.mts"],
+      "outputs": ["coverage/**"]
+    },
+    "storybook:build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", ".storybook/**", "../../../packages/ui/src/**"],
+      "outputs": ["storybook-static/**"]
+    },
+    "analyze": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:e2e": {
+      "cache": false,
+      "inputs": ["e2e/**", "playwright.config.ts"]
+    }
+  }
+}

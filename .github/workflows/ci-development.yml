@@ -1,0 +1,20 @@
+name: CI — Development
+
+# Runs CI checks on PRs to develop only.
+# Preview deployments are handled automatically by Vercel's GitHub integration.
+# Branch deployments to the development environment use deploy-development.yml.
+
+on:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  checks:
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: development
+      run-e2e: false
+      run-chromatic: false
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

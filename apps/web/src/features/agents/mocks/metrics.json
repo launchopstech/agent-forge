@@ -1,0 +1,23 @@
+{
+  "metrics": {
+    "totalConversations": 12847,
+    "totalConversationsChange": 14,
+    "resolutionRate": 78,
+    "resolutionRateChange": 3,
+    "handoffRate": 8.2,
+    "handoffRateChange": 2,
+    "avgResponseTime": "1.2s",
+    "avgResponseTimeChange": 0
+  },
+  "unresolvedIntents": [
+    { "label": "Refund request", "percentage": 68, "severity": "high" },
+    { "label": "Cancel subscription", "percentage": 54, "severity": "medium" },
+    { "label": "Billing question", "percentage": 31, "severity": "medium" }
+  ],
+  "recommendation": {
+    "type": "warning",
+    "message": "Support Bot is escalating 10%+ on billing questions.",
+    "cta": "Add refund + billing intents",
+    "agentId": "1"
+  }
+}

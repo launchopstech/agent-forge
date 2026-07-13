@@ -1,0 +1,20 @@
+name: CI — QA
+
+# Runs CI checks on PRs to qa only.
+# Preview deployments are handled automatically by Vercel's GitHub integration.
+# Branch deployments to the QA environment use deploy-qa.yml.
+
+on:
+  pull_request:
+    branches: [qa]
+
+jobs:
+  checks:
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: qa
+      run-e2e: true
+      run-chromatic: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

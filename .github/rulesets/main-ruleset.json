@@ -1,5 +1,5 @@
 {
-  "name": "production-main-protection",
+  "name": "main-branch-protection",
   "target": "branch",
   "enforcement": "active",
   "conditions": {
@@ -12,9 +12,9 @@
     {
       "type": "pull_request",
       "parameters": {
-        "required_approving_review_count": 2,
+        "required_approving_review_count": 1,
         "dismiss_stale_reviews_on_push": true,
-        "require_code_owner_review": true,
+        "require_code_owner_review": false,
         "require_last_push_approval": true,
         "required_review_thread_resolution": true
       }
@@ -24,11 +24,12 @@
       "parameters": {
         "strict_required_status_checks_policy": true,
         "required_status_checks": [
-          { "context": "lint" },
-          { "context": "typecheck" },
-          { "context": "test" },
-          { "context": "build" },
-          { "context": "Vercel" }
+          { "context": "checks / typecheck" },
+          { "context": "checks / lint" },
+          { "context": "checks / test" },
+          { "context": "checks / build" },
+          { "context": "checks / e2e" },
+          { "context": "checks / storybook" }
         ]
       }
     },
@@ -37,13 +38,6 @@
     },
     {
       "type": "deletion"
-    }
-  ],
-  "bypass_actors": [
-    {
-      "actor_id": 1,
-      "actor_type": "OrganizationAdmin",
-      "bypass_mode": "always"
     }
   ]
 }

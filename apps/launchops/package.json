@@ -1,0 +1,49 @@
+{
+  "name": "@forge/launchops",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "prepare:widget": "pnpm --filter @forge/chat-widget run build && cp ../../packages/chat-widget/dist/widget.js public/widget.js",
+    "dev": "pnpm run prepare:widget && next dev --port 3003",
+    "build": "pnpm run prepare:widget && next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@forge/chat-widget": "workspace:*",
+    "@forge/email": "workspace:*",
+    "@forge/tsconfig": "workspace:*",
+    "@forge/ui": "workspace:*",
+    "@hookform/resolvers": "catalog:",
+    "@radix-ui/react-accordion": "catalog:",
+    "@radix-ui/react-label": "catalog:",
+    "@radix-ui/react-select": "catalog:",
+    "@radix-ui/react-slot": "catalog:",
+    "@vercel/analytics": "catalog:",
+    "@vercel/speed-insights": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "lucide-react": "catalog:",
+    "next": "catalog:",
+    "next-themes": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-hook-form": "catalog:",
+    "sonner": "catalog:",
+    "tailwind-merge": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "tw-animate-css": "catalog:",
+    "typescript": "catalog:"
+  }
+}

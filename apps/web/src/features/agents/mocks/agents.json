@@ -1,0 +1,139 @@
+{
+  "agents": [
+    {
+      "id": "1",
+      "name": "Customer Support Bot",
+      "channels": ["Web", "WhatsApp"],
+      "conversations": 9420,
+      "resolution": 82,
+      "csat": 4.6,
+      "status": "live"
+    },
+    {
+      "id": "2",
+      "name": "Lead Qualifier",
+      "channels": ["Web"],
+      "conversations": 2104,
+      "resolution": 71,
+      "csat": 4.2,
+      "status": "live"
+    },
+    {
+      "id": "3",
+      "name": "Order Assistant",
+      "channels": [],
+      "conversations": 0,
+      "resolution": null,
+      "csat": null,
+      "status": "draft"
+    },
+    {
+      "id": "4",
+      "name": "Billing Helper",
+      "channels": ["Web", "Email"],
+      "conversations": 5320,
+      "resolution": 88,
+      "csat": 4.7,
+      "status": "live"
+    },
+    {
+      "id": "5",
+      "name": "HR Onboarding Guide",
+      "channels": ["Slack"],
+      "conversations": 412,
+      "resolution": 65,
+      "csat": 3.9,
+      "status": "live"
+    },
+    {
+      "id": "6",
+      "name": "IT Helpdesk Bot",
+      "channels": ["Web", "Slack", "Email"],
+      "conversations": 7810,
+      "resolution": 76,
+      "csat": 4.3,
+      "status": "live"
+    },
+    {
+      "id": "7",
+      "name": "Product Recommender",
+      "channels": ["Web", "WhatsApp"],
+      "conversations": 3290,
+      "resolution": 91,
+      "csat": 4.8,
+      "status": "live"
+    },
+    {
+      "id": "8",
+      "name": "Appointment Scheduler",
+      "channels": ["Web"],
+      "conversations": 1456,
+      "resolution": 94,
+      "csat": 4.5,
+      "status": "live"
+    },
+    {
+      "id": "9",
+      "name": "Returns & Refunds",
+      "channels": ["Web", "Email"],
+      "conversations": 2870,
+      "resolution": 79,
+      "csat": 4.1,
+      "status": "paused"
+    },
+    {
+      "id": "10",
+      "name": "Social Media Responder",
+      "channels": [],
+      "conversations": 0,
+      "resolution": null,
+      "csat": null,
+      "status": "draft"
+    },
+    {
+      "id": "11",
+      "name": "FAQ Bot",
+      "channels": ["Web"],
+      "conversations": 48200,
+      "resolution": 96,
+      "csat": 4.9,
+      "status": "live"
+    },
+    {
+      "id": "12",
+      "name": "Sales Demo Booker",
+      "channels": ["Web", "WhatsApp"],
+      "conversations": 890,
+      "resolution": 85,
+      "csat": 4.4,
+      "status": "paused"
+    },
+    {
+      "id": "13",
+      "name": "Compliance Checker",
+      "channels": ["Slack"],
+      "conversations": 324,
+      "resolution": null,
+      "csat": null,
+      "status": "draft"
+    },
+    {
+      "id": "14",
+      "name": "Travel Planner",
+      "channels": ["Web", "Email", "WhatsApp"],
+      "conversations": 1120,
+      "resolution": 73,
+      "csat": 4.0,
+      "status": "live"
+    },
+    {
+      "id": "15",
+      "name": "Inventory Tracker",
+      "channels": ["Slack", "Email"],
+      "conversations": 567,
+      "resolution": 81,
+      "csat": 4.3,
+      "status": "live"
+    }
+  ]
+}

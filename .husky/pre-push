@@ -1,0 +1,5 @@
+#!/bin/sh
+# Full storybook build before push — catches broken stories not caught in pre-commit
+# (e.g. a non-story change that silently breaks a story import).
+echo "📚 Verifying storybook build before push..."
+pnpm --filter=@forge/web storybook:build
