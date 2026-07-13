@@ -3,6 +3,7 @@
 import * as clerkAdapter from './adapters/clerk/server'
 import * as nextAuthAdapter from './adapters/next-auth/server'
 import * as oktaAdapter from './adapters/okta/server'
+import * as authHandlerAdapter from './adapters/auth-handler/server'
 import { activeAuthProvider } from '@forge/config/src/properties'
 import type { AuthServerAdapter } from './contracts'
 import type { AuthSession } from './types'
@@ -16,9 +17,11 @@ function resolve(): AuthServerAdapter {
       return nextAuthAdapter
     case 'okta':
       return oktaAdapter
+    case 'auth-handler':
+      return authHandlerAdapter
     default:
       throw new Error(
-        `[auth] Unknown NEXT_PUBLIC_AUTH_PROVIDER: "${p}". Valid: clerk | next-auth | okta`
+        `[auth] Unknown NEXT_PUBLIC_AUTH_PROVIDER: "${p}". Valid: clerk | next-auth | okta | auth-handler`
       )
   }
 }

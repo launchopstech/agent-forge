@@ -14,9 +14,13 @@ import { NotImplementedError } from '../../contracts'
 import type { AuthClientAdapter } from '../../contracts'
 import type { UseUserReturn } from '../../types'
 
-export const _typeCheck: AuthClientAdapter = { useUser }
+export const _typeCheck: AuthClientAdapter = { useUser, getAccessToken }
 void _typeCheck
 
 export function useUser(): UseUserReturn {
   throw new NotImplementedError('okta', 'useUser')
+}
+
+export async function getAccessToken(): Promise<string | null> {
+  throw new NotImplementedError('okta', 'getAccessToken')
 }

@@ -1,10 +1,16 @@
 name: CI — Staging & Production
 
-# Runs CI checks on PRs to main (pre-merge gate)
-# Actual deployment is handled by deploy-staging-prod.yml after merge
+# Runs CI checks on PRs to main (pre-merge gate).
+# On push to main (post-merge), also promotes main → staging branch,
+# which triggers deploy-staging-prod.yml to handle the full deploy pipeline.
+#
+# Requires:
+#   GH_PAT — Personal Access Token with Contents: write (to trigger staging workflow)
 
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 jobs:
@@ -17,3 +23,16 @@ jobs:
     secrets:
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+  promote-to-staging:
+    name: Promote main → staging
+    needs: [checks]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+      - name: Push main to staging branch
+        run: git push origin HEAD:staging --force

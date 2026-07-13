@@ -1,0 +1,13 @@
+{"ts":"2026-05-15T22:45:26.272Z","cmd":"goto","args":"http://localhost:3000","origin":"http://localhost:3000/","durationMs":234,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:45:26.499Z","cmd":"screenshot","args":"/tmp/landing-page.png --width 1440","origin":"http://localhost:3000/","durationMs":4,"status":"error","hasCookies":false,"mode":"launched","error":"Unknown screenshot flag: --width"}
+{"ts":"2026-05-15T22:45:31.005Z","cmd":"goto","args":"http://localhost:3000","origin":"http://localhost:3000/","durationMs":221,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:45:31.279Z","cmd":"screenshot","args":"/tmp/landing-page.png","origin":"http://localhost:3000/","durationMs":198,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:45:31.329Z","cmd":"viewport","args":"1440x900","origin":"http://localhost:3000/","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:45:31.544Z","cmd":"screenshot","args":"/tmp/landing-full.png","origin":"http://localhost:3000/","durationMs":169,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:45:40.226Z","cmd":"text","args":"","origin":"http://localhost:3000/","durationMs":3,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:46:38.844Z","cmd":"goto","args":"http://localhost:3000","origin":"http://localhost:3000/","durationMs":274,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:46:38.937Z","cmd":"viewport","args":"1440x900","origin":"http://localhost:3000/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:46:38.991Z","cmd":"screenshot","args":"/tmp/navbar-zoom.png @header","origin":"http://localhost:3000/","durationMs":1,"status":"error","hasCookies":false,"mode":"launched","error":"path: unsupported mime type \"null\""}
+{"ts":"2026-05-15T22:47:31.758Z","cmd":"goto","args":"http://localhost:3000","origin":"http://localhost:3000/","durationMs":135,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:47:31.897Z","cmd":"viewport","args":"1440x200","origin":"http://localhost:3000/","durationMs":6,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-05-15T22:47:32.136Z","cmd":"screenshot","args":"/tmp/navbar-zoom.png","origin":"http://localhost:3000/","durationMs":188,"status":"ok","hasCookies":false,"mode":"launched"}

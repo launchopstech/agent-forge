@@ -1,15 +1,28 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@forge/ui/src/button'
 import { Sheet, SheetContent, SheetTrigger } from '@forge/ui/src/sheet'
 import { cn } from '@/lib/utils'
-import { siteConfig, marketingNavItems } from '@/config'
+import { siteConfig, marketingNavItems, activeBrand } from '@/config'
+
 import type { NavItem } from '@forge/config/src/types'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+
+function splitName(name: string, accent?: string): [string, string] {
+  if (!accent) return [name.toLowerCase(), '']
+
+  const lower = name.toLowerCase()
+  const accentLower = accent.toLowerCase()
+  const idx = lower.lastIndexOf(accentLower)
+
+  if (idx === -1) return [lower, '']
+  return [lower.slice(0, idx), lower.slice(idx)]
+}
 
 interface NavbarProps {
   navItems?: NavItem[]
@@ -31,6 +44,7 @@ export const Navbar = React.memo(function Navbar({
   const [open, setOpen] = useState(false)
   const t = useTranslations('nav')
   const name = logoText ?? siteConfig.name
+  const [prefix, accent] = splitName(name, logoText ? undefined : siteConfig.nameAccent)
   const handleClose = useCallback(() => setOpen(false), [])
 
   return (
@@ -42,8 +56,18 @@ export const Navbar = React.memo(function Navbar({
     >
       {/* Logo */}
       <Link href={logoHref} className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-lg bg-primary" />
-        <span className="text-xl font-bold text-foreground">{name}</span>
+        <Image
+          src={activeBrand.assets.logoIconPath ?? activeBrand.assets.logoPath}
+          alt={name}
+          width={32}
+          height={32}
+          priority
+          className="h-8 w-8"
+        />
+        <span className="text-xl font-bold tracking-tight">
+          <span className="text-foreground">{prefix}</span>
+          {accent && <span className="text-primary">{accent}</span>}
+        </span>
       </Link>
 
       {/* Desktop nav */}
@@ -86,8 +110,17 @@ export const Navbar = React.memo(function Navbar({
           <SheetContent side="left" className="w-72">
             <div className="flex flex-col gap-6 pt-6">
               <Link href={logoHref} className="flex items-center gap-2" onClick={handleClose}>
-                <div className="h-8 w-8 rounded-lg bg-primary" />
-                <span className="text-xl font-bold text-foreground">{name}</span>
+                <Image
+                  src={activeBrand.assets.logoIconPath ?? activeBrand.assets.logoPath}
+                  alt={name}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8"
+                />
+                <span className="text-xl font-bold tracking-tight">
+                  <span className="text-foreground">{prefix}</span>
+                  {accent && <span className="text-primary">{accent}</span>}
+                </span>
               </Link>
               <nav className="flex flex-col gap-1">
                 {navItems.map((item) => (

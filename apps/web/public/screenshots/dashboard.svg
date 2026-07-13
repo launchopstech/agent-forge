@@ -1,0 +1,63 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">MindRithm governed agent dashboard</title>
+  <desc id="desc">Dashboard view with three AI agents, governance states, and message metrics.</desc>
+  <rect width="1440" height="900" fill="#F8FAFC"/>
+  <rect x="32" y="32" width="260" height="836" rx="18" fill="#0F172A"/>
+  <rect x="64" y="68" width="46" height="46" rx="10" fill="#4F46E5"/>
+  <path d="M76 98V80H83.5L91 93.5L98.5 80H106V98H101.3V87.4L93.9 100H88.1L80.7 87.4V98H76Z" fill="white"/>
+  <text x="126" y="98" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">MindRithm</text>
+  <rect x="56" y="156" width="204" height="48" rx="10" fill="#1E293B"/>
+  <circle cx="82" cy="180" r="7" fill="#818CF8"/>
+  <text x="104" y="186" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="600">Agents</text>
+  <text x="82" y="254" fill="#94A3B8" font-family="Inter, Arial, sans-serif" font-size="14">Governance</text>
+  <text x="82" y="300" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="16">Reviews</text>
+  <text x="82" y="344" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="16">Audit trail</text>
+  <text x="82" y="388" fill="#CBD5E1" font-family="Inter, Arial, sans-serif" font-size="16">Client brands</text>
+  <rect x="332" y="56" width="1036" height="116" rx="20" fill="white" stroke="#D1D5DB"/>
+  <text x="372" y="104" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">Governed agent portfolio</text>
+  <text x="372" y="136" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="17">Monitor live agents, review coverage, and launch readiness across clients.</text>
+  <rect x="1168" y="90" width="144" height="46" rx="10" fill="#4F46E5"/>
+  <text x="1202" y="119" fill="white" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">New agent</text>
+  <g>
+    <rect x="332" y="208" width="316" height="144" rx="18" fill="white" stroke="#D1D5DB"/>
+    <text x="364" y="252" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="15">Total agents</text>
+    <text x="364" y="304" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="800">12</text>
+    <rect x="530" y="236" width="76" height="30" rx="15" fill="#DCFCE7"/>
+    <text x="552" y="257" fill="#166534" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">ready</text>
+  </g>
+  <g>
+    <rect x="684" y="208" width="316" height="144" rx="18" fill="white" stroke="#D1D5DB"/>
+    <text x="716" y="252" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="15">Live agents</text>
+    <text x="716" y="304" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="800">5</text>
+    <rect x="882" y="236" width="76" height="30" rx="15" fill="#E0E7FF"/>
+    <text x="905" y="257" fill="#3730A3" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">live</text>
+  </g>
+  <g>
+    <rect x="1036" y="208" width="332" height="144" rx="18" fill="white" stroke="#D1D5DB"/>
+    <text x="1068" y="252" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="15">Review coverage</text>
+    <text x="1068" y="304" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="800">84%</text>
+    <rect x="1252" y="236" width="74" height="30" rx="15" fill="#FEF3C7"/>
+    <text x="1273" y="257" fill="#92400E" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">audit</text>
+  </g>
+  <rect x="332" y="392" width="1036" height="412" rx="20" fill="white" stroke="#D1D5DB"/>
+  <text x="372" y="446" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">Agents</text>
+  <text x="372" y="482" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="15">Status, policy coverage, and owner review in one place.</text>
+  <line x1="372" y1="528" x2="1328" y2="528" stroke="#E5E7EB"/>
+  <text x="372" y="568" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">AGENT</text>
+  <text x="726" y="568" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">STATUS</text>
+  <text x="914" y="568" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">GOVERNANCE</text>
+  <text x="1160" y="568" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">MESSAGES</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="372" y="634" fill="#1E293B" font-size="18" font-weight="700">EU Returns Advisor</text>
+    <text x="372" y="662" fill="#64748B" font-size="14">E-commerce returns and escalation policy</text>
+    <rect x="726" y="612" width="78" height="32" rx="16" fill="#DCFCE7"/><text x="750" y="633" fill="#166534" font-size="13" font-weight="700">Live</text>
+    <rect x="914" y="612" width="138" height="32" rx="16" fill="#E0E7FF"/><text x="938" y="633" fill="#3730A3" font-size="13" font-weight="700">Reviewed</text>
+    <text x="1160" y="636" fill="#1E293B" font-size="18" font-weight="700">1,248</text>
+    <line x1="372" y1="690" x2="1328" y2="690" stroke="#E5E7EB"/>
+    <text x="372" y="746" fill="#1E293B" font-size="18" font-weight="700">HIPAA Intake Guide</text>
+    <text x="372" y="774" fill="#64748B" font-size="14">Healthcare eligibility and safe fallback flow</text>
+    <rect x="726" y="724" width="92" height="32" rx="16" fill="#FEF3C7"/><text x="750" y="745" fill="#92400E" font-size="13" font-weight="700">Draft</text>
+    <rect x="914" y="724" width="158" height="32" rx="16" fill="#FEE2E2"/><text x="938" y="745" fill="#991B1B" font-size="13" font-weight="700">Needs review</text>
+    <text x="1160" y="748" fill="#1E293B" font-size="18" font-weight="700">0</text>
+  </g>
+</svg>

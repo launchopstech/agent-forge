@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Next.js build
+.next/
+out/
+
+# Build outputs
+build/
+dist/
+storybook-static/
+
+# Coverage & test artifacts
+coverage/
+test-results/
+playwright-report/
+
+# Turbo & caches
+.turbo/
+.cache/
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# Lock files (large, low signal)
+pnpm-lock.yaml
+
+# Logs
+*.log
+
+# Vercel & secrets
+.vercel/
+.clerk/
+.env
+.env.local
+.env.production
+.env.staging
+
+# macOS
+.DS_Store
+
+# Lighthouse artifacts
+.lighthouseci/
+chromewebdata/
+chrome-profile-*/
+.local-chromium/

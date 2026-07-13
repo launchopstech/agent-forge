@@ -2,6 +2,8 @@
 
 Each client brand gets its own Vercel project pointing at the same GitHub repository. The only difference between deployments is the `NEXT_PUBLIC_BRAND` environment variable.
 
+For the full identity, API, DNS, and tenant verification checklist, use the canonical [New Tenant / White-Label Org Setup](../../../docs/runbooks/new-tenant-setup.md) runbook.
+
 ## Initial Setup (one-time per client)
 
 ### 1. Create a new Vercel project
@@ -17,18 +19,39 @@ In the Vercel dashboard → **Add New Project** → import the same GitHub repo.
 
 In **Vercel Dashboard → Project → Settings → Environment Variables**, add:
 
-| Variable                            | Value                                  | Environments                     |
-| ----------------------------------- | -------------------------------------- | -------------------------------- |
-| `NEXT_PUBLIC_BRAND`                 | `client-a`                             | Production, Preview, Development |
-| `NEXT_PUBLIC_APP_URL`               | `https://client-a.example.com`         | Production                       |
-| `NEXT_PUBLIC_APP_URL`               | `https://staging.client-a.example.com` | Preview                          |
-| `NEXT_PUBLIC_APP_URL`               | `http://localhost:3000`                | Development                      |
-| `NEXT_PUBLIC_APP_ENV`               | `production`                           | Production                       |
-| `NEXT_PUBLIC_APP_ENV`               | `staging`                              | Preview                          |
-| `NEXT_PUBLIC_APP_ENV`               | `development`                          | Development                      |
-| `NEXT_PUBLIC_AUTH_PROVIDER`         | `clerk`                                | All                              |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | _(client's Clerk key)_                 | All                              |
-| `CLERK_SECRET_KEY`                  | _(client's Clerk secret)_              | All                              |
+| Variable                         | Value                                                          | Environments                     |
+| -------------------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `NEXT_PUBLIC_BRAND`              | `client-a`                                                     | Production, Preview, Development |
+| `NEXT_PUBLIC_APP_URL`            | `https://client-a.example.com`                                 | Production                       |
+| `NEXT_PUBLIC_APP_URL`            | `https://staging.client-a.example.com`                         | Preview                          |
+| `NEXT_PUBLIC_APP_URL`            | `http://localhost:3000`                                        | Development                      |
+| `NEXT_PUBLIC_APP_ENV`            | `production`                                                   | Production                       |
+| `NEXT_PUBLIC_APP_ENV`            | `staging`                                                      | Preview                          |
+| `NEXT_PUBLIC_APP_ENV`            | `development`                                                  | Development                      |
+| `NEXT_PUBLIC_FORGE_API_BASE_URL` | `https://api.client-a.example.com`                             | All                              |
+| `NEXT_PUBLIC_AUTH_PROVIDER`      | `auth-handler`                                                 | All                              |
+| `NEXT_PUBLIC_ORG_ID`             | `org_...`                                                      | All                              |
+| `AUTH_HANDLER_ISSUER`            | `https://auth.client-a.example.com/auth`                       | All                              |
+| `AUTH_HANDLER_CLIENT_ID`         | `agent-forge-web`                                              | All                              |
+| `AUTH_HANDLER_REDIRECT_URI`      | `https://client-a.example.com/callback`                        | Production                       |
+| `AUTH_HANDLER_REDIRECT_URI`      | `https://staging.client-a.example.com/callback`                | Preview                          |
+| `AUTH_HANDLER_REDIRECT_URI`      | `http://localhost:3000/callback`                               | Development                      |
+| `AUTH_HANDLER_SCOPE`             | `openid profile email offline_access agents:read agents:write` | All                              |
+| `AUTH_HANDLER_CONNECTION`        | `clerk`                                                        | All                              |
+| `AUTH_HANDLER_SESSION_SECRET`    | encrypted random secret                                        | All                              |
+| `AUTH_HANDLER_ORG_ID`            | `org_...`                                                      | Optional server-only override    |
+
+`NEXT_PUBLIC_ORG_ID` is required for auth-handler deployments. The web auth routes pass it as OAuth `org_id` so auth-handler mints platform JWTs with a non-empty `org_id` claim. If this value is missing, new users can sign in but tenant-scoped API calls such as `GET /api/agent-templates`, `GET /api/agents`, and `GET /api/metrics` will return 403.
+
+`AUTH_HANDLER_ORG_ID` is optional and only needed when you want a server-only org ID override. If it is unset, the routes fall back to `NEXT_PUBLIC_ORG_ID`.
+
+Legacy Clerk-direct deployments may still use:
+
+| Variable                            | Value                     | Environments |
+| ----------------------------------- | ------------------------- | ------------ |
+| `NEXT_PUBLIC_AUTH_PROVIDER`         | `clerk`                   | All          |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | _(client's Clerk key)_    | All          |
+| `CLERK_SECRET_KEY`                  | _(client's Clerk secret)_ | All          |
 
 ### 3. Pull env vars locally for this client
 

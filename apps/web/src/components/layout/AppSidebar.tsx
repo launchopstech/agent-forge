@@ -17,7 +17,8 @@ import {
   useSidebar,
 } from '@forge/ui/src/sidebar'
 import { cn } from '@/lib/utils'
-import { siteConfig, dashboardNavGroups, dashboardFooterNavItems } from '@/config'
+import Image from 'next/image'
+import { siteConfig, dashboardNavGroups, dashboardFooterNavItems, activeBrand } from '@/config'
 import type { NavGroup, NavItem } from '@forge/config/src/types'
 
 interface AppSidebarProps {
@@ -104,11 +105,13 @@ export const AppSidebar = React.memo(function AppSidebar({
             <SidebarMenuButton asChild size="lg">
               <Link href={logoHref}>
                 {/* Icon mark — visible both expanded and icon-only */}
-                <div className="h-8 w-8 rounded-lg bg-primary shrink-0 flex items-center justify-center">
-                  <span className="text-sm font-bold text-primary-foreground select-none">
-                    {rawName.slice(0, 1).toUpperCase()}
-                  </span>
-                </div>
+                <Image
+                  src={activeBrand.assets.logoIconPath ?? activeBrand.assets.logoPath}
+                  alt={rawName}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 shrink-0"
+                />
                 {/* Two-tone brand name — hidden when sidebar collapses to icon */}
                 <span className="font-bold tracking-tight">
                   <span className="text-foreground">{prefix}</span>

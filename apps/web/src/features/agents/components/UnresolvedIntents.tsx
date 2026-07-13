@@ -32,7 +32,8 @@ export function UnresolvedIntents({ intents, recommendation }: UnresolvedIntents
       <div className="rounded-xl border bg-card p-4 space-y-4">
         <p className="text-base font-bold">{t('unresolvedIntents')}</p>
 
-        <table className="w-full border-separate border-spacing-y-2">
+        {/* Desktop: table layout */}
+        <table className="hidden sm:table w-full border-separate border-spacing-y-2">
           <tbody>
             {intents.map((intent) => (
               <tr key={intent.label}>
@@ -52,6 +53,24 @@ export function UnresolvedIntents({ intents, recommendation }: UnresolvedIntents
             ))}
           </tbody>
         </table>
+
+        {/* Mobile: stacked layout */}
+        <div className="sm:hidden space-y-3">
+          {intents.map((intent) => (
+            <div key={intent.label} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span>{intent.label}</span>
+                <span className="text-muted-foreground">{intent.percentage}%</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className={cn('h-2 rounded-full', severityColor(intent.severity))}
+                  style={{ width: `${intent.percentage}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
 
         <Button variant="outline" className="w-full" asChild>
           <Link href="/agents/new">{t('fixInBuilder')}</Link>

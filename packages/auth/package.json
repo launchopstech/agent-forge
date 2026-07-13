@@ -8,12 +8,16 @@
     "./middleware": "./src/middleware-registry.ts",
     "./provider": "./src/auth-provider.tsx",
     "./contracts": "./src/contracts.ts",
+    "./client-registry": "./src/client-registry.ts",
     "./adapters/clerk/server": "./src/adapters/clerk/server.ts",
-    "./adapters/clerk/middleware": "./src/adapters/clerk/middleware.ts"
+    "./adapters/clerk/middleware": "./src/adapters/clerk/middleware.ts",
+    "./adapters/auth-handler/client": "./src/adapters/auth-handler/client.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@forge/config": "workspace:*",
@@ -27,6 +31,9 @@
     "typescript": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "vitest": "catalog:",
+    "vite-tsconfig-paths": "catalog:",
+    "@vitest/coverage-v8": "catalog:"
   }
 }

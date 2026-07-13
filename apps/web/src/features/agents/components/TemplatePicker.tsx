@@ -10,9 +10,10 @@ import { Progress } from '@forge/ui/src/progress'
 import { Skeleton } from '@forge/ui/src/skeleton'
 import { cn } from '@forge/ui/src/utils'
 import { siteConfig } from '@/config'
+import { fetchAgentTypes } from '../api/agent-types.api'
 import { fetchTemplates } from '../api/templates.api'
 import { useAgentBuilderStore } from '../store/agent-builder.store'
-import type { AgentTemplate } from '../types'
+import type { AgentTemplate, AgentType } from '../types'
 
 /** Split a name into [prefix, accent] for two-tone rendering */
 function splitName(name: string, accent?: string): [string, string] {
@@ -28,9 +29,13 @@ function sectionCount(tpl: AgentTemplate): number {
   if (tpl.identity.name) count++
   if (tpl.behaviour.systemPrompt) count++
   if (tpl.actions.length > 0) count++
-  if (tpl.knowledge.length > 0) count++
+  if ((tpl.knowledgeSources?.length ?? tpl.knowledge.length) > 0) count++
   if (tpl.channels.length > 0) count++
   return count
+}
+
+function templateKnowledgeNames(template: AgentTemplate): string[] {
+  return template.knowledgeSources?.map((source) => source.name) ?? template.knowledge
 }
 
 const EMOJI_BG: Record<string, string> = {
@@ -55,16 +60,6 @@ const EMOJI_BG: Record<string, string> = {
   blank: 'bg-muted',
 }
 
-const CATEGORY_KEYS = ['all', 'support', 'sales', 'ecommerce', 'onboarding'] as const
-
-const CATEGORY_I18N: Record<(typeof CATEGORY_KEYS)[number], string> = {
-  all: 'categoryAll',
-  support: 'categorySupport',
-  sales: 'categorySales',
-  ecommerce: 'categoryEcommerce',
-  onboarding: 'categoryOnboarding',
-}
-
 export const TemplatePicker = React.memo(function TemplatePicker() {
   const t = useTranslations('agentHub.templates')
   const tSidebar = useTranslations('sidebar')
@@ -73,6 +68,7 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
   const resetDraft = useAgentBuilderStore((s) => s.resetDraft)
 
   const [templates, setTemplates] = useState<AgentTemplate[]>([])
+  const [agentTypes, setAgentTypes] = useState<AgentType[]>([])
   const [selected, setSelected] = useState<AgentTemplate | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -82,8 +78,9 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
   const ws = siteConfig.workspaceName
 
   useEffect(() => {
-    void fetchTemplates().then((data) => {
-      setTemplates(data)
+    void Promise.all([fetchTemplates(), fetchAgentTypes()]).then(([templateData, typeData]) => {
+      setTemplates(templateData)
+      setAgentTypes(typeData)
       setIsLoading(false)
     })
   }, [])
@@ -91,7 +88,7 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
   const filteredTemplates = useMemo(() => {
     let result = templates
     if (activeCategory !== 'all') {
-      result = result.filter((tpl) => tpl.category === activeCategory || tpl.category === 'blank')
+      result = result.filter((tpl) => tpl.agentType === activeCategory)
     }
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase()
@@ -157,18 +154,30 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
 
       {/* Category filter bar */}
       <div className="flex flex-wrap gap-1.5">
-        {CATEGORY_KEYS.map((cat) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn(
+            'h-7 rounded-full text-xs',
+            activeCategory === 'all' && 'bg-primary/10 text-primary hover:bg-primary/15'
+          )}
+          onClick={() => handleCategoryChange('all')}
+        >
+          {t('categoryAll')}
+        </Button>
+        {agentTypes.map((agentType) => (
           <Button
-            key={cat}
+            key={agentType.slug}
             variant="ghost"
             size="sm"
             className={cn(
               'h-7 rounded-full text-xs',
-              activeCategory === cat && 'bg-primary/10 text-primary hover:bg-primary/15'
+              activeCategory === agentType.slug && 'bg-primary/10 text-primary hover:bg-primary/15'
             )}
-            onClick={() => handleCategoryChange(cat)}
+            onClick={() => handleCategoryChange(agentType.slug)}
           >
-            {t(CATEGORY_I18N[cat])}
+            <span aria-hidden="true">{agentType.emoji}</span>
+            {agentType.name}
           </Button>
         ))}
       </div>
@@ -204,7 +213,7 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
           ) : (
             <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
               {filteredTemplates.map((template) => {
-                const isBlank = template.category === 'blank'
+                const isBlank = template.agentType === 'custom'
                 const isSelected = selected?.id === template.id
 
                 return (
@@ -297,12 +306,12 @@ export const TemplatePicker = React.memo(function TemplatePicker() {
                 )}
 
                 {/* Knowledge card */}
-                {selected.knowledge.length > 0 && (
+                {templateKnowledgeNames(selected).length > 0 && (
                   <div className="rounded-xl border p-3 space-y-1">
                     <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                       📚 {t('previewKnowledge')}
                     </div>
-                    <div className="text-sm">{selected.knowledge.join(' · ')}</div>
+                    <div className="text-sm">{templateKnowledgeNames(selected).join(' · ')}</div>
                   </div>
                 )}
               </div>

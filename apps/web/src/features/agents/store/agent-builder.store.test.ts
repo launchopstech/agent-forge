@@ -1,32 +1,113 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useAgentBuilderStore } from './agent-builder.store'
 import type { AgentTemplate, Agent } from '../types'
+
+vi.mock('../api/agents.api', () => ({
+  createAgent: vi.fn(),
+  fetchAgent: vi.fn(),
+  updateAgent: vi.fn(),
+  publishAgent: vi.fn(),
+  pauseAgent: vi.fn(),
+  resumeAgent: vi.fn(),
+}))
+
+const listStoreMocks = vi.hoisted(() => ({
+  refreshDashboardData: vi.fn(),
+}))
+
+vi.mock('./agent-list.store', () => ({
+  useAgentListStore: {
+    getState: () => ({
+      refreshDashboardData: listStoreMocks.refreshDashboardData,
+    }),
+  },
+}))
+
+import {
+  createAgent as apiCreateAgent,
+  fetchAgent,
+  updateAgent,
+  publishAgent as apiPublishAgent,
+  pauseAgent as apiPauseAgent,
+  resumeAgent as apiResumeAgent,
+} from '../api/agents.api'
 
 const MOCK_TEMPLATE: AgentTemplate = {
   id: 'customer-support',
   name: 'Customer Support',
   emoji: '💬',
   category: 'support',
+  agentType: 'support',
   description: 'FAQ, order tracking, and escalation',
   identity: { name: 'Support Bot', welcomeMessage: 'Hi!', tone: 'professional', language: 'en-US' },
-  behaviour: { systemPrompt: 'You are a support bot.', responseStyle: 30, fallback: 'handoff' },
+  behaviour: {
+    systemPrompt: 'You are a support bot.',
+    responseStyle: 30,
+    fallback: 'handoff',
+    tonePreset: 'friendly',
+    customToneInstructions: '',
+    useEmojis: true,
+    showSourceLinks: true,
+    guidanceRules: [
+      {
+        id: 'rule-1',
+        name: 'Refund Handling',
+        category: 'escalation',
+        whenCondition: 'Customer requests a refund',
+        instructions: 'Escalate to supervisor',
+        enabled: true,
+        createdAt: '2025-01-01T00:00:00.000Z',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+      },
+    ],
+  },
   actions: ['Process Refund', 'Create Ticket'],
   knowledge: ['FAQ Database'],
   channels: ['web'],
 }
 
+const MOCK_TEMPLATE_LEGACY: AgentTemplate = {
+  id: 'legacy',
+  name: 'Legacy',
+  emoji: '📦',
+  category: 'support',
+  agentType: 'support',
+  description: 'Legacy template without new behaviour fields',
+  identity: { name: 'Legacy Bot', welcomeMessage: 'Hi!', tone: 'professional', language: 'en-US' },
+  behaviour: {
+    systemPrompt: 'Legacy prompt.',
+    responseStyle: 50,
+    fallback: 'handoff',
+  } as AgentTemplate['behaviour'],
+  actions: [],
+  knowledge: [],
+  channels: [],
+}
+
 const MOCK_AGENT: Agent = {
   id: '42',
   name: 'Existing Bot',
+  agentType: 'support',
   channels: ['Web', 'WhatsApp'],
   conversations: 500,
   resolution: 80,
   csat: 4.5,
   status: 'live',
+  shareToken: 'share-token-42',
 }
 
 beforeEach(() => {
+  vi.clearAllMocks()
   useAgentBuilderStore.getState().resetDraft()
+  vi.mocked(apiCreateAgent).mockResolvedValue({
+    ...MOCK_AGENT,
+    id: 'created-agent',
+    name: 'Draft Bot',
+    agentType: 'custom',
+    channels: [],
+    status: 'draft',
+    shareToken: null,
+  })
 })
 
 describe('agent-builder.store', () => {
@@ -34,7 +115,12 @@ describe('agent-builder.store', () => {
     it('starts with a blank draft', () => {
       const { draftAgent } = useAgentBuilderStore.getState()
       expect(draftAgent.identity.name).toBe('')
+      expect(draftAgent.behaviour.tonePreset).toBe('neutral')
+      expect(draftAgent.behaviour.useEmojis).toBe(true)
+      expect(draftAgent.behaviour.showSourceLinks).toBe(true)
+      expect(draftAgent.behaviour.guidanceRules).toEqual([])
       expect(draftAgent.actions).toEqual([])
+      expect(draftAgent.agentType).toBe('custom')
       expect(draftAgent.channels).toEqual([])
     })
 
@@ -44,6 +130,14 @@ describe('agent-builder.store', () => {
 
     it('starts with no completed sections', () => {
       expect(useAgentBuilderStore.getState().completedSections).toEqual([])
+    })
+
+    it('starts with no loaded agent status', () => {
+      expect(useAgentBuilderStore.getState().agentStatus).toBeNull()
+    })
+
+    it('starts with no loaded share token', () => {
+      expect(useAgentBuilderStore.getState().agentShareToken).toBeNull()
     })
   })
 
@@ -57,6 +151,17 @@ describe('agent-builder.store', () => {
       useAgentBuilderStore.getState().setAgentId(null)
       expect(useAgentBuilderStore.getState().agentId).toBeNull()
     })
+
+    it('clears agentStatus when clearing agent id', () => {
+      useAgentBuilderStore.setState({
+        agentId: '99',
+        agentStatus: 'live',
+        agentShareToken: 'share-token',
+      })
+      useAgentBuilderStore.getState().setAgentId(null)
+      expect(useAgentBuilderStore.getState().agentStatus).toBeNull()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBeNull()
+    })
   })
 
   describe('hydrateFromAgent', () => {
@@ -65,6 +170,17 @@ describe('agent-builder.store', () => {
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBe('42')
       expect(state.draftAgent.identity.name).toBe('Existing Bot')
+      expect(state.draftAgent.agentType).toBe('support')
+    })
+
+    it('sets agentStatus from existing agent', () => {
+      useAgentBuilderStore.getState().hydrateFromAgent({ ...MOCK_AGENT, status: 'paused' })
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('paused')
+    })
+
+    it('sets agentShareToken from existing agent', () => {
+      useAgentBuilderStore.getState().hydrateFromAgent(MOCK_AGENT)
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('share-token-42')
     })
 
     it('maps channels to lowercase', () => {
@@ -88,8 +204,13 @@ describe('agent-builder.store', () => {
       useAgentBuilderStore.getState().applyTemplate(MOCK_TEMPLATE)
       const { draftAgent } = useAgentBuilderStore.getState()
       expect(draftAgent.templateId).toBe('customer-support')
+      expect(draftAgent.agentType).toBe('support')
       expect(draftAgent.identity.name).toBe('Support Bot')
       expect(draftAgent.behaviour.systemPrompt).toBe('You are a support bot.')
+      expect(draftAgent.behaviour.tonePreset).toBe('friendly')
+      expect(draftAgent.behaviour.useEmojis).toBe(true)
+      expect(draftAgent.behaviour.guidanceRules).toHaveLength(1)
+      expect(draftAgent.behaviour.guidanceRules[0]?.name).toBe('Refund Handling')
       expect(draftAgent.actions).toEqual(['Process Refund', 'Create Ticket'])
       expect(draftAgent.knowledge).toEqual(['FAQ Database'])
       expect(draftAgent.channels).toEqual(['web'])
@@ -100,6 +221,16 @@ describe('agent-builder.store', () => {
       const { draftAgent } = useAgentBuilderStore.getState()
       draftAgent.actions.push('Extra')
       expect(MOCK_TEMPLATE.actions).not.toContain('Extra')
+    })
+
+    it('applies defaults for legacy templates missing new fields', () => {
+      useAgentBuilderStore.getState().applyTemplate(MOCK_TEMPLATE_LEGACY)
+      const { behaviour } = useAgentBuilderStore.getState().draftAgent
+      expect(behaviour.systemPrompt).toBe('Legacy prompt.')
+      expect(behaviour.tonePreset).toBe('neutral')
+      expect(behaviour.useEmojis).toBe(true)
+      expect(behaviour.showSourceLinks).toBe(true)
+      expect(behaviour.guidanceRules).toEqual([])
     })
   })
 
@@ -141,6 +272,122 @@ describe('agent-builder.store', () => {
       expect(behaviour.responseStyle).toBe(80)
       expect(behaviour.fallback).toBe('ticket')
       expect(behaviour.systemPrompt).toBe('') // default preserved
+    })
+
+    it('merges new behaviour fields', () => {
+      useAgentBuilderStore.getState().updateBehaviour({ tonePreset: 'friendly', useEmojis: false })
+      const { behaviour } = useAgentBuilderStore.getState().draftAgent
+      expect(behaviour.tonePreset).toBe('friendly')
+      expect(behaviour.useEmojis).toBe(false)
+      expect(behaviour.showSourceLinks).toBe(true) // default preserved
+    })
+  })
+
+  describe('addGuidanceRule', () => {
+    it('adds a rule with generated id and timestamps', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'Test',
+        category: 'communication',
+        whenCondition: 'When asked',
+        instructions: 'Do this',
+        enabled: true,
+      })
+      const { guidanceRules } = useAgentBuilderStore.getState().draftAgent.behaviour
+      expect(guidanceRules).toHaveLength(1)
+      expect(guidanceRules[0]?.id).toBeDefined()
+      expect(guidanceRules[0]?.name).toBe('Test')
+      expect(guidanceRules[0]?.createdAt).toBeDefined()
+      expect(guidanceRules[0]?.updatedAt).toBeDefined()
+    })
+
+    it('appends multiple rules', () => {
+      const store = useAgentBuilderStore.getState()
+      store.addGuidanceRule({
+        name: 'R1',
+        category: 'communication',
+        whenCondition: 'c1',
+        instructions: 'i1',
+        enabled: true,
+      })
+      store.addGuidanceRule({
+        name: 'R2',
+        category: 'escalation',
+        whenCondition: 'c2',
+        instructions: 'i2',
+        enabled: true,
+      })
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules).toHaveLength(2)
+    })
+  })
+
+  describe('updateGuidanceRule', () => {
+    it('merges patch into the matching rule', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'Original',
+        category: 'communication',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const ruleId = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.id
+      useAgentBuilderStore.getState().updateGuidanceRule(ruleId, { name: 'Updated' })
+      const rule = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!
+      expect(rule.name).toBe('Updated')
+      expect(rule.category).toBe('communication') // preserved
+    })
+
+    it('updates the updatedAt timestamp', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2025-01-01T00:00:00.000Z'))
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'R',
+        category: 'other',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const original = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!
+      vi.setSystemTime(new Date('2025-01-01T00:01:00.000Z'))
+      useAgentBuilderStore.getState().updateGuidanceRule(original.id, { name: 'New' })
+      const updated = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!
+      expect(updated.updatedAt).not.toBe(original.updatedAt)
+      vi.useRealTimers()
+    })
+  })
+
+  describe('removeGuidanceRule', () => {
+    it('removes the rule by id', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'ToDelete',
+        category: 'communication',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const ruleId = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.id
+      useAgentBuilderStore.getState().removeGuidanceRule(ruleId)
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules).toHaveLength(0)
+    })
+  })
+
+  describe('toggleGuidanceRule', () => {
+    it('flips the enabled flag', () => {
+      useAgentBuilderStore.getState().addGuidanceRule({
+        name: 'Toggle',
+        category: 'escalation',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
+      const ruleId = useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.id
+      useAgentBuilderStore.getState().toggleGuidanceRule(ruleId)
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.enabled).toBe(
+        false
+      )
+      useAgentBuilderStore.getState().toggleGuidanceRule(ruleId)
+      expect(useAgentBuilderStore.getState().draftAgent.behaviour.guidanceRules[0]!.enabled).toBe(
+        true
+      )
     })
   })
 
@@ -232,15 +479,368 @@ describe('agent-builder.store', () => {
       const store = useAgentBuilderStore.getState()
       store.setAgentId('7')
       store.updateIdentity({ name: 'Modified' })
+      store.updateBehaviour({ tonePreset: 'formal' })
+      store.addGuidanceRule({
+        name: 'R',
+        category: 'communication',
+        whenCondition: 'c',
+        instructions: 'i',
+        enabled: true,
+      })
       store.markSectionCompleted('identity')
       store.addTestMessage({ role: 'user', content: 'test' })
       store.resetDraft()
       const state = useAgentBuilderStore.getState()
       expect(state.agentId).toBeNull()
+      expect(state.agentStatus).toBeNull()
+      expect(state.agentShareToken).toBeNull()
       expect(state.draftAgent.identity.name).toBe('')
+      expect(state.draftAgent.behaviour.tonePreset).toBe('neutral')
+      expect(state.draftAgent.behaviour.guidanceRules).toEqual([])
       expect(state.completedSections).toEqual([])
       expect(state.testMessages).toEqual([])
       expect(state.activeSection).toBe('identity')
+    })
+
+    it('clears isLoading, isSaving, and error', () => {
+      useAgentBuilderStore.setState({ isLoading: true, isSaving: true, error: 'some error' })
+      useAgentBuilderStore.getState().resetDraft()
+      const state = useAgentBuilderStore.getState()
+      expect(state.isLoading).toBe(false)
+      expect(state.isSaving).toBe(false)
+      expect(state.error).toBeNull()
+    })
+  })
+
+  describe('loadAgent', () => {
+    it('calls fetchAgent with the given id', async () => {
+      vi.mocked(fetchAgent).mockResolvedValue(MOCK_AGENT)
+      await useAgentBuilderStore.getState().loadAgent('42')
+      expect(fetchAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('hydrates the store from the fetched agent', async () => {
+      vi.mocked(fetchAgent).mockResolvedValue(MOCK_AGENT)
+      await useAgentBuilderStore.getState().loadAgent('42')
+      const state = useAgentBuilderStore.getState()
+      expect(state.agentId).toBe('42')
+      expect(state.draftAgent.identity.name).toBe('Existing Bot')
+    })
+
+    it('sets isLoading during the call', async () => {
+      let loadingDuring = false
+      vi.mocked(fetchAgent).mockImplementation(async () => {
+        loadingDuring = useAgentBuilderStore.getState().isLoading
+        return MOCK_AGENT
+      })
+      await useAgentBuilderStore.getState().loadAgent('42')
+      expect(loadingDuring).toBe(true)
+      expect(useAgentBuilderStore.getState().isLoading).toBe(false)
+    })
+
+    it('sets error when agent is not found (null)', async () => {
+      vi.mocked(fetchAgent).mockResolvedValue(null)
+      await useAgentBuilderStore.getState().loadAgent('nonexistent')
+      const state = useAgentBuilderStore.getState()
+      expect(state.error).toBe('Agent not found')
+      expect(state.isLoading).toBe(false)
+    })
+
+    it('sets error on unexpected failure', async () => {
+      vi.mocked(fetchAgent).mockRejectedValue(new Error('Network error'))
+      await useAgentBuilderStore.getState().loadAgent('42')
+      expect(useAgentBuilderStore.getState().error).toBe('Network error')
+    })
+  })
+
+  describe('ensureDraftAgent', () => {
+    it('returns the current agent when one already exists', async () => {
+      useAgentBuilderStore.setState({
+        agentId: '42',
+        agentStatus: 'draft',
+        agentShareToken: 'share-token',
+      })
+
+      const agent = await useAgentBuilderStore.getState().ensureDraftAgent()
+
+      expect(agent.id).toBe('42')
+      expect(agent.status).toBe('draft')
+      expect(agent.shareToken).toBe('share-token')
+      expect(apiCreateAgent).not.toHaveBeenCalled()
+    })
+
+    it('creates a draft agent from the current builder state', async () => {
+      vi.mocked(apiCreateAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        id: 'created-agent',
+        name: 'Order Bot',
+        agentType: 'ecommerce',
+        channels: ['Web'],
+        status: 'draft',
+        shareToken: 'share-token-created',
+      })
+      useAgentBuilderStore.setState((state) => ({
+        draftAgent: {
+          ...state.draftAgent,
+          templateId: 'order-template',
+          agentType: 'ecommerce',
+          identity: { ...state.draftAgent.identity, name: 'Order Bot' },
+          channels: ['web'],
+          knowledge: ['product-overview', 'return-policy'],
+        },
+      }))
+
+      const agent = await useAgentBuilderStore.getState().ensureDraftAgent()
+
+      expect(apiCreateAgent).toHaveBeenCalledWith({
+        name: 'Order Bot',
+        templateId: 'order-template',
+        agentType: 'ecommerce',
+        uiConfig: { channels: ['web'] },
+        knowledgeSourceSlugs: ['product-overview', 'return-policy'],
+      })
+      expect(agent.id).toBe('created-agent')
+      expect(useAgentBuilderStore.getState().agentId).toBe('created-agent')
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('draft')
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('share-token-created')
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
+    it('uses Untitled Agent when the draft has no name', async () => {
+      await useAgentBuilderStore.getState().ensureDraftAgent()
+
+      expect(apiCreateAgent).toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'Untitled Agent' })
+      )
+    })
+
+    it('reuses an in-flight create request', async () => {
+      const first = useAgentBuilderStore.getState().ensureDraftAgent()
+      const second = useAgentBuilderStore.getState().ensureDraftAgent()
+
+      await Promise.all([first, second])
+
+      expect(apiCreateAgent).toHaveBeenCalledOnce()
+    })
+
+    it('sets error and clears saving state when create fails', async () => {
+      vi.mocked(apiCreateAgent).mockRejectedValue(new Error('Create failed'))
+
+      await expect(useAgentBuilderStore.getState().ensureDraftAgent()).rejects.toThrow(
+        'Create failed'
+      )
+
+      const state = useAgentBuilderStore.getState()
+      expect(state.agentId).toBeNull()
+      expect(state.error).toBe('Create failed')
+      expect(state.isSaving).toBe(false)
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('saveDraft', () => {
+    it('calls updateAgent with agentId and draft fields', async () => {
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+      useAgentBuilderStore.getState().updateIdentity({ name: 'My Bot' })
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(updateAgent).toHaveBeenCalledWith('42', expect.objectContaining({ name: 'My Bot' }))
+    })
+
+    it('does nothing when agentId is null', async () => {
+      useAgentBuilderStore.getState().resetDraft()
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(updateAgent).not.toHaveBeenCalled()
+    })
+
+    it('clears isSaving after completion', async () => {
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(useAgentBuilderStore.getState().isSaving).toBe(false)
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(updateAgent).mockRejectedValue(new Error('Save failed'))
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().saveDraft()
+      expect(useAgentBuilderStore.getState().error).toBe('Save failed')
+      expect(useAgentBuilderStore.getState().isSaving).toBe(false)
+    })
+  })
+
+  describe('publishAgent', () => {
+    it('calls apiPublishAgent with agentId', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(apiPublishAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('updates local agentStatus from the response', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'draft' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('live')
+    })
+
+    it('updates local agentShareToken from the response', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        status: 'live',
+        shareToken: 'new-share-token',
+      })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'draft' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('new-share-token')
+    })
+
+    it('refreshes dashboard data after successful publish', async () => {
+      vi.mocked(apiPublishAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'draft' })
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
+    it('does nothing when agentId is null', async () => {
+      useAgentBuilderStore.getState().resetDraft()
+      await useAgentBuilderStore.getState().publishAgent()
+      expect(apiPublishAgent).not.toHaveBeenCalled()
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(apiPublishAgent).mockRejectedValue(new Error('Publish failed'))
+      useAgentBuilderStore.setState({ agentId: '42' })
+      await expect(useAgentBuilderStore.getState().publishAgent()).rejects.toThrow('Publish failed')
+      expect(useAgentBuilderStore.getState().error).toBe('Publish failed')
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('pauseAgent', () => {
+    it('calls apiPauseAgent with agentId', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'paused' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(apiPauseAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('updates local agentStatus from the response', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'paused' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('paused')
+    })
+
+    it('preserves local agentShareToken from the pause response', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        status: 'paused',
+        shareToken: 'share-token-42',
+      })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('share-token-42')
+    })
+
+    it('refreshes dashboard data after successful pause', async () => {
+      vi.mocked(apiPauseAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'paused' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await useAgentBuilderStore.getState().pauseAgent()
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(apiPauseAgent).mockRejectedValue(new Error('Pause failed'))
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'live' })
+      await expect(useAgentBuilderStore.getState().pauseAgent()).rejects.toThrow('Pause failed')
+      expect(useAgentBuilderStore.getState().error).toBe('Pause failed')
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('resumeAgent', () => {
+    it('calls apiResumeAgent with agentId', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(apiResumeAgent).toHaveBeenCalledWith('42')
+    })
+
+    it('updates local agentStatus from the response', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(useAgentBuilderStore.getState().agentStatus).toBe('live')
+    })
+
+    it('updates local agentShareToken from the resume response', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({
+        ...MOCK_AGENT,
+        status: 'live',
+        shareToken: 'resumed-share-token',
+      })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(useAgentBuilderStore.getState().agentShareToken).toBe('resumed-share-token')
+    })
+
+    it('refreshes dashboard data after successful resume', async () => {
+      vi.mocked(apiResumeAgent).mockResolvedValue({ ...MOCK_AGENT, status: 'live' })
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await useAgentBuilderStore.getState().resumeAgent()
+      expect(listStoreMocks.refreshDashboardData).toHaveBeenCalledOnce()
+    })
+
+    it('sets error on failure', async () => {
+      vi.mocked(apiResumeAgent).mockRejectedValue(new Error('Resume failed'))
+      useAgentBuilderStore.setState({ agentId: '42', agentStatus: 'paused' })
+      await expect(useAgentBuilderStore.getState().resumeAgent()).rejects.toThrow('Resume failed')
+      expect(useAgentBuilderStore.getState().error).toBe('Resume failed')
+      expect(listStoreMocks.refreshDashboardData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('auto-save debounce', () => {
+    it('schedules saveDraft 500ms after updateIdentity when agentId is set', async () => {
+      vi.useFakeTimers()
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+
+      useAgentBuilderStore.getState().updateIdentity({ name: 'Auto Save Bot' })
+      expect(updateAgent).not.toHaveBeenCalled()
+
+      await vi.advanceTimersByTimeAsync(500)
+      expect(updateAgent).toHaveBeenCalledTimes(1)
+
+      vi.useRealTimers()
+    })
+
+    it('debounces — only saves once for rapid consecutive updates', async () => {
+      vi.useFakeTimers()
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.setState({ agentId: '42' })
+
+      useAgentBuilderStore.getState().updateIdentity({ name: 'A' })
+      useAgentBuilderStore.getState().updateIdentity({ name: 'AB' })
+      useAgentBuilderStore.getState().updateIdentity({ name: 'ABC' })
+
+      await vi.advanceTimersByTimeAsync(500)
+      expect(updateAgent).toHaveBeenCalledTimes(1)
+
+      vi.useRealTimers()
+    })
+
+    it('does not schedule auto-save when agentId is null', async () => {
+      vi.useFakeTimers()
+      vi.mocked(updateAgent).mockResolvedValue(MOCK_AGENT)
+      useAgentBuilderStore.getState().resetDraft() // agentId = null
+
+      useAgentBuilderStore.getState().updateIdentity({ name: 'No Save' })
+      await vi.advanceTimersByTimeAsync(500)
+      expect(updateAgent).not.toHaveBeenCalled()
+
+      vi.useRealTimers()
     })
   })
 })

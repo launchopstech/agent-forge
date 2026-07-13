@@ -8,13 +8,14 @@ import {
   Settings,
   HelpCircle,
   Paintbrush,
+  Radio,
 } from 'lucide-react'
 import type { NavGroup, NavItem } from './types'
 
 export const marketingNavItems: NavItem[] = [
   { label: 'Features', href: '#features' },
-  { label: 'Benefits', href: '#benefits' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'Ownership', href: '#ownership' },
+  { label: 'Demo', href: '#demo' },
 ]
 
 export const dashboardNavGroups: NavGroup[] = [
@@ -22,6 +23,7 @@ export const dashboardNavGroups: NavGroup[] = [
     items: [
       { label: 'Overview', labelKey: 'overview', href: '/dashboard', icon: LayoutDashboard },
       { label: 'Agents', labelKey: 'agents', href: '/agents', icon: Bot },
+      { label: 'Channels', labelKey: 'channels', href: '/dashboard/channels', icon: Radio },
       { label: 'Workflows', labelKey: 'workflows', href: '/dashboard/workflows', icon: GitBranch },
     ],
   },
@@ -61,24 +63,24 @@ export const footerNavColumns: Array<{ heading: string; items: NavItem[] }> = [
     heading: 'Product',
     items: [
       { label: 'Features', href: '#features' },
-      { label: 'Pricing', href: '#pricing' },
-      { label: 'Security', href: '#security' },
+      { label: 'Ownership', href: '#ownership' },
+      { label: 'Demo', href: '#demo' },
     ],
   },
   {
-    heading: 'Company',
+    heading: 'MindRithm',
     items: [
-      { label: 'About', href: '#about' },
-      { label: 'Blog', href: '#blog' },
-      { label: 'Careers', href: '#careers' },
+      { label: 'Get started', href: '/signup' },
+      { label: 'Log in', href: '/login' },
+      { label: 'Contact', href: 'mailto:hello@mindrithm.ai', external: true },
     ],
   },
   {
     heading: 'Legal',
     items: [
-      { label: 'Privacy', href: '#privacy' },
-      { label: 'Terms', href: '#terms' },
-      { label: 'Contact', href: '#contact' },
+      { label: 'Privacy', href: 'mailto:hello@mindrithm.ai?subject=Privacy', external: true },
+      { label: 'Terms', href: 'mailto:hello@mindrithm.ai?subject=Terms', external: true },
+      { label: 'AgentForge', href: '#top' },
     ],
   },
 ]

@@ -1,27 +1,16 @@
 'use client'
 
-import { useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Input } from '@forge/ui/src/input'
 import { Label } from '@forge/ui/src/label'
 import { Textarea } from '@forge/ui/src/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@forge/ui/src/select'
-import { Button } from '@forge/ui/src/button'
 import { useAgentBuilderStore } from '../../store/agent-builder.store'
 
 export function IdentitySection() {
   const t = useTranslations('agentHub.builder.identity')
-  const tCommon = useTranslations('agentHub.builder')
-  const router = useRouter()
-  const { draftAgent, updateIdentity, markSectionCompleted, agentId } = useAgentBuilderStore()
+  const { draftAgent, updateIdentity } = useAgentBuilderStore()
   const { identity } = draftAgent
-  const builderBase = `/agents/${agentId ?? 'new'}`
-
-  const handleNext = useCallback(() => {
-    markSectionCompleted('identity')
-    router.push(`${builderBase}/behaviour`)
-  }, [markSectionCompleted, router, builderBase])
 
   return (
     <div className="space-y-6">
@@ -88,10 +77,6 @@ export function IdentitySection() {
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div className="flex justify-end">
-        <Button onClick={handleNext}>{tCommon('next')}</Button>
       </div>
     </div>
   )
