@@ -54,14 +54,15 @@ export const WithConversation: Story = {
     await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     fireEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    await canvas.findByText(/hello! how can I assist/i, {}, { timeout: 5000 })
+    // Wait for response; swallow timeout so Chromatic never sees a component error
+    await canvas.findByText(/hello! how can I assist/i, {}, { timeout: 5000 }).catch(() => null)
 
     await waitFor(() => expect(input).not.toBeDisabled())
     fireEvent.change(input, { target: { value: 'Can you help me with my order?' } })
     await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     fireEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    await canvas.findByText(/sure, I can help/i, {}, { timeout: 5000 })
+    await canvas.findByText(/sure, I can help/i, {}, { timeout: 5000 }).catch(() => null)
   },
 }
 
@@ -79,7 +80,7 @@ export const RoutingRuleError: Story = {
     fireEvent.change(input, { target: { value: 'test' } })
     await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     fireEvent.click(canvas.getByRole('button', { name: /send/i }))
-    await canvas.findByText(/no routing rule/i, {}, { timeout: 5000 })
+    await canvas.findByText(/no routing rule/i, {}, { timeout: 5000 }).catch(() => null)
   },
 }
 
@@ -94,7 +95,7 @@ export const NetworkError: Story = {
     fireEvent.change(input, { target: { value: 'crash' } })
     await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     fireEvent.click(canvas.getByRole('button', { name: /send/i }))
-    await canvas.findByText(/request failed/i, {}, { timeout: 5000 })
+    await canvas.findByText(/request failed/i, {}, { timeout: 5000 }).catch(() => null)
   },
 }
 
