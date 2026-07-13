@@ -32,6 +32,10 @@ export function TestConsole({
   // fresh server-side conversation (findOrCreate keys on fromId).
   const [sessionFromId, setSessionFromId] = useState(() => crypto.randomUUID())
   const bottomRef = useRef<HTMLDivElement>(null)
+  // Always call the latest triggerTest prop without adding it to useCallback deps
+  // (adding it would cause the button to become disabled mid-play due to re-renders)
+  const triggerTestRef = useRef(triggerTest)
+  triggerTestRef.current = triggerTest
 
   // Auto-scroll to the latest message
   useEffect(() => {
@@ -54,7 +58,7 @@ export function TestConsole({
     setError(null)
 
     try {
-      const result = await triggerTest(channelId, { text, fromId: sessionFromId })
+      const result = await triggerTestRef.current(channelId, { text, fromId: sessionFromId })
 
       if (!result.ok) {
         setError(result.reason ?? 'No routing rule matched')
