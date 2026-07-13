@@ -160,10 +160,7 @@ function run(cmd, cwd) {
 
 function setVar(key, value, vercelEnvTier, projectDir) {
   const escaped = value.replace(/'/g, "'\\''")
-  run(
-    `vercel env add ${key} ${vercelEnvTier} --value '${escaped}' --yes`,
-    projectDir
-  )
+  run(`vercel env add ${key} ${vercelEnvTier} --value '${escaped}' --yes`, projectDir)
 }
 
 // ── Execute ───────────────────────────────────────────────────────────────────
