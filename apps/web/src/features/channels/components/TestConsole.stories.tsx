@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect } from '@storybook/test'
+import { fn, userEvent, within, waitFor, expect } from '@storybook/test'
 import { TestConsole } from './TestConsole'
 
 const meta: Meta<typeof TestConsole> = {
@@ -51,14 +51,17 @@ export const WithConversation: Story = {
 
     const input = canvas.getByPlaceholderText(/type a message/i)
     await userEvent.type(input, 'Hello there')
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     await userEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    await expect(canvas.findByText(/hello! how can I assist/i)).resolves.toBeTruthy()
+    await canvas.findByText(/hello! how can I assist/i)
 
+    await waitFor(() => expect(input).not.toBeDisabled())
     await userEvent.type(input, 'Can you help me with my order?')
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     await userEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    await expect(canvas.findByText(/sure, I can help/i)).resolves.toBeTruthy()
+    await canvas.findByText(/sure, I can help/i)
   },
 }
 
@@ -74,8 +77,9 @@ export const RoutingRuleError: Story = {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText(/type a message/i)
     await userEvent.type(input, 'test')
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     await userEvent.click(canvas.getByRole('button', { name: /send/i }))
-    await expect(canvas.findByText(/no routing rule/i)).resolves.toBeTruthy()
+    await canvas.findByText(/no routing rule/i)
   },
 }
 
@@ -88,8 +92,9 @@ export const NetworkError: Story = {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText(/type a message/i)
     await userEvent.type(input, 'crash')
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
     await userEvent.click(canvas.getByRole('button', { name: /send/i }))
-    await expect(canvas.findByText(/request failed/i)).resolves.toBeTruthy()
+    await canvas.findByText(/request failed/i)
   },
 }
 
