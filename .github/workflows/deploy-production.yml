@@ -1,0 +1,54 @@
+name: Deploy — Production
+
+# Deployment pipeline for the prod branch:
+# 1. Deploy all configured Vercel projects to production
+# 2. Run smoke tests against production
+#
+# Triggered by: push to prod branch (from staging → prod PR merge)
+# The "production" GitHub Environment has required reviewers configured,
+# which acts as the approval gate before deploy-production runs.
+#
+# Requires a GitHub Environment named "production" with:
+#   Secret: VERCEL_DEPLOY_HOOK              (agent-forge-web)
+#   Secret: VERCEL_DEPLOY_HOOK_BLUE_STONE   (ploutos-blue-stone)
+#   Secret: VERCEL_DEPLOY_HOOK_LAUNCHOPS    (launchops)
+#   Var:    NEXT_PUBLIC_APP_URL             (e.g. https://yourapp.com)
+#   Protection: Required reviewers (approval gate)
+
+on:
+  push:
+    branches: [prod]
+
+jobs:
+  # ============================================================
+  # Phase 1: Deploy all Vercel projects to Production
+  # ============================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Deploy all projects
+        uses: ./.github/actions/multi-deploy
+        with:
+          hook_forge_web: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+          hook_launchops: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
+          hook_blue_stone: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
+
+  # ============================================================
+  # Phase 2: Post-deploy Smoke Tests on Production
+  # ============================================================
+  smoke-production:
+    needs: [deploy-production]
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: production
+      run-e2e: true
+      run-chromatic: false
+      e2e-test-path: e2e/smoke.spec.ts
+      wait-for-deployment: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
