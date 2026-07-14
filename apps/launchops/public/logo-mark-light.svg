@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="llGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <radialGradient id="llNode" cx="30%" cy="30%" r="70%">
+      <stop offset="0%"   stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </radialGradient>
+    <filter id="llNodeGlow" x="-140%" y="-140%" width="380%" height="380%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Light background tile -->
+  <rect width="64" height="64" rx="14" fill="#ede9fe"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none"
+        stroke="rgba(124,58,237,0.22)" stroke-width="1"/>
+
+  <!-- L letterform on light -->
+  <path fill="url(#llGrad)"
+    d="M 12 10 L 22 10 L 22 44 L 48 44 L 48 54 L 12 54 Z"/>
+
+  <!-- Trajectory arc -->
+  <path d="M 22 12 Q 34 2 42 15"
+    fill="none"
+    stroke="rgba(124,58,237,0.4)"
+    stroke-width="1.2"
+    stroke-dasharray="2.5 2.2"
+    stroke-linecap="round"/>
+
+  <!-- Node -->
+  <circle cx="42" cy="15" r="3.2" fill="url(#llNode)" filter="url(#llNodeGlow)"/>
+</svg>

@@ -1,0 +1,49 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">MindRithm governed agent builder</title>
+  <desc id="desc">Builder screen with identity, tone, guidance rules, and launch readiness panels.</desc>
+  <rect width="1440" height="900" fill="#F8FAFC"/>
+  <rect x="52" y="52" width="1336" height="796" rx="22" fill="white" stroke="#D1D5DB"/>
+  <rect x="52" y="52" width="1336" height="76" rx="22" fill="#0F172A"/>
+  <text x="92" y="101" fill="#E2E8F0" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">EU Returns Advisor</text>
+  <rect x="1148" y="74" width="102" height="34" rx="17" fill="#FEF3C7"/>
+  <text x="1175" y="96" fill="#92400E" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">Draft</text>
+  <rect x="1266" y="74" width="84" height="34" rx="17" fill="#4F46E5"/>
+  <text x="1286" y="96" fill="white" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Publish</text>
+  <rect x="92" y="168" width="230" height="612" rx="18" fill="#F3F4F6" stroke="#E5E7EB"/>
+  <text x="126" y="218" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">Builder steps</text>
+  <rect x="118" y="254" width="178" height="44" rx="10" fill="#E0E7FF"/>
+  <text x="142" y="282" fill="#3730A3" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="800">Identity</text>
+  <text x="142" y="342" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="15">Behaviour</text>
+  <text x="142" y="402" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="15">Actions</text>
+  <text x="142" y="462" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="15">Knowledge</text>
+  <text x="142" y="522" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="15">Channels</text>
+  <rect x="362" y="168" width="604" height="612" rx="18" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <text x="404" y="220" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800">Agent identity</text>
+  <text x="404" y="254" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="16">Define how the agent presents itself before governance review.</text>
+  <text x="404" y="324" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Agent name</text>
+  <rect x="404" y="342" width="500" height="50" rx="10" fill="#F8FAFC" stroke="#D1D5DB"/>
+  <text x="428" y="374" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="16">EU Returns Advisor</text>
+  <text x="404" y="440" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Welcome message</text>
+  <rect x="404" y="458" width="500" height="96" rx="10" fill="#F8FAFC" stroke="#D1D5DB"/>
+  <text x="428" y="492" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="16">I can help with return eligibility, policy</text>
+  <text x="428" y="522" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="16">questions, and escalation requests.</text>
+  <text x="404" y="604" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Guidance rules</text>
+  <rect x="404" y="626" width="500" height="62" rx="10" fill="#ECFDF5" stroke="#A7F3D0"/>
+  <text x="428" y="654" fill="#065F46" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="800">Refund escalation</text>
+  <text x="428" y="676" fill="#047857" font-family="Inter, Arial, sans-serif" font-size="13">Escalate exception requests above policy threshold.</text>
+  <rect x="1004" y="168" width="330" height="612" rx="18" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <text x="1042" y="220" fill="#1E293B" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">Launch readiness</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="1042" y="264" width="252" height="52" rx="12" fill="#DCFCE7"/>
+    <text x="1070" y="297" fill="#166534" font-size="15" font-weight="800">Identity complete</text>
+    <rect x="1042" y="340" width="252" height="52" rx="12" fill="#E0E7FF"/>
+    <text x="1070" y="373" fill="#3730A3" font-size="15" font-weight="800">Guardrails attached</text>
+    <rect x="1042" y="416" width="252" height="52" rx="12" fill="#FEF3C7"/>
+    <text x="1070" y="449" fill="#92400E" font-size="15" font-weight="800">Review pending</text>
+    <rect x="1042" y="520" width="252" height="144" rx="14" fill="#F8FAFC" stroke="#E5E7EB"/>
+    <text x="1070" y="560" fill="#334155" font-size="15" font-weight="800">Audit context</text>
+    <text x="1070" y="594" fill="#64748B" font-size="13">Owner: Ops lead</text>
+    <text x="1070" y="622" fill="#64748B" font-size="13">Risk: Customer policy</text>
+    <text x="1070" y="650" fill="#64748B" font-size="13">Review: Required</text>
+  </g>
+</svg>

@@ -182,7 +182,7 @@ export default function PreviewPage() {
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-14 items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+            <span className="font-mono text-xs text-foreground bg-muted px-2 py-1 rounded">
               DEV
             </span>
             <span className="font-semibold text-sm">Component Preview</span>

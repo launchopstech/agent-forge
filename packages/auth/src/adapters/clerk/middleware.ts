@@ -20,6 +20,10 @@ export function buildMiddleware(
       return NextResponse.redirect(new URL('/dashboard', req.url))
     }
 
-    if (isProtected(req)) await auth.protect()
+    if (isProtected(req) && !userId) {
+      const loginUrl = new URL('/login', req.url)
+      loginUrl.searchParams.set('returnTo', req.nextUrl.pathname)
+      return NextResponse.redirect(loginUrl)
+    }
   })
 }

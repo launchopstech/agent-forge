@@ -24,7 +24,11 @@ export function MarketingLayout({
 }: MarketingLayoutProps) {
   return (
     <div className={cn('min-h-screen bg-background flex flex-col', className)}>
-      <Navbar navItems={navItems} />
+      <Navbar
+        navItems={navItems}
+        ctaSecondary={{ label: 'Log in', href: '/login' }}
+        ctaPrimary={{ label: 'Get started free', href: '/signup' }}
+      />
       <main className="flex-1">{children}</main>
       {showFooter && <Footer columns={footerColumns} copyrightText={copyrightText} />}
     </div>

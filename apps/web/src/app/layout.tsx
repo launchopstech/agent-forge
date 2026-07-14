@@ -93,7 +93,7 @@ export default async function RootLayout({
           </TenantProvider>
         </NextIntlClientProvider>
         <Analytics />
-        <SpeedInsights />
+        {process.env.VERCEL_SPEED_INSIGHTS_ID && <SpeedInsights />}
       </body>
     </html>
   )

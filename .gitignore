@@ -12,6 +12,11 @@ build/
 storybook-static/
 coverage/
 
+# generated widget artefact (built from packages/chat-widget)
+apps/web/public/widget.js
+apps/launchops/public/widget.js
+packages/chat-widget/dist/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -35,6 +40,7 @@ next-env.d.ts
 
 # playwright
 test-results/
+.playwright-cli/
 
 # macOS
 .DS_Store
@@ -52,3 +58,4 @@ chrome-profile-*/
 
 # package-lock (project uses pnpm)
 package-lock.json
+.gstack/

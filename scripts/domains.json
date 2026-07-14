@@ -1,0 +1,60 @@
+{
+  "projects": {
+    "ploutos-blue-stone": {
+      "dir": "apps/ploutos/clients/blue-stone-construction",
+      "domains": {
+        "development": "dev.bluestoneconstruction.llc",
+        "qa": "qa.bluestoneconstruction.llc",
+        "staging": "staging.bluestoneconstruction.llc",
+        "production": "bluestoneconstruction.llc"
+      },
+      "gitBranches": {
+        "development": "develop",
+        "qa": "qa",
+        "staging": "staging"
+      },
+      "envVars": {
+        "NEXT_PUBLIC_BRAND": "blue-stone-construction",
+        "NEXT_PUBLIC_APP_ENV": {
+          "development": "development",
+          "qa": "qa",
+          "staging": "staging",
+          "production": "production"
+        }
+      },
+      "secrets": ["NEXT_PUBLIC_PHONE", "RESEND_API_KEY"]
+    },
+    "agent-forge-web": {
+      "dir": ".",
+      "domains": {
+        "preview": "preview.mindrithm.app",
+        "staging": "staging.mindrithm.app",
+        "production": "mindrithm.app"
+      },
+      "envVars": {
+        "NEXT_PUBLIC_BRAND": "mindrithm",
+        "NEXT_PUBLIC_APP_ENV": {
+          "preview": "staging",
+          "staging": "staging",
+          "production": "production"
+        }
+      },
+      "secrets": []
+    },
+    "agent-forge-web-launchops": {
+      "dir": "apps/launchops",
+      "domains": {
+        "preview": "preview.launchops.ai",
+        "production": "launchops.ai"
+      },
+      "envVars": {
+        "NEXT_PUBLIC_BRAND": "launchops",
+        "NEXT_PUBLIC_APP_ENV": {
+          "preview": "staging",
+          "production": "production"
+        }
+      },
+      "secrets": []
+    }
+  }
+}

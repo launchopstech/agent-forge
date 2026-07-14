@@ -1,19 +1,45 @@
 import { create } from 'zustand'
-import type { DraftAgent, BuilderSection, TestMessage, AgentTemplate, Agent } from '../types'
+import type {
+  DraftAgent,
+  BuilderSection,
+  TestMessage,
+  AgentTemplate,
+  Agent,
+  GuidanceRule,
+  TemplateBehaviour,
+  AgentStatus,
+} from '../types'
+import {
+  createAgent as apiCreateAgent,
+  fetchAgent,
+  updateAgent,
+  publishAgent as apiPublishAgent,
+  pauseAgent as apiPauseAgent,
+  resumeAgent as apiResumeAgent,
+} from '../api/agents.api'
+import { useAgentListStore } from './agent-list.store'
+
+const DEFAULT_BEHAVIOUR: TemplateBehaviour = {
+  systemPrompt: '',
+  responseStyle: 50,
+  fallback: 'handoff',
+  tonePreset: 'neutral',
+  customToneInstructions: '',
+  useEmojis: true,
+  showSourceLinks: true,
+  guidanceRules: [],
+}
 
 const DEFAULT_DRAFT: DraftAgent = {
   templateId: null,
+  agentType: 'custom',
   identity: {
     name: '',
     welcomeMessage: '',
     tone: 'professional',
     language: 'en-US',
   },
-  behaviour: {
-    systemPrompt: '',
-    responseStyle: 50,
-    fallback: 'handoff',
-  },
+  behaviour: DEFAULT_BEHAVIOUR,
   actions: [],
   knowledge: [],
   channels: [],
@@ -21,10 +47,15 @@ const DEFAULT_DRAFT: DraftAgent = {
 
 interface AgentBuilderState {
   agentId: string | null
+  agentStatus: AgentStatus | null
+  agentShareToken: string | null
   draftAgent: DraftAgent
   activeSection: BuilderSection
   completedSections: BuilderSection[]
   testMessages: TestMessage[]
+  isLoading: boolean
+  isSaving: boolean
+  error: string | null
   setAgentId: (id: string | null) => void
   hydrateFromAgent: (agent: Agent) => void
   applyTemplate: (template: AgentTemplate) => void
@@ -32,28 +63,53 @@ interface AgentBuilderState {
   markSectionCompleted: (section: BuilderSection) => void
   updateIdentity: (identity: Partial<DraftAgent['identity']>) => void
   updateBehaviour: (behaviour: Partial<DraftAgent['behaviour']>) => void
+  addGuidanceRule: (rule: Omit<GuidanceRule, 'id' | 'createdAt' | 'updatedAt'>) => void
+  updateGuidanceRule: (ruleId: string, patch: Partial<GuidanceRule>) => void
+  removeGuidanceRule: (ruleId: string) => void
+  toggleGuidanceRule: (ruleId: string) => void
   toggleAction: (action: string) => void
   toggleKnowledge: (source: string) => void
   toggleChannel: (channel: string) => void
   addTestMessage: (message: Omit<TestMessage, 'id' | 'timestamp'>) => void
+  appendToLastTestMessage: (chunk: string) => void
   clearTestMessages: () => void
   resetDraft: () => void
+  loadAgent: (id: string) => Promise<void>
+  ensureDraftAgent: () => Promise<Agent>
+  saveDraft: () => Promise<void>
+  publishAgent: () => Promise<void>
+  pauseAgent: () => Promise<void>
+  resumeAgent: () => Promise<void>
 }
 
-export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
+let _saveTimeout: ReturnType<typeof setTimeout> | null = null
+let _ensureDraftPromise: Promise<Agent> | null = null
+
+export const useAgentBuilderStore = create<AgentBuilderState>((set, get) => ({
   agentId: null,
+  agentStatus: null,
+  agentShareToken: null,
   draftAgent: DEFAULT_DRAFT,
   activeSection: 'identity',
   completedSections: [],
   testMessages: [],
+  isLoading: false,
+  isSaving: false,
+  error: null,
 
-  setAgentId: (id) => set({ agentId: id }),
+  setAgentId: (id) =>
+    set(
+      id === null ? { agentId: null, agentStatus: null, agentShareToken: null } : { agentId: id }
+    ),
 
   hydrateFromAgent: (agent: Agent) => {
     set({
       agentId: agent.id,
+      agentStatus: agent.status,
+      agentShareToken: agent.shareToken ?? null,
       draftAgent: {
         ...DEFAULT_DRAFT,
+        agentType: agent.agentType,
         identity: {
           ...DEFAULT_DRAFT.identity,
           name: agent.name,
@@ -69,10 +125,17 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
     set({
       draftAgent: {
         templateId: template.id,
+        agentType: template.agentType ?? template.category ?? 'custom',
         identity: { ...template.identity },
-        behaviour: { ...template.behaviour },
+        behaviour: {
+          ...DEFAULT_BEHAVIOUR,
+          ...template.behaviour,
+          guidanceRules: template.behaviour.guidanceRules
+            ? [...template.behaviour.guidanceRules]
+            : [],
+        },
         actions: [...template.actions],
-        knowledge: [...template.knowledge],
+        knowledge: [...(template.knowledgeSourceSlugs ?? template.knowledge)],
         channels: [...template.channels],
       },
     })
@@ -97,6 +160,10 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
         identity: { ...state.draftAgent.identity, ...identity },
       },
     }))
+    if (get().agentId) {
+      if (_saveTimeout) clearTimeout(_saveTimeout)
+      _saveTimeout = setTimeout(() => void get().saveDraft(), 500)
+    }
   },
 
   updateBehaviour: (behaviour) => {
@@ -104,6 +171,69 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
       draftAgent: {
         ...state.draftAgent,
         behaviour: { ...state.draftAgent.behaviour, ...behaviour },
+      },
+    }))
+    if (get().agentId) {
+      if (_saveTimeout) clearTimeout(_saveTimeout)
+      _saveTimeout = setTimeout(() => void get().saveDraft(), 500)
+    }
+  },
+
+  addGuidanceRule: (rule) => {
+    const now = new Date().toISOString()
+    const newRule: GuidanceRule = {
+      ...rule,
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+    }
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: [...state.draftAgent.behaviour.guidanceRules, newRule],
+        },
+      },
+    }))
+  },
+
+  updateGuidanceRule: (ruleId, patch) => {
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: state.draftAgent.behaviour.guidanceRules.map((r) =>
+            r.id === ruleId ? { ...r, ...patch, updatedAt: new Date().toISOString() } : r
+          ),
+        },
+      },
+    }))
+  },
+
+  removeGuidanceRule: (ruleId) => {
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: state.draftAgent.behaviour.guidanceRules.filter((r) => r.id !== ruleId),
+        },
+      },
+    }))
+  },
+
+  toggleGuidanceRule: (ruleId) => {
+    set((state) => ({
+      draftAgent: {
+        ...state.draftAgent,
+        behaviour: {
+          ...state.draftAgent.behaviour,
+          guidanceRules: state.draftAgent.behaviour.guidanceRules.map((r) =>
+            r.id === ruleId ? { ...r, enabled: !r.enabled, updatedAt: new Date().toISOString() } : r
+          ),
+        },
       },
     }))
   },
@@ -147,11 +277,21 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
         ...state.testMessages,
         {
           ...message,
-          id: String(Date.now()),
+          id: crypto.randomUUID(),
           timestamp: new Date(),
         },
       ],
     }))
+  },
+
+  appendToLastTestMessage: (chunk) => {
+    set((state) => {
+      const msgs = state.testMessages
+      const last = msgs[msgs.length - 1]
+      if (!last || last.role !== 'assistant') return state
+      const updated: TestMessage = { ...last, content: last.content + chunk }
+      return { testMessages: [...msgs.slice(0, -1), updated] }
+    })
   },
 
   clearTestMessages: () => {
@@ -159,12 +299,155 @@ export const useAgentBuilderStore = create<AgentBuilderState>((set) => ({
   },
 
   resetDraft: () => {
+    if (_saveTimeout) {
+      clearTimeout(_saveTimeout)
+      _saveTimeout = null
+    }
+    _ensureDraftPromise = null
     set({
       agentId: null,
+      agentStatus: null,
+      agentShareToken: null,
       draftAgent: DEFAULT_DRAFT,
       activeSection: 'identity',
       completedSections: [],
       testMessages: [],
+      isLoading: false,
+      isSaving: false,
+      error: null,
     })
+  },
+
+  loadAgent: async (id: string) => {
+    set({ isLoading: true, error: null })
+    try {
+      const agent = await fetchAgent(id)
+      if (!agent) {
+        set({ isLoading: false, error: 'Agent not found' })
+        return
+      }
+      get().hydrateFromAgent(agent)
+      set({ isLoading: false })
+    } catch (err) {
+      set({ isLoading: false, error: err instanceof Error ? err.message : 'Failed to load agent' })
+    }
+  },
+
+  ensureDraftAgent: async () => {
+    const { agentId, agentStatus, agentShareToken, draftAgent } = get()
+    if (agentId) {
+      return {
+        id: agentId,
+        name: draftAgent.identity.name || 'Untitled Agent',
+        agentType: draftAgent.agentType,
+        channels: draftAgent.channels as Agent['channels'],
+        conversations: 0,
+        resolution: null,
+        csat: null,
+        status: agentStatus ?? 'draft',
+        shareToken: agentShareToken,
+      }
+    }
+
+    if (_ensureDraftPromise) return _ensureDraftPromise
+
+    set({ isSaving: true, error: null })
+    _ensureDraftPromise = apiCreateAgent({
+      name: draftAgent.identity.name || 'Untitled Agent',
+      templateId: draftAgent.templateId ?? undefined,
+      agentType: draftAgent.agentType,
+      uiConfig: { channels: draftAgent.channels },
+      knowledgeSourceSlugs: draftAgent.knowledge,
+    })
+      .then((agent) => {
+        if (!agent.id) throw new Error('Failed to create draft agent')
+        set({
+          agentId: agent.id,
+          agentStatus: agent.status,
+          agentShareToken: agent.shareToken ?? null,
+          isSaving: false,
+        })
+        void useAgentListStore.getState().refreshDashboardData()
+        return agent
+      })
+      .catch((err) => {
+        set({
+          isSaving: false,
+          error: err instanceof Error ? err.message : 'Failed to create draft agent',
+        })
+        throw err
+      })
+      .finally(() => {
+        _ensureDraftPromise = null
+      })
+
+    return _ensureDraftPromise
+  },
+
+  saveDraft: async () => {
+    const { agentId, draftAgent } = get()
+    if (!agentId) return
+    set({ isSaving: true })
+    try {
+      await updateAgent(agentId, {
+        name: draftAgent.identity.name,
+        uiConfig: { channels: draftAgent.channels },
+      })
+    } catch (err) {
+      set({ error: err instanceof Error ? err.message : 'Failed to save draft' })
+    } finally {
+      set({ isSaving: false })
+    }
+  },
+
+  publishAgent: async () => {
+    const { agentId } = get()
+    if (!agentId) return
+    set({ isSaving: true, error: null })
+    try {
+      const agent = await apiPublishAgent(agentId)
+      set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
+      void useAgentListStore.getState().refreshDashboardData()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to publish agent'
+      set({ error: message })
+      throw err
+    } finally {
+      set({ isSaving: false })
+    }
+  },
+
+  pauseAgent: async () => {
+    const { agentId } = get()
+    if (!agentId) return
+    set({ isSaving: true, error: null })
+    try {
+      const agent = await apiPauseAgent(agentId)
+      set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
+      void useAgentListStore.getState().refreshDashboardData()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to pause agent'
+      set({ error: message })
+      throw err
+    } finally {
+      set({ isSaving: false })
+    }
+  },
+
+  resumeAgent: async () => {
+    const { agentId } = get()
+    if (!agentId) return
+    set({ isSaving: true, error: null })
+    try {
+      const agent = await apiResumeAgent(agentId)
+      set({ agentStatus: agent.status, agentShareToken: agent.shareToken ?? null })
+      void useAgentListStore.getState().refreshDashboardData()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to resume agent'
+      set({ error: message })
+      throw err
+    } finally {
+      set({ isSaving: false })
+    }
   },
 }))

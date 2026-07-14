@@ -110,6 +110,7 @@ jobs:
         env:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
           NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+          NEXT_PUBLIC_BRAND: ${{ vars.NEXT_PUBLIC_BRAND || 'mindrithm' }}
 
   e2e:
     name: e2e
@@ -134,6 +135,7 @@ jobs:
         env:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
           NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+          NEXT_PUBLIC_BRAND: ${{ vars.NEXT_PUBLIC_BRAND || 'mindrithm' }}
       - run: pnpm --filter=@forge/web exec playwright install --with-deps chromium
       - name: Wait for deployment to be ready
         if: ${{ inputs.wait-for-deployment }}
@@ -148,6 +150,7 @@ jobs:
           NEXT_PUBLIC_AUTH_PROVIDER: ${{ vars.NEXT_PUBLIC_AUTH_PROVIDER || 'clerk' }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_BRAND: ${{ vars.NEXT_PUBLIC_BRAND || 'mindrithm' }}
 
   storybook:
     name: storybook
@@ -175,6 +178,7 @@ jobs:
         env:
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
           NEXT_PUBLIC_APP_ENV: ${{ vars.NEXT_PUBLIC_APP_ENV || 'development' }}
+          NEXT_PUBLIC_BRAND: ${{ vars.NEXT_PUBLIC_BRAND || 'mindrithm' }}
       - name: Run Chromatic
         run: pnpm --filter=@forge/web exec chromatic --exit-zero-on-changes --build-script-name=storybook:build
         env:

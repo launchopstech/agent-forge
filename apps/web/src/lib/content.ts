@@ -18,7 +18,7 @@ const pages: Page[] = [
   {
     slug: 'about',
     title: 'About Us',
-    body: 'AgentForge is a platform for building and deploying AI agents at scale.',
+    body: 'MindRithm helps businesses launch AI agents they own, control, and can prove, so they can serve customers faster without risking data or trust.',
   },
   {
     slug: 'privacy',
@@ -28,17 +28,17 @@ const pages: Page[] = [
   {
     slug: 'terms',
     title: 'Terms of Service',
-    body: 'By using AgentForge you agree to these terms and conditions.',
+    body: 'By using MindRithm you agree to these terms and conditions.',
   },
 ]
 
 const posts: Post[] = [
   {
     slug: 'introducing-agent-forge',
-    title: 'Introducing AgentForge',
-    excerpt: 'Learn how AgentForge helps teams build AI-powered workflows faster.',
+    title: 'Introducing MindRithm',
+    excerpt: 'Learn how MindRithm helps businesses launch AI agents they own and control.',
     publishedAt: '2025-01-15',
-    body: 'AgentForge brings together the best tools for AI agent development in one cohesive platform.',
+    body: 'MindRithm brings agent building, knowledge setup, testing, publishing, audit trails, and client delivery into one owned workflow.',
   },
   {
     slug: 'building-with-next-js',

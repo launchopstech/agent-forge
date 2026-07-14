@@ -5,6 +5,7 @@ export interface BrandColors {
 
 export interface BrandAssets {
   logoPath: string
+  logoIconPath?: string
   faviconPath: string
 }
 

@@ -1,12 +1,15 @@
 {
   "name": "agent-forge-root",
-  "version": "0.0.0",
+  "version": "0.1.0.0",
   "private": true,
   "packageManager": "pnpm@9.11.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
-    "dev": "turbo dev --filter=@forge/web",
-    "build": "turbo build --filter=@forge/web",
-    "start": "turbo start --filter=@forge/web",
+    "dev": "turbo dev --filter=@forge/web --filter=@forge/launchops",
+    "build": "turbo build --filter=@forge/web --filter=@forge/launchops",
+    "start": "turbo start --filter=@forge/web --filter=@forge/launchops",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
@@ -19,6 +22,7 @@
     "prepare": "husky",
     "test:e2e": "pnpm --filter=@forge/web test:e2e",
     "chromatic": "pnpm --filter=@forge/web chromatic",
+    "test:scripts": "node --test 'scripts/__tests__/**/*.test.mjs'",
     "check": "pnpm typecheck && pnpm lint && pnpm build && pnpm test:coverage && pnpm storybook:build && pnpm test:e2e"
   },
   "lint-staged": {
@@ -30,6 +34,12 @@
     ],
     "apps/web/src/**/*.{ts,tsx}": [
       "pnpm --filter=@forge/web exec vitest related --run"
+    ],
+    "packages/ui/src/*.tsx": [
+      "node scripts/check-story-coverage.mjs"
+    ],
+    "apps/web/src/features/**/components/*.tsx": [
+      "node scripts/check-story-coverage.mjs"
     ]
   },
   "devDependencies": {
