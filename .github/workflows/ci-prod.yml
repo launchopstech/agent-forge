@@ -1,0 +1,20 @@
+name: CI — Production
+
+# Runs CI checks on PRs to main (pre-merge gate).
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    uses: ./.github/workflows/shared-checks.yml
+    with:
+      environment: staging
+      run-e2e: false
+      run-chromatic: true
+    secrets:
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
