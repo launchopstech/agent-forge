@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prepare:widget": "pnpm --filter @forge/chat-widget run build && cp ../../packages/chat-widget/dist/widget.js public/widget.js",
+    "prepare:widget": "test -f ../../packages/chat-widget/dist/widget.js || pnpm --filter @forge/chat-widget run build && cp ../../packages/chat-widget/dist/widget.js public/widget.js",
     "dev": "pnpm run prepare:widget && next dev --port 3003",
     "build": "pnpm run prepare:widget && next build",
     "start": "next start",

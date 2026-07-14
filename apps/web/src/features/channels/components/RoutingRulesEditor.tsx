@@ -66,13 +66,13 @@ export function RoutingRulesEditor({
     setIsLoading(true)
     try {
       const data = await fetchRoutingRules(channelId)
-      setRules(data)
+      setRules(Array.isArray(data) ? data : [])
     } catch {
       toast({ title: 'Failed to load routing rules', variant: 'destructive' })
     } finally {
       setIsLoading(false)
     }
-  }, [channelId])
+  }, [channelId, fetchRoutingRules])
 
   useEffect(() => {
     void load()
