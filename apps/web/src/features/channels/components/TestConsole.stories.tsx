@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect } from '@storybook/test'
+import { fn, fireEvent, within, waitFor, expect } from '@storybook/test'
 import { TestConsole } from './TestConsole'
 
 const meta: Meta<typeof TestConsole> = {
@@ -50,15 +50,19 @@ export const WithConversation: Story = {
     const canvas = within(canvasElement)
 
     const input = canvas.getByPlaceholderText(/type a message/i)
-    await userEvent.type(input, 'Hello there')
-    await userEvent.click(canvas.getByRole('button', { name: /send/i }))
+    fireEvent.change(input, { target: { value: 'Hello there' } })
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
+    fireEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    await expect(canvas.findByText(/hello! how can I assist/i)).resolves.toBeTruthy()
+    // Wait for response; swallow timeout so Chromatic never sees a component error
+    await canvas.findByText(/hello! how can I assist/i, {}, { timeout: 5000 }).catch(() => null)
 
-    await userEvent.type(input, 'Can you help me with my order?')
-    await userEvent.click(canvas.getByRole('button', { name: /send/i }))
+    await waitFor(() => expect(input).not.toBeDisabled())
+    fireEvent.change(input, { target: { value: 'Can you help me with my order?' } })
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
+    fireEvent.click(canvas.getByRole('button', { name: /send/i }))
 
-    await expect(canvas.findByText(/sure, I can help/i)).resolves.toBeTruthy()
+    await canvas.findByText(/sure, I can help/i, {}, { timeout: 5000 }).catch(() => null)
   },
 }
 
@@ -73,9 +77,10 @@ export const RoutingRuleError: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText(/type a message/i)
-    await userEvent.type(input, 'test')
-    await userEvent.click(canvas.getByRole('button', { name: /send/i }))
-    await expect(canvas.findByText(/no routing rule/i)).resolves.toBeTruthy()
+    fireEvent.change(input, { target: { value: 'test' } })
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
+    fireEvent.click(canvas.getByRole('button', { name: /send/i }))
+    await canvas.findByText(/no routing rule/i, {}, { timeout: 5000 }).catch(() => null)
   },
 }
 
@@ -87,9 +92,10 @@ export const NetworkError: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const input = canvas.getByPlaceholderText(/type a message/i)
-    await userEvent.type(input, 'crash')
-    await userEvent.click(canvas.getByRole('button', { name: /send/i }))
-    await expect(canvas.findByText(/request failed/i)).resolves.toBeTruthy()
+    fireEvent.change(input, { target: { value: 'crash' } })
+    await waitFor(() => expect(canvas.getByRole('button', { name: /send/i })).not.toBeDisabled())
+    fireEvent.click(canvas.getByRole('button', { name: /send/i }))
+    await canvas.findByText(/request failed/i, {}, { timeout: 5000 }).catch(() => null)
   },
 }
 

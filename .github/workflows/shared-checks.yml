@@ -181,6 +181,5 @@ jobs:
           NEXT_PUBLIC_BRAND: ${{ vars.NEXT_PUBLIC_BRAND || 'mindrithm' }}
       - name: Run Chromatic
         run: pnpm --filter=@forge/web exec chromatic --exit-zero-on-changes --build-script-name=storybook:build
-        continue-on-error: true
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}

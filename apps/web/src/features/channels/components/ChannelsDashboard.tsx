@@ -234,14 +234,14 @@ export function ChannelsDashboard({
     setError(null)
     try {
       const [chs, cat] = await Promise.all([fetchChannels(), fetchChannelCatalog()])
-      setChannels(chs)
-      setCatalog(cat)
+      setChannels(Array.isArray(chs) ? chs : [])
+      setCatalog(Array.isArray(cat) ? cat : [])
     } catch {
       setError('Failed to load channels')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [fetchChannels, fetchChannelCatalog])
 
   useEffect(() => {
     void load()
