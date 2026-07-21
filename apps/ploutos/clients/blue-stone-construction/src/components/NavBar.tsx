@@ -118,7 +118,7 @@ export function NavBar() {
           ))}
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
             <a
-              href={`tel:${process.env.NEXT_PUBLIC_PHONE ?? ''}`}
+              href={`tel:+1${(process.env.NEXT_PUBLIC_PHONE ?? '').replace(/\D/g, '')}`}
               className="btn-outline"
               style={{ justifyContent: 'center' }}
             >
