@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Phone, Mail, MapPin, Clock, Shield, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Phone, Mail, MapPin, Clock, Shield, Loader2, CheckCircle } from 'lucide-react'
 
 const SERVICES_OPTIONS = [
   'General Contracting',
@@ -17,6 +17,15 @@ export function ContactSection() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [preselectedService, setPreselectedService] = useState('')
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      setPreselectedService((e as CustomEvent<string>).detail)
+    }
+    window.addEventListener('selectService', handler)
+    return () => window.removeEventListener('selectService', handler)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -39,7 +48,7 @@ export function ContactSection() {
       if (!res.ok) throw new Error('send failed')
       setSubmitted(true)
     } catch {
-      setError('Something went wrong. Please email us directly at bluestonegcllc@gmail.com.')
+      setError('Something went wrong. Please email us directly at admin@bluestoneconstruction.llc.')
     } finally {
       setLoading(false)
     }
@@ -85,13 +94,13 @@ export function ContactSection() {
                 icon: <Phone size={20} />,
                 label: 'Phone',
                 value: process.env.NEXT_PUBLIC_PHONE ?? '(862) XXX-XXXX',
-                href: `tel:${process.env.NEXT_PUBLIC_PHONE ?? ''}`,
+                href: `tel:+1${(process.env.NEXT_PUBLIC_PHONE ?? '').replace(/\D/g, '')}`,
               },
               {
                 icon: <Mail size={20} />,
                 label: 'Email',
-                value: 'bluestonegcllc@gmail.com',
-                href: 'mailto:bluestonegcllc@gmail.com',
+                value: 'admin@bluestoneconstruction.llc',
+                href: 'mailto:admin@bluestoneconstruction.llc',
               },
               {
                 icon: <MapPin size={20} />,
@@ -164,7 +173,7 @@ export function ContactSection() {
         >
           {submitted ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>✅</div>
+              <CheckCircle size={48} style={{ color: 'var(--green)', marginBottom: 16 }} />
               <h3 style={{ fontWeight: 800, color: 'var(--green)', marginBottom: 8 }}>
                 Request Sent!
               </h3>
@@ -200,7 +209,7 @@ export function ContactSection() {
                   name: 'phone',
                   label: 'Phone Number',
                   type: 'tel',
-                  placeholder: '(862) 555-0100',
+                  placeholder: '(973) 555-0100',
                   required: true,
                 },
                 {
@@ -262,6 +271,8 @@ export function ContactSection() {
                 <select
                   id="service"
                   name="service"
+                  value={preselectedService}
+                  onChange={(e) => setPreselectedService(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '12px 16px',

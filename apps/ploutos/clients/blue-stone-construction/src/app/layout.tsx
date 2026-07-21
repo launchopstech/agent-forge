@@ -51,12 +51,12 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  '@id': 'https://bluestoneconstruction.com',
+  '@id': 'https://bluestoneconstruction.llc',
   name: 'Blue Stone Construction LLC',
   description: 'General contractor serving Lake Hiawatha, NJ and Morris County.',
-  url: 'https://bluestoneconstruction.com',
+  url: 'https://bluestoneconstruction.llc',
   telephone: process.env.NEXT_PUBLIC_PHONE ?? '',
-  email: 'bluestonegcllc@gmail.com',
+  email: 'admin@bluestoneconstruction.llc',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Lake Hiawatha',
