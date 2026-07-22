@@ -1,6 +1,6 @@
 'use client'
 
-import { Phone, Mail, MapPin } from 'lucide-react'
+import { Phone, Mail, MapPin, Instagram } from 'lucide-react'
 
 const SERVICES_LINKS = [
   'General Contracting',
@@ -69,6 +69,40 @@ export function Footer() {
             <MapPin size={12} style={{ display: 'inline', marginRight: 4 }} />
             Lake Hiawatha, NJ 07034
           </div>
+          <a
+            href="https://www.instagram.com/bluestone_contruction"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              marginTop: 20,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              color: 'rgba(255,255,255,0.7)',
+              padding: '8px 16px',
+              borderRadius: 8,
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement
+              el.style.background = 'rgba(225,48,108,0.15)'
+              el.style.borderColor = '#E1306C'
+              el.style.color = '#E1306C'
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement
+              el.style.background = 'rgba(255,255,255,0.07)'
+              el.style.borderColor = 'rgba(255,255,255,0.12)'
+              el.style.color = 'rgba(255,255,255,0.7)'
+            }}
+          >
+            <Instagram size={16} />
+            @bluestone_contruction
+          </a>
         </div>
 
         {/* Services */}
@@ -157,7 +191,7 @@ export function Footer() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <a
-              href={`tel:${process.env.NEXT_PUBLIC_PHONE ?? ''}`}
+              href="tel:+19738306838"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -167,10 +201,10 @@ export function Footer() {
               }}
             >
               <Phone size={14} />
-              {process.env.NEXT_PUBLIC_PHONE ?? '(862) XXX-XXXX'}
+              (973) 830-6838
             </a>
             <a
-              href="mailto:bluestonegcllc@gmail.com"
+              href="mailto:admin@bluestoneconstruction.llc"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -180,7 +214,7 @@ export function Footer() {
               }}
             >
               <Mail size={14} />
-              bluestonegcllc@gmail.com
+              admin@bluestoneconstruction.llc
             </a>
             <a
               href="#contact"

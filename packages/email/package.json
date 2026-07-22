@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@forge/tsconfig": "workspace:*",
+    "@getbrevo/brevo": "^6.0.2",
     "resend": "catalog:"
   },
   "devDependencies": {
