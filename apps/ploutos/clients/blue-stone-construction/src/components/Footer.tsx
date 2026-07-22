@@ -191,7 +191,7 @@ export function Footer() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <a
-              href={`tel:+1${(process.env.NEXT_PUBLIC_PHONE ?? '').replace(/\D/g, '')}`}
+              href="tel:+19738306838"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -201,7 +201,7 @@ export function Footer() {
               }}
             >
               <Phone size={14} />
-              {process.env.NEXT_PUBLIC_PHONE ?? '(862) XXX-XXXX'}
+              (973) 830-6838
             </a>
             <a
               href="mailto:admin@bluestoneconstruction.llc"
