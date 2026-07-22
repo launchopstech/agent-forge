@@ -73,10 +73,10 @@ const PROJECTS = [
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
   },
   {
-    title: 'Restaurant Renovation',
+    title: 'Commercial and Industrial Renovation',
     location: 'Netcong, NJ',
     category: 'Commercial',
-    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=800&q=80',
   },
 ]
 

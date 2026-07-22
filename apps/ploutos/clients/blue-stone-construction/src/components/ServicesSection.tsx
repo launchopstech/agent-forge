@@ -11,36 +11,42 @@ import {
   Building2,
 } from 'lucide-react'
 
-const SERVICES: { icon: ReactNode; title: string; desc: string }[] = [
+const SERVICES: { icon: ReactNode; title: string; desc: string; serviceKey: string }[] = [
   {
     icon: <ClipboardList size={24} />,
     title: 'General Contracting',
     desc: "Full project management from permits to final walkthrough. We coordinate everything so you don't have to.",
+    serviceKey: 'General Contracting',
   },
   {
     icon: <Home size={24} />,
     title: 'Home Remodels',
     desc: 'Kitchen, bathroom, basement, and whole-home renovations built to your vision and budget.',
+    serviceKey: 'Home Remodel',
   },
   {
     icon: <Layers size={24} />,
     title: 'Room Additions',
     desc: "Expand your living space with seamlessly integrated additions that match your home's existing style.",
+    serviceKey: 'Room Addition',
   },
   {
     icon: <HardHat size={24} />,
     title: 'New Construction',
     desc: 'Ground-up residential and commercial builds, from foundation to roof.',
+    serviceKey: 'New Construction',
   },
   {
     icon: <Paintbrush size={24} />,
     title: 'Exterior Work',
     desc: 'Siding, roofing, decks, patios, and curb appeal improvements that last.',
+    serviceKey: 'Exterior Work',
   },
   {
     icon: <Building2 size={24} />,
     title: 'Commercial Projects',
     desc: 'Light commercial construction for small businesses, offices, and investment properties across NJ.',
+    serviceKey: 'Commercial',
   },
 ]
 
@@ -128,7 +134,12 @@ export function ServicesSection() {
                 {s.desc}
               </p>
               <a
-                href="#contact"
+                href={`#contact?service=${encodeURIComponent(s.serviceKey)}`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  window.dispatchEvent(new CustomEvent('selectService', { detail: s.serviceKey }))
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+                }}
                 style={{
                   fontSize: '0.8rem',
                   fontWeight: 700,
