@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
     'contact-form',
     { name, phone, email, service, description },
     {
-      from: 'Blue Stone Construction <noreply@bluestoneconstruction.com>',
-      to: ['bluestonegcllc@gmail.com'],
+      from: 'Blue Stone Construction <noreply@bluestoneconstruction.llc>',
+      to: ['admin@bluestoneconstruction.llc'],
       replyTo: email,
     }
   )
