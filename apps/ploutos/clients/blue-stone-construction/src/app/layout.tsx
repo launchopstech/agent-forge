@@ -55,7 +55,7 @@ const jsonLd = {
   name: 'Blue Stone Construction LLC',
   description: 'General contractor serving Lake Hiawatha, NJ and Morris County.',
   url: 'https://bluestoneconstruction.llc',
-  telephone: process.env.NEXT_PUBLIC_PHONE ?? '',
+  telephone: '(973) 830-6838',
   email: 'admin@bluestoneconstruction.llc',
   address: {
     '@type': 'PostalAddress',

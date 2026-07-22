@@ -93,8 +93,8 @@ export function ContactSection() {
               {
                 icon: <Phone size={20} />,
                 label: 'Phone',
-                value: process.env.NEXT_PUBLIC_PHONE ?? '(862) XXX-XXXX',
-                href: `tel:+1${(process.env.NEXT_PUBLIC_PHONE ?? '').replace(/\D/g, '')}`,
+                value: '(973) 830-6838',
+                href: 'tel:+19738306838',
               },
               {
                 icon: <Mail size={20} />,
