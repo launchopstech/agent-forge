@@ -1,10 +1,10 @@
 name: Deploy — Production
 
-# Deployment pipeline for the prod branch:
+# Deployment pipeline for the main branch:
 # 1. Deploy all configured Vercel projects to production
 # 2. Run smoke tests against production
 #
-# Triggered by: push to prod branch (from staging → prod PR merge)
+# Triggered by: push to main branch (from staging → main PR merge)
 # The "production" GitHub Environment has required reviewers configured,
 # which acts as the approval gate before deploy-production runs.
 #
@@ -17,7 +17,7 @@ name: Deploy — Production
 
 on:
   push:
-    branches: [prod]
+    branches: [main]
 
 jobs:
   # ============================================================
