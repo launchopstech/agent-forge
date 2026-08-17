@@ -149,13 +149,76 @@ node scripts/vercel-deploy-hooks.mjs --project ploutos-<slug>
 
 This creates 4 Vercel deploy hooks (develop/qa/staging/main) and adds `VERCEL_DEPLOY_HOOK_<SLUG_UPPER>` to all 4 GitHub environments automatically.
 
-## Step 7 — DNS setup (optional, if domain is ready)
+## Step 7 — Domain setup (do when domain is ready)
+
+Two sub-steps: add domains to Vercel, then set DNS in GoDaddy. Order matters — add to Vercel first so Vercel can verify ownership after DNS propagates.
+
+### 7a — Add custom domains to the Vercel project
 
 ```bash
 node scripts/setup-domain.mjs --project ploutos-<slug> --all-envs
 ```
 
-This configures custom domains in Vercel. DNS records still need to be set in GoDaddy — the script prints exact records to add.
+This adds all four domains from `domains.json` (`dev.<domain>`, `qa.<domain>`, `staging.<domain>`, `<domain>`) to the Vercel project and maps each to the correct git branch. The script prints the exact DNS records needed — copy them for Step 7b.
+
+Dry-run first to preview:
+```bash
+node scripts/setup-domain.mjs --project ploutos-<slug> --all-envs --dry-run
+```
+
+### 7b — Set DNS records in GoDaddy (automated)
+
+Requires GoDaddy API credentials in macOS Keychain (one-time setup via `scripts/godaddy-credentials.mjs`). Once configured:
+
+```bash
+# Dry-run first — see exactly what will be created
+node scripts/godaddy-dns-set.mjs --project ploutos-<slug> --dry-run
+
+# Apply — idempotent, safe to re-run
+node scripts/godaddy-dns-set.mjs --project ploutos-<slug>
+```
+
+This creates:
+- `A @ → 76.76.21.21` (production root domain)
+- `CNAME www → cname.vercel-dns.com`
+- `CNAME dev → cname.vercel-dns.com`
+- `CNAME qa → cname.vercel-dns.com`
+- `CNAME staging → cname.vercel-dns.com`
+
+### 7c — Verify
+
+DNS propagation takes 5–30 min. Check with:
+```bash
+dig dev.<domain>       # should resolve to 76.76.21.21 or cname.vercel-dns.com
+dig <domain>           # should resolve to 76.76.21.21
+```
+
+Vercel provisions SSL automatically once DNS resolves. Check domain status:
+```bash
+vercel domains inspect <domain> --scope launch-ops
+```
+
+### 7d — Set `NEXT_PUBLIC_APP_URL` per environment
+
+Once domains resolve, add the URL env var for each environment so the app knows its own origin:
+
+```bash
+# Development (branch: develop)
+vercel env add NEXT_PUBLIC_APP_URL --scope launch-ops --project ploutos-<slug>
+# Enter: https://dev.<domain>  →  Environment: Preview  →  Git branch: develop
+
+# QA (branch: qa)
+vercel env add NEXT_PUBLIC_APP_URL --scope launch-ops --project ploutos-<slug>
+# Enter: https://qa.<domain>   →  Environment: Preview  →  Git branch: qa
+
+# Staging (branch: staging)
+vercel env add NEXT_PUBLIC_APP_URL --scope launch-ops --project ploutos-<slug>
+# Enter: https://staging.<domain> → Environment: Preview → Git branch: staging
+
+# Production
+vercel env add NEXT_PUBLIC_APP_URL --scope launch-ops --project ploutos-<slug>
+# Enter: https://<domain>      →  Environment: Production
+```
 
 ## Step 8 — Commit and push
 
