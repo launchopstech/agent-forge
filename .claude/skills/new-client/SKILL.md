@@ -181,8 +181,32 @@ Follow the branch chain:
 
 ## Verification checklist
 
-- [ ] `pnpm --filter @ploutos/<slug> typecheck` passes
-- [ ] Dev deploy URL loads with correct branding
-- [ ] Contact form submits → email arrives via Resend
-- [ ] GitHub Actions shows the new client in the deploy step output
+**Vercel project (run after Step 4):**
+- [ ] `vercel project inspect ploutos-<slug> --scope launch-ops` shows `Root Directory: apps/ploutos/clients/<slug>` and `Framework Preset: Next.js` — if not, the PATCH in `vercel-project-create.mjs` failed; fix manually in dashboard
+- [ ] First preview deployment in `vercel list` shows `● Ready`, not `Canceled` or `● Error`
+- [ ] Build log shows `@ploutos/<slug>:build` — NOT `@forge/web:build` (wrong root dir symptom)
+
+**CI (run after Step 8 push):**
+- [ ] All 4 checks pass: `lint`, `typecheck`, `test`, `build`
+- [ ] `Vercel – ploutos-<slug>: Deployment has completed` in PR checks
+- [ ] GitHub Actions deploy step shows `ploutos-<slug>` in the fired hooks output
+
+**End-to-end:**
+- [ ] `pnpm --filter @ploutos/<slug> typecheck` passes locally
+- [ ] Preview URL loads with correct branding (no `@forge/web` 404 or env error)
+- [ ] Contact form submits → email arrives via Resend to `hello@<domain>`
 - [ ] Production deploy URL resolves at `<domain>`
+
+## Known gotchas
+
+**`rootDirectory` not set after `vercel link`**
+`vercel link --yes` only creates the local `.vercel/project.json` — it does NOT set `rootDirectory` on the Vercel project server-side. Without it, Vercel builds from the repo root, pulls in `@forge/web`, and fails with missing env vars. `vercel-project-create.mjs` handles this automatically via `vercel api PATCH`.
+
+**`ignoreCommand` breaks when `rootDirectory` is set**
+Vercel runs `ignoreCommand` from `rootDirectory`, so repo-root-relative pathspecs (e.g. `apps/ploutos/clients/<slug>/`) resolve to nothing → git diff always exits 0 → every build is skipped. Do not add `ignoreCommand` to `vercel.json`. Selective deploys are handled by GitHub Actions change detection in `multi-deploy/action.yml`.
+
+**GitHub environment name is `Production` (capital P)**
+When setting secrets with `gh secret set --env`, the production environment name is `Production`, not `production`. A 503 from `gh secret set` usually means the environment name is wrong. `vercel-deploy-hooks.mjs` already has this hardcoded correctly.
+
+**`vercel git connect` must run from repo root**
+`vercel git connect` needs the `.git` directory — run it from the agent-forge repo root, not the client subdirectory.
