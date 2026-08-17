@@ -40,7 +40,8 @@ Then update `package.json` in the new directory:
 
 Update `vercel.json`:
 - `buildCommand`: `cd ../../.. && pnpm turbo build --filter=@ploutos/<slug>`
-- `ignoreCommand`: `git diff HEAD^ HEAD --quiet -- apps/ploutos/clients/<slug>/ packages/`
+
+Do NOT add an `ignoreCommand` — Vercel runs it from the `rootDirectory` subdirectory, so repo-root-relative pathspecs silently resolve to nothing and every build gets skipped. Selective deploys are handled by GitHub Actions change detection in `multi-deploy/action.yml`.
 
 Register in `pnpm-workspace.yaml` — it's already covered by `apps/ploutos/clients/*` glob, no change needed.
 
