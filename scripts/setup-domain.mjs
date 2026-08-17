@@ -187,8 +187,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log(`\n→ ${name} / ${env}  →  ${appUrl}`)
 
     // 1. Add domain to Vercel project
+    // Subdomains require the project name; apex domains work without it.
     console.log(`  1. Adding domain to Vercel project...`)
-    run(`vercel domains add ${domain}`, projectDir)
+    run(`vercel domains add ${domain} ${name} --scope launch-ops`, projectDir)
 
     // 2. Pin domain to its git branch via Vercel API (if configured)
     if (gitBranch) {
