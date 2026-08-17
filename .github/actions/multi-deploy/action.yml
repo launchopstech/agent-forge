@@ -14,6 +14,10 @@ inputs:
     description: 'Deploy hook for ploutos-blue-stone'
     required: false
     default: ''
+  hook_ploutos:
+    description: 'Deploy hook for ploutos-agency (Ploutos agency site)'
+    required: false
+    default: ''
   force_deploy:
     description: 'Deploy all configured projects regardless of changed files'
     required: false
@@ -32,6 +36,7 @@ runs:
           echo "DEPLOY_WEB=true"        >> $GITHUB_ENV
           echo "DEPLOY_LAUNCHOPS=true"  >> $GITHUB_ENV
           echo "DEPLOY_BLUE_STONE=true" >> $GITHUB_ENV
+          echo "DEPLOY_PLOUTOS=true"    >> $GITHUB_ENV
           exit 0
         fi
 
@@ -42,6 +47,7 @@ runs:
           echo "DEPLOY_WEB=true"        >> $GITHUB_ENV
           echo "DEPLOY_LAUNCHOPS=true"  >> $GITHUB_ENV
           echo "DEPLOY_BLUE_STONE=true" >> $GITHUB_ENV
+          echo "DEPLOY_PLOUTOS=true"    >> $GITHUB_ENV
           exit 0
         fi
 
@@ -54,13 +60,15 @@ runs:
         LAUNCHOPS=false
         BLUE_STONE=false
 
-        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/web/'; }       && WEB=true || true
-        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/launchops/'; } && LAUNCHOPS=true || true
-        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/ploutos/'; }   && BLUE_STONE=true || true
+        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/web/'; }                              && WEB=true || true
+        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/launchops/'; }                     && LAUNCHOPS=true || true
+        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/ploutos/clients/blue-stone'; }     && BLUE_STONE=true || true
+        { [ "$SHARED" -gt 0 ] || echo "$CHANGED" | grep -q '^apps/ploutos/clients/ploutos/'; }       && PLOUTOS=true || true
 
         echo "DEPLOY_WEB=$WEB"               >> $GITHUB_ENV
         echo "DEPLOY_LAUNCHOPS=$LAUNCHOPS"   >> $GITHUB_ENV
         echo "DEPLOY_BLUE_STONE=$BLUE_STONE" >> $GITHUB_ENV
+        echo "DEPLOY_PLOUTOS=$PLOUTOS"       >> $GITHUB_ENV
 
     - name: Fire deploy hooks in parallel
       shell: bash
@@ -68,6 +76,7 @@ runs:
         HOOK_FORGE_WEB: ${{ inputs.hook_forge_web }}
         HOOK_LAUNCHOPS: ${{ inputs.hook_launchops }}
         HOOK_BLUE_STONE: ${{ inputs.hook_blue_stone }}
+        HOOK_PLOUTOS: ${{ inputs.hook_ploutos }}
       run: |
         fire() {
           local name="$1" hook="$2" should_deploy="$3"
@@ -92,6 +101,7 @@ runs:
         fire "forge-web"          "$HOOK_FORGE_WEB"  "$DEPLOY_WEB"        & PIDS+=($!)
         fire "launchops"          "$HOOK_LAUNCHOPS"  "$DEPLOY_LAUNCHOPS"  & PIDS+=($!)
         fire "ploutos-blue-stone" "$HOOK_BLUE_STONE" "$DEPLOY_BLUE_STONE" & PIDS+=($!)
+        fire "ploutos-agency"     "$HOOK_PLOUTOS"    "$DEPLOY_PLOUTOS"    & PIDS+=($!)
 
         EXIT=0
         for pid in "${PIDS[@]}"; do
