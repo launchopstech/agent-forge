@@ -141,5 +141,7 @@ Key routing rules:
 - Code review/diff check → invoke /review
 - Visual polish → invoke /design-review
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
+- SEO audit, search ranking, metadata, structured data → invoke /seo
+- Onboard new client site → invoke /new-client
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore

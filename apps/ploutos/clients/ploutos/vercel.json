@@ -1,5 +1,13 @@
 {
   "framework": "nextjs",
   "installCommand": "cd ../../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../../.. && pnpm turbo build --filter=@ploutos/ploutos"
+  "buildCommand": "cd ../../.. && pnpm turbo build --filter=@ploutos/ploutos",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.ploutos.digital" }],
+      "destination": "https://ploutos.digital/$1",
+      "permanent": true
+    }
+  ]
 }

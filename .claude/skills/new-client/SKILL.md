@@ -235,7 +235,21 @@ feat(ploutos): add <slug> client site and wire into deploy pipeline
 
 Push `develop` → CI fires → first dev deploy.
 
-## Step 9 — Ship to production
+## Step 9 — SEO enrichment (run /seo)
+
+The scaffold includes starter SEO files from `_template` (sitemap, robots, OG image placeholder, apple-touch-icon placeholder). Run the `/seo` skill to enrich them with client-specific data:
+
+```bash
+# Audit first
+/seo <slug> --audit-only
+
+# Apply fixes (provide phone/address for local pack ranking)
+/seo <slug> --schema local-business
+```
+
+This updates the JSON-LD schema, sitemap section anchors, twitter card image, and www→apex redirect.
+
+## Step 10 — Ship to production
 
 Follow the branch chain:
 1. Push `develop` → dev deploy
