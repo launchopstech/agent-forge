@@ -122,12 +122,14 @@ Add entry to `scripts/domains.json` under `projects`:
 # Create the project
 vercel projects add ploutos-<slug> --scope launch-ops
 
-# Link the directory
+# Link the directory AND set rootDirectory + framework=nextjs on the Vercel project
 node scripts/vercel-project-create.mjs --project ploutos-<slug>
 
 # Connect to GitHub (run from repo root where .git lives)
 vercel git connect --project ploutos-<slug> --scope launch-ops --yes
 ```
+
+`vercel-project-create.mjs` automatically PATCHes the Vercel project after linking to set `rootDirectory` (relative path from repo root) and `framework=nextjs`. Without this, Vercel builds from the repo root and fails with missing env vars from other apps.
 
 ## Step 5 — Set Vercel environment variables
 
