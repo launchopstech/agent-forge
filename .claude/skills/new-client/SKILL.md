@@ -40,7 +40,8 @@ Then update `package.json` in the new directory:
 
 Update `vercel.json`:
 - `buildCommand`: `cd ../../.. && pnpm turbo build --filter=@ploutos/<slug>`
-- `ignoreCommand`: `git diff HEAD^ HEAD --quiet -- apps/ploutos/clients/<slug>/ packages/`
+
+Do NOT add an `ignoreCommand` — Vercel runs it from the `rootDirectory` subdirectory, so repo-root-relative pathspecs silently resolve to nothing and every build gets skipped. Selective deploys are handled by GitHub Actions change detection in `multi-deploy/action.yml`.
 
 Register in `pnpm-workspace.yaml` — it's already covered by `apps/ploutos/clients/*` glob, no change needed.
 
@@ -122,12 +123,14 @@ Add entry to `scripts/domains.json` under `projects`:
 # Create the project
 vercel projects add ploutos-<slug> --scope launch-ops
 
-# Link the directory
+# Link the directory AND set rootDirectory + framework=nextjs on the Vercel project
 node scripts/vercel-project-create.mjs --project ploutos-<slug>
 
 # Connect to GitHub (run from repo root where .git lives)
 vercel git connect --project ploutos-<slug> --scope launch-ops --yes
 ```
+
+`vercel-project-create.mjs` automatically PATCHes the Vercel project after linking to set `rootDirectory` (relative path from repo root) and `framework=nextjs`. Without this, Vercel builds from the repo root and fails with missing env vars from other apps.
 
 ## Step 5 — Set Vercel environment variables
 

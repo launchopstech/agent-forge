@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
   "installCommand": "cd ../../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "cd ../../.. && pnpm turbo build --filter=@ploutos/ploutos",
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- apps/ploutos/clients/ploutos/ packages/"
+  "buildCommand": "cd ../../.. && pnpm turbo build --filter=@ploutos/ploutos"
 }

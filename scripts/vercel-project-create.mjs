@@ -19,7 +19,7 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs'
-import { resolve, dirname } from 'node:path'
+import { resolve, dirname, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 
@@ -95,6 +95,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(0)
   }
 
+  const repoRoot = resolve(__dir, '..')
+
   try {
     const out = execFileSync(cmd[0], cmd.slice(1), {
       encoding: 'utf8',
@@ -102,10 +104,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     })
     if (out.trim()) console.log(out.trim())
     console.log(`✓ "${projectArg}" linked successfully.`)
-    console.log(`\nNext steps:`)
-    console.log(`  node scripts/godaddy-dns-set.mjs  --project ${projectArg}`)
-    console.log(`  node scripts/setup-domain.mjs     --project ${projectArg} --all-envs`)
-    console.log(`  node scripts/vercel-env-set.mjs   --project ${projectArg} --all-envs`)
   } catch (err) {
     const msg = (err.stderr || err.message || '').trim()
     if (msg.includes('not logged in') || msg.includes('login')) {
@@ -117,4 +115,40 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
     process.exit(1)
   }
+
+  // Set rootDirectory and framework on the Vercel project.
+  // vercel link --yes does not set these server-side; without them Vercel
+  // builds from the repo root and uses the wrong framework preset.
+  const projectJson = JSON.parse(readFileSync(resolve(absDir, '.vercel', 'project.json'), 'utf8'))
+  const projectId = projectJson.projectId
+  const rootDirectory = relative(repoRoot, absDir)
+
+  try {
+    execFileSync(
+      VERCEL_BIN,
+      [
+        'api',
+        `/v9/projects/${projectId}`,
+        '-X',
+        'PATCH',
+        '-F',
+        `rootDirectory=${rootDirectory}`,
+        '-F',
+        'framework=nextjs',
+      ],
+      { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }
+    )
+    console.log(`✓ Vercel project rootDirectory set to "${rootDirectory}" (framework: nextjs).`)
+  } catch (err) {
+    const msg = (err.stderr || err.message || '').trim()
+    console.error(`⚠ Could not set rootDirectory via Vercel API: ${msg}`)
+    console.error(
+      `  Fix manually: Vercel dashboard → ${projectArg} → Settings → General → Root Directory → "${rootDirectory}"`
+    )
+  }
+
+  console.log(`\nNext steps:`)
+  console.log(`  node scripts/godaddy-dns-set.mjs  --project ${projectArg}`)
+  console.log(`  node scripts/setup-domain.mjs     --project ${projectArg} --all-envs`)
+  console.log(`  node scripts/vercel-env-set.mjs   --project ${projectArg} --all-envs`)
 }
