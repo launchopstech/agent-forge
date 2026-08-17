@@ -61,7 +61,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const GH_BIN = process.env.GH_BIN ?? 'gh'
 
   const args = process.argv.slice(2)
-  const get = (f) => { const i = args.indexOf(f); return i !== -1 ? args[i + 1] : null }
+  const get = (f) => {
+    const i = args.indexOf(f)
+    return i !== -1 ? args[i + 1] : null
+  }
   const has = (f) => args.includes(f)
 
   const projectArg = get('--project')
@@ -145,10 +148,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     let hookUrl
     try {
       const stdout = run(VERCEL_BIN, [
-        'deploy-hooks', 'create', hookName,
-        '--ref', branch,
-        '--scope', VERCEL_SCOPE,
-        '--project', projectArg,
+        'deploy-hooks',
+        'create',
+        hookName,
+        '--ref',
+        branch,
+        '--scope',
+        VERCEL_SCOPE,
+        '--project',
+        projectArg,
       ])
       hookUrl = parseHookUrl(stdout)
       if (!hookUrl) throw new Error(`Could not parse hook URL from output:\n${stdout}`)
@@ -169,10 +177,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // 2. Set GitHub secret
     try {
       run(GH_BIN, [
-        'secret', 'set', secret,
-        '--body', hookUrl,
-        '--env', githubEnv,
-        '--repo', GITHUB_REPO,
+        'secret',
+        'set',
+        secret,
+        '--body',
+        hookUrl,
+        '--env',
+        githubEnv,
+        '--repo',
+        GITHUB_REPO,
       ])
       console.log(`  ✓ GitHub secret ${secret} set in env "${githubEnv}"`)
     } catch (err) {
