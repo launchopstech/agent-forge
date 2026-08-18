@@ -1,5 +1,28 @@
 {
   "projects": {
+    "ploutos-agency": {
+      "dir": "apps/ploutos/clients/ploutos",
+      "domains": {
+        "development": "dev.ploutos.digital",
+        "qa": "qa.ploutos.digital",
+        "staging": "staging.ploutos.digital",
+        "production": "ploutos.digital"
+      },
+      "gitBranches": {
+        "development": "develop",
+        "qa": "qa",
+        "staging": "staging"
+      },
+      "envVars": {
+        "NEXT_PUBLIC_APP_ENV": {
+          "development": "development",
+          "qa": "qa",
+          "staging": "staging",
+          "production": "production"
+        }
+      },
+      "secrets": ["RESEND_API_KEY"]
+    },
     "ploutos-blue-stone": {
       "dir": "apps/ploutos/clients/blue-stone-construction",
       "domains": {

@@ -1,0 +1,57 @@
+/* Ploutos — Design Tokens (Greek Marble Edition) */
+
+:root {
+  /* Brand accent — emerald */
+  --accent: #10b981;
+  --accent-dark: #059669;
+  --accent-glow: rgba(16, 185, 129, 0.12);
+
+  /* Bridge aliases — existing var() refs in components auto-update */
+  --violet: #10b981;
+  --violet-dark: #059669;
+  --violet-hi: #10b981;
+  --violet-glow: rgba(16, 185, 129, 0.12);
+  --indigo: #059669;
+  --green: #10b981;
+
+  /* Backgrounds — warm marble / Greek parchment */
+  --bg: #faf7f2;
+  --bg-alt: #f0ebe3;
+  --surface: #ffffff;
+  --surface2: #f5f0e8;
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.08);
+  --border-sub: rgba(0, 0, 0, 0.05);
+
+  /* Text — deep Aegean navy */
+  --text: #1a1a2e;
+  --sub: #4a5568;
+  --muted: #718096;
+
+  /* Layout */
+  --max: 1100px;
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Tailwind / shadcn semantic aliases */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface2);
+  --secondary-foreground: var(--text);
+  --muted-foreground: var(--sub);
+  --accent-foreground: var(--accent);
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --input: var(--surface);
+  --ring: var(--accent);
+  --radius: 10px;
+}
