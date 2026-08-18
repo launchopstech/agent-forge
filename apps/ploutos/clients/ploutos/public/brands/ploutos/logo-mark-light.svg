@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="pGradL" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <radialGradient id="nodeGradL" cx="35%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </radialGradient>
+    <filter id="nodeGlowL" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Light background tile -->
+  <rect width="64" height="64" rx="14" fill="#f5f3ff"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none"
+        stroke="rgba(124,58,237,0.2)" stroke-width="1"/>
+
+  <!-- P letterform (same geometry, violet gradient on light bg) -->
+  <path
+    fill-rule="evenodd"
+    fill="url(#pGradL)"
+    d="
+      M 9 10
+      L 20 10
+      C 48 10, 48 35, 20 35
+      L 20 54
+      L 9  54
+      Z
+
+      M 20 17
+      C 38 17, 38 28, 20 28
+      Z
+    "
+  />
+
+  <!-- Node -->
+  <circle cx="41" cy="22" r="3.2" fill="url(#nodeGradL)" filter="url(#nodeGlowL)"/>
+</svg>

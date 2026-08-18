@@ -11,6 +11,7 @@ name: Deploy — Staging
 #   Secret: VERCEL_DEPLOY_HOOK              (agent-forge-web)
 #   Secret: VERCEL_DEPLOY_HOOK_BLUE_STONE   (ploutos-blue-stone)
 #   Secret: VERCEL_DEPLOY_HOOK_LAUNCHOPS    (launchops)
+#   Secret: VERCEL_DEPLOY_HOOK_PLOUTOS      (ploutos-agency)
 #   Var:    NEXT_PUBLIC_APP_URL             (e.g. https://staging.yourapp.com)
 
 on:
@@ -35,6 +36,7 @@ jobs:
           hook_forge_web: ${{ secrets.VERCEL_DEPLOY_HOOK }}
           hook_launchops: ${{ secrets.VERCEL_DEPLOY_HOOK_LAUNCHOPS }}
           hook_blue_stone: ${{ secrets.VERCEL_DEPLOY_HOOK_BLUE_STONE }}
+          hook_ploutos: ${{ secrets.VERCEL_DEPLOY_HOOK_PLOUTOS }}
 
   # ============================================================
   # Phase 2: Post-deploy E2E on Staging
