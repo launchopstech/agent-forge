@@ -1,15 +1,20 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
+import { useCallback, useState, type FormEvent } from 'react'
+import { track } from '@vercel/analytics'
 import { ScrollReveal } from './ScrollReveal'
 
 export function ContactSection() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
+    setSubmissionError(null)
     if (!form.checkValidity()) {
+      setStatus('idle')
       form.reportValidity()
       return
     }
@@ -22,6 +27,7 @@ export function ContactSection() {
       company: (form.querySelector('#f-url') as HTMLInputElement).value,
       message: (form.querySelector('#f-problem') as HTMLTextAreaElement).value,
       timeline: '',
+      faxNumber: (form.querySelector('#f-fax') as HTMLInputElement).value,
     }
 
     try {
@@ -33,11 +39,22 @@ export function ContactSection() {
       if (res.ok) {
         setStatus('success')
         form.reset()
-      } else setStatus('error')
+        track('website_review_requested')
+      } else {
+        setStatus('error')
+        if (res.status === 400) {
+          setSubmissionError('Please check the form. Your message must be at least 10 characters.')
+        } else if (res.status === 429) {
+          setSubmissionError('Too many requests. Please wait a few minutes and try again.')
+        } else {
+          setSubmissionError('We could not send your request. Please try again or email us.')
+        }
+      }
     } catch {
       setStatus('error')
+      setSubmissionError('We could not send your request. Please try again or email us.')
     }
-  }
+  }, [])
 
   const inputStyle: React.CSSProperties = {
     background: 'var(--surface)',
@@ -77,7 +94,7 @@ export function ContactSection() {
               >
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              Free Quote
+              Free Website Review
             </div>
             <h2
               className="font-serif"
@@ -101,8 +118,8 @@ export function ContactSection() {
                 margin: '0 auto',
               }}
             >
-              Tell us about your business and we&apos;ll review your current website and online
-              presence for free. Plain English feedback — no jargon, no hard sell.
+              Tell us about your business and we&apos;ll send three prioritized findings about your
+              website and online presence. Plain English feedback — no jargon, no hard sell.
             </p>
           </div>
         </ScrollReveal>
@@ -127,6 +144,8 @@ export function ContactSection() {
                   type="text"
                   placeholder="Jane Smith"
                   required
+                  minLength={2}
+                  maxLength={100}
                   style={inputStyle}
                 />
               </div>
@@ -140,6 +159,7 @@ export function ContactSection() {
                   type="email"
                   placeholder="jane@yourbusiness.com"
                   required
+                  maxLength={254}
                   style={inputStyle}
                 />
               </div>
@@ -147,15 +167,21 @@ export function ContactSection() {
 
             <div>
               <label htmlFor="f-url" style={labelStyle}>
-                Current Website URL
+                Current Website URL <span style={{ fontWeight: 500 }}>(optional)</span>
               </label>
               <input
                 id="f-url"
                 name="url"
                 type="url"
                 placeholder="https://yourbusiness.com"
+                maxLength={300}
                 style={inputStyle}
               />
+            </div>
+
+            <div hidden>
+              <label htmlFor="f-fax">Fax number</label>
+              <input id="f-fax" name="faxNumber" type="text" tabIndex={-1} autoComplete="off" />
             </div>
 
             <div>
@@ -167,12 +193,22 @@ export function ContactSection() {
                 name="problem"
                 placeholder="Tell us what's not working — slow load times, poor rankings, ads not converting, manual processes eating your time... any detail helps."
                 required
+                minLength={10}
+                maxLength={3000}
+                aria-describedby="f-problem-help"
                 style={{ ...inputStyle, resize: 'vertical', minHeight: 130 }}
               />
+              <div
+                id="f-problem-help"
+                style={{ marginTop: 6, color: 'var(--muted)', fontSize: '0.75rem' }}
+              >
+                Please enter at least 10 characters.
+              </div>
             </div>
 
             {status === 'success' && (
               <div
+                role="alert"
                 style={{
                   padding: '14px 18px',
                   borderRadius: 'var(--r)',
@@ -199,12 +235,12 @@ export function ContactSection() {
                   color: '#f87171',
                 }}
               >
-                Something went wrong. Email us at{' '}
+                {submissionError} If the problem continues, email{' '}
                 <a
-                  href="mailto:hello@ploutos.ai"
+                  href="mailto:admin@ploutos.llc"
                   style={{ color: 'inherit', textDecoration: 'underline' }}
                 >
-                  hello@ploutos.ai
+                  admin@ploutos.llc
                 </a>
               </div>
             )}
@@ -264,7 +300,7 @@ export function ContactSection() {
                 </>
               ) : (
                 <>
-                  Get My Free Review
+                  Get My Free Website Review
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -287,7 +323,7 @@ export function ContactSection() {
                 lineHeight: 1.6,
               }}
             >
-              No sales pitch. No obligation. Audit delivered within 48 hours.
+              No sales pitch. No obligation. Three prioritized findings delivered within 48 hours.
             </p>
           </form>
         </ScrollReveal>
