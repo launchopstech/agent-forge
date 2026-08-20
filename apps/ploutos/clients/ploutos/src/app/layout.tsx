@@ -20,27 +20,23 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://ploutos.digital'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Ploutos — Websites, Online Stores & Digital Marketing for Local Business',
+    default: 'Ploutos — Websites, Local SEO & Google Ads for Service Businesses',
     template: '%s | Ploutos',
   },
   description:
-    'Ploutos builds fast, professional websites, online stores, and runs Google & social ads for local businesses. No tech jargon. No long-term contracts. Just results.',
+    'Ploutos builds conversion-focused websites and manages local SEO and Google Ads for service businesses across the U.S.',
+  alternates: { canonical: '/' },
   metadataBase: new URL(BASE_URL),
   keywords: [
-    'software engineering agency',
-    'custom web applications',
-    'growth architecture',
-    'local business digital agency',
-    'Shopify development',
-    'workflow automation',
-    'performance marketing',
-    'Google local ads',
-    'web portal development',
+    'local service business websites',
+    'local SEO agency',
+    'Google Ads management',
+    'contractor website design',
+    'Google Business Profile optimization',
   ],
   openGraph: {
-    title: 'Ploutos — Websites, Online Stores & Digital Marketing for Local Business',
-    description:
-      'Fast websites, online stores, and Google & social ads that bring real customers to your door.',
+    title: 'Ploutos — Websites, Local SEO & Google Ads for Service Businesses',
+    description: 'One founder-led team for your website, local search visibility, and Google Ads.',
     url: BASE_URL,
     siteName: 'Ploutos',
     type: 'website',
@@ -48,9 +44,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ploutos — Websites, Online Stores & Digital Marketing for Local Business',
-    description:
-      'Fast websites, online stores, and Google & social ads that bring real customers to your door.',
+    title: 'Ploutos — Websites, Local SEO & Google Ads for Service Businesses',
+    description: 'One founder-led team for your website, local search visibility, and Google Ads.',
     images: [`${BASE_URL}/opengraph-image`],
   },
   robots: { index: true, follow: true },
@@ -58,17 +53,21 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
+  '@type': 'Organization',
+  '@id': `${BASE_URL}/#organization`,
   name: 'Ploutos',
   url: BASE_URL,
-  email: 'hello@ploutos.digital',
+  email: 'admin@ploutos.llc',
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'admin@ploutos.llc',
+    contactType: 'sales',
+    areaServed: 'US',
+  },
   description:
-    'Websites, online stores, and Google & social ads that bring real customers to local businesses. No tech jargon. No long-term contracts.',
+    'Conversion-focused websites, local SEO, and Google Ads for service businesses across the U.S.',
   priceRange: '$$',
-  areaServed: [
-    { '@type': 'Country', name: 'AU' },
-    { '@type': 'Country', name: 'US' },
-  ],
+  areaServed: { '@type': 'Country', name: 'US' },
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Digital Services for Local Business',
@@ -85,16 +84,16 @@ const jsonLd = {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Online Store Setup',
-          description: 'Shopify and WordPress ecommerce stores built to sell.',
+          name: 'Local SEO',
+          description: 'Google Business Profile and on-page optimization for local visibility.',
         },
       },
       {
         '@type': 'Offer',
         itemOffered: {
           '@type': 'Service',
-          name: 'Google & Social Ads',
-          description: 'Google Local Services Ads and social campaigns that drive foot traffic.',
+          name: 'Google Ads Management',
+          description: 'Search campaigns with call and conversion tracking.',
         },
       },
     ],

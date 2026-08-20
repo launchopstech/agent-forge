@@ -1,10 +1,11 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 import { ScrollReveal } from './ScrollReveal'
 
 const cards = [
   {
-    audience: 'For Growing Local Businesses',
-    headline: 'Plain English. Real Results.',
-    body: 'No confusing tech jargon. No management layers. We fix slow websites, build high-converting Google Ads, and do all the technical heavy lifting — so you can focus on running your business.',
+    audience: 'For Local Service Businesses',
+    headline: 'Plain English. Accountable Work.',
+    body: 'No confusing tech jargon. No management layers. We fix slow websites, build conversion-focused Google Ads, and do the technical heavy lifting — so you can focus on running your business.',
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -21,8 +22,8 @@ const cards = [
     points: [
       'No tech jargon — plain English throughout',
       'We handle everything, top to bottom',
-      'Fast turnaround — live in days, not months',
-      'You own everything — no lock-in',
+      'A clear scope, timeline, and proposal',
+      'You own delivered assets after final payment',
     ],
   },
   {
@@ -81,7 +82,7 @@ export function TrustSection() {
                 marginBottom: 28,
               }}
             >
-              Whether you&apos;re a corner store or a&nbsp;growing business,{' '}
+              When your business depends on local calls and&nbsp;quotes,{' '}
               <span style={{ color: 'var(--accent)' }}>we fix what&apos;s holding you back.</span>
             </h2>
             {/* Common problems callout */}
@@ -94,10 +95,10 @@ export function TrustSection() {
               }}
             >
               {[
-                'Slow sites losing Google rankings',
-                "DIY templates that don't convert",
-                "Paying for ads that aren't working",
-                'No one picks up the phone',
+                'Invisible on Google',
+                'Competitors taking your calls',
+                'Ad spend with no results',
+                "A website that doesn't convert",
               ].map((problem) => (
                 <div
                   key={problem}

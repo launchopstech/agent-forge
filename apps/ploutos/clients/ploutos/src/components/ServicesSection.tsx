@@ -1,14 +1,16 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 import { ScrollReveal } from './ScrollReveal'
 
 const pillars = [
   {
     num: '01',
-    title: 'Websites Built to Win',
-    body: 'Fast, professional websites designed to turn visitors into customers. We handle design, build, hosting, and maintenance — you just show up and take the calls.',
+    title: 'Websites That Work',
+    body: 'Fast, professional, built to convert. We design and build your site so it looks great on mobile, loads quickly, and turns visitors into inquiries — then handle hosting and maintenance.',
     features: [
-      'Custom Website Design & Build',
-      'Mobile-First & Lightning Fast',
-      'Built to Rank on Google',
+      'Custom design & build',
+      'Mobile-first, performance-focused build',
+      'Search-ready structure and metadata',
+      'Hosting & maintenance included',
     ],
     icon: (
       <svg
@@ -26,12 +28,13 @@ const pillars = [
   },
   {
     num: '02',
-    title: 'Online Stores That Sell',
-    body: 'Custom online stores built for maximum sales. Easy to manage, fast to load, and optimised for mobile shoppers who are ready to buy.',
+    title: 'Local SEO That Compounds',
+    body: 'We improve the signals that help your business compete in Google Maps and local search — visibility that can compound over time.',
     features: [
-      'Custom Shopify & WordPress Stores',
-      'Simple Checkout — Less Cart Abandonment',
-      'Speed Optimised (< 1s loads)',
+      'Google Business Profile optimization',
+      'On-page SEO (title tags, schema, speed)',
+      'Local citation building',
+      'Monthly ranking report',
     ],
     icon: (
       <svg
@@ -42,20 +45,20 @@ const pillars = [
         width={22}
         height={22}
       >
-        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-        <line x1="3" y1="6" x2="21" y2="6" />
-        <path d="M16 10a4 4 0 0 1-8 0" />
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
     ),
   },
   {
     num: '03',
-    title: 'Ads & SEO That Bring Buyers',
-    body: 'Get in front of customers who are actively searching for what you sell. We manage your Google Ads, Facebook campaigns, and local SEO — you just answer the phone.',
+    title: 'Google Ads That Bring Calls',
+    body: 'When you need leads now, not in six months. We build and run targeted search campaigns so you show up for exactly the searches that matter — and track every call back to the dollar spent.',
     features: [
-      'Google & Facebook Ad Campaigns',
-      'Local SEO & Google Maps',
-      "Conversion Tracking — Know What's Working",
+      'Search campaign build & management',
+      'Keyword & negative list strategy',
+      'Weekly bid optimization',
+      'Call & conversion tracking',
     ],
     icon: (
       <svg
@@ -89,7 +92,7 @@ export function ServicesSection() {
               >
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
-              Everything You Need to Win Online
+              Website. SEO. Ads. All of It.
             </div>
             <h2
               className="font-serif"
@@ -102,11 +105,12 @@ export function ServicesSection() {
                 marginBottom: 16,
               }}
             >
-              Websites, Online Stores &amp; Ads That Actually Work
+              Website. SEO. Ads. <span style={{ color: 'var(--accent)' }}>All of It.</span>
             </h2>
             <p style={{ fontSize: '1rem', color: 'var(--sub)', lineHeight: 1.8 }}>
-              Most web agencies don&apos;t understand marketing. Most marketing agencies can&apos;t
-              build a proper website. We do both — so nothing falls through the cracks.
+              Most agencies pick one lane. A website agency can&apos;t run your ads. An SEO shop
+              can&apos;t build your site. We do all three — so the whole thing works together
+              instead of falling apart at the joins.
             </p>
           </div>
         </ScrollReveal>
