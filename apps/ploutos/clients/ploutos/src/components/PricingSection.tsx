@@ -1,36 +1,30 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 import { ScrollReveal } from './ScrollReveal'
 
 const tiers = [
   {
-    name: 'Core Care',
-    price: '$750',
-    period: '/mo',
-    desc: 'Everything you need to keep your website running fast, secure, and up to date — without lifting a finger.',
+    name: 'Website Launch',
+    desc: 'A scoped website project that gives your business a fast, credible foundation you own after final payment.',
     features: [
-      'Fast, secure hosting included',
-      'Security patches & monitoring',
-      'Core app updates & maintenance',
-      'Monthly SEO health checkup',
-      '2 hours of layout edits/month',
-      'Monthly performance report',
+      'Website design & build',
+      'Google Business Profile foundation',
+      'Local on-page SEO setup',
+      'Analytics and conversion tracking',
     ],
-    cta: 'Get Started',
+    cta: 'Get my free website review',
     featured: false,
   },
   {
-    name: 'Growth Engine',
-    price: '$2,950',
-    period: '/mo',
-    desc: "The full package — paid ads, SEO, and conversion fixes — with a monthly call to review what's working and what to do next.",
+    name: 'Growth Management',
+    desc: 'Optional monthly management for businesses ready to improve local visibility and generate tracked inquiries.',
     features: [
-      'Everything in Core Care',
-      'Complete Google Ads management',
-      'Meta (Facebook/Instagram) campaigns',
-      'Advanced Google Maps SEO',
-      'Conversion page optimization',
-      '1-on-1 monthly growth strategy call',
+      'Website care and landing page improvements',
+      'Google Ads campaign management',
+      'Local SEO and Google profile management',
+      'Weekly campaign optimization',
+      'Monthly strategy call',
     ],
-    cta: 'Book Your Audit',
+    cta: 'Get my free website review',
     featured: true,
   },
 ]
@@ -53,7 +47,7 @@ export function PricingSection() {
                 <line x1="12" y1="1" x2="12" y2="23" />
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
-              Simple Monthly Plans
+              Clear Custom Proposals
             </div>
             <h2
               className="font-serif"
@@ -66,11 +60,11 @@ export function PricingSection() {
                 marginBottom: 14,
               }}
             >
-              Simple Monthly Plans.{' '}
-              <span style={{ color: 'var(--accent)' }}>No Lock-In. No Surprises.</span>
+              Know the scope before <span style={{ color: 'var(--accent)' }}>work begins.</span>
             </h2>
             <p style={{ fontSize: '1rem', color: 'var(--sub)', lineHeight: 1.8 }}>
-              Month-to-month. Cancel anytime. Scope locked before billing starts.
+              Every project is priced around your market, competition, scope, and advertising needs.
+              You receive a written proposal before making a commitment.
             </p>
           </div>
         </ScrollReveal>
@@ -85,7 +79,7 @@ export function PricingSection() {
           }}
           className="pricing-grid"
         >
-          {tiers.map(({ name, price, period, desc, features, cta, featured }, i) => (
+          {tiers.map(({ name, desc, features, cta, featured }, i) => (
             <ScrollReveal key={name} delay={(i + 1) as 1 | 2}>
               <div
                 style={{
@@ -118,7 +112,7 @@ export function PricingSection() {
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    Most Popular
+                    Ongoing
                   </div>
                 )}
 
@@ -135,24 +129,14 @@ export function PricingSection() {
                   >
                     {name}
                   </div>
-                  <div
-                    style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 16 }}
+                  <p
+                    style={{
+                      fontSize: '0.875rem',
+                      color: 'var(--sub)',
+                      lineHeight: 1.7,
+                      marginBottom: 16,
+                    }}
                   >
-                    <span
-                      className="font-serif"
-                      style={{
-                        fontSize: '3rem',
-                        fontWeight: 800,
-                        color: 'var(--text)',
-                        letterSpacing: '-0.04em',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {price}
-                    </span>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{period}</span>
-                  </div>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--sub)', lineHeight: 1.7 }}>
                     {desc}
                   </p>
                 </div>
@@ -241,7 +225,8 @@ export function PricingSection() {
         <p
           style={{ textAlign: 'center', marginTop: 28, fontSize: '0.8rem', color: 'var(--muted)' }}
         >
-          All retainers are month-to-month with no lock-in. Cancel with 30 days notice.
+          Website builds are quoted as projects. Ongoing services are optional, billed separately,
+          and advertising spend is never included in the management fee.
         </p>
       </div>
       <style>{`
