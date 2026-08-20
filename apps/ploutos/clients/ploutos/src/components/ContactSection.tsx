@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
+import { useCallback, useState, type FormEvent } from 'react'
+import { track } from '@vercel/analytics'
 import { ScrollReveal } from './ScrollReveal'
 
 export function ContactSection() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
     if (!form.checkValidity()) {
@@ -22,6 +24,7 @@ export function ContactSection() {
       company: (form.querySelector('#f-url') as HTMLInputElement).value,
       message: (form.querySelector('#f-problem') as HTMLTextAreaElement).value,
       timeline: '',
+      faxNumber: (form.querySelector('#f-fax') as HTMLInputElement).value,
     }
 
     try {
@@ -33,11 +36,12 @@ export function ContactSection() {
       if (res.ok) {
         setStatus('success')
         form.reset()
+        track('website_review_requested')
       } else setStatus('error')
     } catch {
       setStatus('error')
     }
-  }
+  }, [])
 
   const inputStyle: React.CSSProperties = {
     background: 'var(--surface)',
@@ -77,7 +81,7 @@ export function ContactSection() {
               >
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
-              Free Quote
+              Free Website Review
             </div>
             <h2
               className="font-serif"
@@ -101,8 +105,8 @@ export function ContactSection() {
                 margin: '0 auto',
               }}
             >
-              Tell us about your business and we&apos;ll review your current website and online
-              presence for free. Plain English feedback — no jargon, no hard sell.
+              Tell us about your business and we&apos;ll send three prioritized findings about your
+              website and online presence. Plain English feedback — no jargon, no hard sell.
             </p>
           </div>
         </ScrollReveal>
@@ -147,7 +151,7 @@ export function ContactSection() {
 
             <div>
               <label htmlFor="f-url" style={labelStyle}>
-                Current Website URL
+                Current Website URL <span style={{ fontWeight: 500 }}>(optional)</span>
               </label>
               <input
                 id="f-url"
@@ -156,6 +160,11 @@ export function ContactSection() {
                 placeholder="https://yourbusiness.com"
                 style={inputStyle}
               />
+            </div>
+
+            <div hidden>
+              <label htmlFor="f-fax">Fax number</label>
+              <input id="f-fax" name="faxNumber" type="text" tabIndex={-1} autoComplete="off" />
             </div>
 
             <div>
@@ -199,12 +208,12 @@ export function ContactSection() {
                   color: '#f87171',
                 }}
               >
-                Something went wrong. Email us at{' '}
+                We couldn&apos;t send your request. Try again or email{' '}
                 <a
-                  href="mailto:hello@ploutos.ai"
+                  href="mailto:admin@ploutos.llc"
                   style={{ color: 'inherit', textDecoration: 'underline' }}
                 >
-                  hello@ploutos.ai
+                  admin@ploutos.llc
                 </a>
               </div>
             )}
@@ -264,7 +273,7 @@ export function ContactSection() {
                 </>
               ) : (
                 <>
-                  Get My Free Review
+                  Get My Free Website Review
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -287,7 +296,7 @@ export function ContactSection() {
                 lineHeight: 1.6,
               }}
             >
-              No sales pitch. No obligation. Audit delivered within 48 hours.
+              No sales pitch. No obligation. Three prioritized findings delivered within 48 hours.
             </p>
           </form>
         </ScrollReveal>
