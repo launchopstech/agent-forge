@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 import { ScrollReveal } from './ScrollReveal'
 
 export function HeroSection() {
@@ -53,7 +54,7 @@ export function HeroSection() {
                 >
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
-                For Local Business Owners Who Want More Customers
+                Websites + Google growth for U.S. service businesses
               </div>
 
               <h1
@@ -67,8 +68,7 @@ export function HeroSection() {
                   color: 'var(--text)',
                 }}
               >
-                Your Website Should Bring You Customers,{' '}
-                <span style={{ color: 'var(--accent)' }}>Not Embarrassment.</span>
+                Get Found. Get Called. <span style={{ color: 'var(--accent)' }}>Get Paid.</span>
               </h1>
 
               <p
@@ -80,14 +80,13 @@ export function HeroSection() {
                   marginBottom: 40,
                 }}
               >
-                We build fast, professional websites and run Google &amp; social ads that bring real
-                customers to your door. No tech jargon. No long-term contracts. Just results — in
-                days, not months.
+                We build your website, strengthen your local Google presence, and manage your ads —
+                with one accountable partner connecting every part of the system.
               </p>
 
               <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                 <a href="#contact" className="btn-vio">
-                  Get My Free Website Quote
+                  Get My Free Website Review
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
@@ -109,9 +108,9 @@ export function HeroSection() {
                 }}
               >
                 {[
-                  { val: '7 Days', lbl: 'Avg. launch time' },
+                  { val: 'Clear scope', lbl: 'Before work starts' },
                   { val: '100%', lbl: 'Done for you' },
-                  { val: 'Direct', lbl: 'Owner access' },
+                  { val: 'Your assets', lbl: 'After final payment' },
                 ].map(({ val, lbl }) => (
                   <div key={val}>
                     <div
@@ -210,10 +209,10 @@ export function HeroSection() {
                   </div>
 
                   {[
-                    { label: 'New enquiries this month', value: '+340%', up: true },
-                    { label: 'Site load time', value: '0.8s', up: false },
-                    { label: 'Ad cost per lead', value: '–62%', up: false },
-                  ].map(({ label, value, up }) => (
+                    { label: 'Website', value: 'Built for calls' },
+                    { label: 'Local search', value: 'Maps-ready' },
+                    { label: 'Google Ads', value: 'Tracked' },
+                  ].map(({ label, value }) => (
                     <div
                       key={label}
                       style={{
@@ -232,7 +231,7 @@ export function HeroSection() {
                         style={{
                           fontSize: '0.78rem',
                           fontWeight: 700,
-                          color: up ? 'var(--accent)' : '#60a5fa',
+                          color: 'var(--accent)',
                         }}
                       >
                         {value}
@@ -255,7 +254,7 @@ export function HeroSection() {
                   }}
                 >
                   <div style={{ fontSize: '0.65rem', color: 'var(--muted)', marginBottom: 2 }}>
-                    Clients this month
+                    One connected system
                   </div>
                   <div
                     style={{
@@ -265,7 +264,7 @@ export function HeroSection() {
                       letterSpacing: '-0.04em',
                     }}
                   >
-                    3 / 5
+                    Site · SEO · Ads
                   </div>
                 </div>
               </div>

@@ -1,3 +1,4 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 import { ScrollReveal } from './ScrollReveal'
 
 export function ArchitectSection() {
@@ -46,9 +47,10 @@ export function ArchitectSection() {
           <p
             style={{ fontSize: '1.05rem', color: 'var(--sub)', lineHeight: 1.85, marginBottom: 44 }}
           >
-            Changes happen in hours, not weeks. Questions get answered same day. And because one
-            person is fully across your business, nothing slips through the cracks. That&apos;s the
-            difference between a boutique specialist and a big agency.
+            Changes move without an agency approval chain. Questions are answered within one
+            business day. And because one person understands the full system, fewer details get lost
+            between teams. That&apos;s the difference between a boutique specialist and a big
+            agency.
           </p>
 
           {/* Capacity pill */}
@@ -65,9 +67,8 @@ export function ArchitectSection() {
           >
             <span className="dot dot-pulse" style={{ width: 8, height: 8 }} />
             <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-              Accepting only{' '}
-              <strong style={{ color: 'var(--accent)' }}>2 new client partnerships</strong> this
-              month
+              <strong style={{ color: 'var(--accent)' }}>Founder-led delivery</strong> with a
+              deliberately small client roster
             </span>
           </div>
         </ScrollReveal>
@@ -86,18 +87,18 @@ export function ArchitectSection() {
             {[
               {
                 icon: '🎯',
-                title: 'One Person, Full Focus',
-                body: 'Not spread across 40 clients. Your project gets our full attention, every time.',
+                title: 'One Point of Contact',
+                body: 'The person discussing the work with you is accountable for delivering it.',
               },
               {
                 icon: '⚡',
-                title: 'Zero Lag',
-                body: 'Changes happen in hours — not weeks waiting on an approval chain.',
+                title: 'Direct Response',
+                body: 'Direct communication and a one-business-day response target.',
               },
               {
                 icon: '🔒',
                 title: 'Total Ownership',
-                body: 'You own all code, credentials, and infrastructure from day one.',
+                body: 'You own delivered code, credentials, and infrastructure after final payment.',
               },
             ].map(({ icon, title, body }) => (
               <div

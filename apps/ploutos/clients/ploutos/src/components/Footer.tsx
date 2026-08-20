@@ -1,11 +1,13 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 export function Footer() {
   const year = new Date().getFullYear()
 
   const links = [
     ['Services', '#services'],
-    ['How It Works', '#architect'],
+    ['How It Works', '#process'],
+    ['Our Work', '#work'],
     ['Pricing', '#pricing'],
-    ['Get a Quote', '#contact'],
+    ['Free Website Review', '#contact'],
   ]
 
   return (
@@ -63,8 +65,8 @@ export function Footer() {
               </span>
             </div>
             <p style={{ fontSize: '0.84rem', color: '#64748b', lineHeight: 1.7, maxWidth: 280 }}>
-              Professional websites, online stores, and digital marketing for local businesses that
-              want to grow.
+              Websites, local SEO, and Google Ads for U.S. service businesses that want a clearer
+              path to more qualified calls.
             </p>
             <div
               style={{
@@ -124,8 +126,8 @@ export function Footer() {
               Contact
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <a href="mailto:hello@ploutos.ai" className="foot-link">
-                hello@ploutos.ai
+              <a href="mailto:admin@ploutos.llc" className="foot-link">
+                admin@ploutos.llc
               </a>
               <a href="#contact" className="foot-link">
                 Start a project →
@@ -138,10 +140,10 @@ export function Footer() {
         <div className="foot-bottom">
           <span>© {year} Ploutos. All Rights Reserved.</span>
           <div style={{ display: 'flex', gap: 16 }}>
-            <a href="mailto:hello@ploutos.ai?subject=Privacy enquiry" className="foot-legal-link">
+            <a href="/privacy" className="foot-legal-link">
               Privacy
             </a>
-            <a href="mailto:hello@ploutos.ai?subject=Terms enquiry" className="foot-legal-link">
+            <a href="/terms" className="foot-legal-link">
               Terms
             </a>
           </div>
@@ -150,6 +152,9 @@ export function Footer() {
 
       <style>{`
         .foot-link {
+          display: inline-flex;
+          align-items: center;
+          min-height: 44px;
           font-size: .84rem;
           color: #64748b;
           transition: color .2s;
@@ -157,6 +162,9 @@ export function Footer() {
         }
         .foot-link:hover { color: #e2e8f0; }
         .foot-legal-link {
+          display: inline-flex;
+          align-items: center;
+          min-height: 44px;
           color: #475569;
           transition: color .2s;
           text-decoration: none;

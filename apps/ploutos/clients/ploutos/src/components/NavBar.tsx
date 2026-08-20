@@ -1,10 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
-export function NavBar() {
+export const NavBar = memo(function NavBar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+  const toggleMenu = useCallback(() => setMenuOpen((open) => !open), [])
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20)
@@ -12,9 +16,22 @@ export function NavBar() {
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
+  useEffect(() => {
+    if (!menuOpen) return
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [menuOpen])
+
   const links = [
     { label: 'Services', href: '#services' },
-    { label: 'How It Works', href: '#architect' },
+    { label: 'How It Works', href: '#process' },
+    { label: 'Work', href: '#work' },
     { label: 'Pricing', href: '#pricing' },
   ]
 
@@ -86,7 +103,7 @@ export function NavBar() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 32,
+              gap: 24,
               listStyle: 'none',
               margin: 0,
               padding: 0,
@@ -117,22 +134,28 @@ export function NavBar() {
             className="btn-vio hide-mobile"
             style={{ fontSize: '0.8rem', padding: '10px 20px', letterSpacing: '0.05em' }}
           >
-            Get a Free Quote
+            Get My Free Website Review
           </a>
 
           {/* Mobile hamburger */}
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
+            ref={menuButtonRef}
+            onClick={toggleMenu}
             style={{
               display: 'none',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: 6,
+              width: 44,
+              height: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
               color: 'var(--text)',
             }}
             className="show-mobile-flex"
-            aria-label="Toggle menu"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
           >
             <svg
               viewBox="0 0 24 24"
@@ -162,6 +185,7 @@ export function NavBar() {
       {/* Mobile drawer */}
       {menuOpen && (
         <div
+          id="mobile-navigation"
           style={{
             background: 'rgba(250,247,242,0.98)',
             backdropFilter: 'blur(20px)',
@@ -173,10 +197,11 @@ export function NavBar() {
             <a
               key={label}
               href={href}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
               style={{
-                display: 'block',
-                padding: '12px 0',
+                minHeight: 48,
+                display: 'flex',
+                alignItems: 'center',
                 fontSize: '1rem',
                 fontWeight: 600,
                 color: 'var(--sub)',
@@ -189,11 +214,11 @@ export function NavBar() {
           ))}
           <a
             href="#contact"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
             className="btn-vio"
-            style={{ marginTop: 18, display: 'block', textAlign: 'center' }}
+            style={{ marginTop: 18, display: 'flex', justifyContent: 'center', minHeight: 48 }}
           >
-            Get a Free Quote
+            Get My Free Website Review
           </a>
         </div>
       )}
@@ -206,4 +231,4 @@ export function NavBar() {
       `}</style>
     </nav>
   )
-}
+})

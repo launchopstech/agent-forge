@@ -1,6 +1,7 @@
+/* eslint-disable i18next/no-literal-string -- This client site ships English marketing copy only. */
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Ploutos — Websites, Online Stores & Ads That Actually Work'
+export const alt = 'Ploutos — Websites, Local SEO & Google Ads for Service Businesses'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -55,7 +56,7 @@ export default function OGImage() {
           maxWidth: 700,
         }}
       >
-        Websites, Online Stores & Ads That Actually Work
+        Websites, Local SEO & Google Ads That Work Together
       </div>
       <div
         style={{
