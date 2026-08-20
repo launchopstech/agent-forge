@@ -7,11 +7,14 @@ import { ScrollReveal } from './ScrollReveal'
 
 export function ContactSection() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
 
   const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
+    setSubmissionError(null)
     if (!form.checkValidity()) {
+      setStatus('idle')
       form.reportValidity()
       return
     }
@@ -37,9 +40,19 @@ export function ContactSection() {
         setStatus('success')
         form.reset()
         track('website_review_requested')
-      } else setStatus('error')
+      } else {
+        setStatus('error')
+        if (res.status === 400) {
+          setSubmissionError('Please check the form. Your message must be at least 10 characters.')
+        } else if (res.status === 429) {
+          setSubmissionError('Too many requests. Please wait a few minutes and try again.')
+        } else {
+          setSubmissionError('We could not send your request. Please try again or email us.')
+        }
+      }
     } catch {
       setStatus('error')
+      setSubmissionError('We could not send your request. Please try again or email us.')
     }
   }, [])
 
@@ -131,6 +144,8 @@ export function ContactSection() {
                   type="text"
                   placeholder="Jane Smith"
                   required
+                  minLength={2}
+                  maxLength={100}
                   style={inputStyle}
                 />
               </div>
@@ -144,6 +159,7 @@ export function ContactSection() {
                   type="email"
                   placeholder="jane@yourbusiness.com"
                   required
+                  maxLength={254}
                   style={inputStyle}
                 />
               </div>
@@ -158,6 +174,7 @@ export function ContactSection() {
                 name="url"
                 type="url"
                 placeholder="https://yourbusiness.com"
+                maxLength={300}
                 style={inputStyle}
               />
             </div>
@@ -176,12 +193,22 @@ export function ContactSection() {
                 name="problem"
                 placeholder="Tell us what's not working — slow load times, poor rankings, ads not converting, manual processes eating your time... any detail helps."
                 required
+                minLength={10}
+                maxLength={3000}
+                aria-describedby="f-problem-help"
                 style={{ ...inputStyle, resize: 'vertical', minHeight: 130 }}
               />
+              <div
+                id="f-problem-help"
+                style={{ marginTop: 6, color: 'var(--muted)', fontSize: '0.75rem' }}
+              >
+                Please enter at least 10 characters.
+              </div>
             </div>
 
             {status === 'success' && (
               <div
+                role="alert"
                 style={{
                   padding: '14px 18px',
                   borderRadius: 'var(--r)',
@@ -208,7 +235,7 @@ export function ContactSection() {
                   color: '#f87171',
                 }}
               >
-                We couldn&apos;t send your request. Try again or email{' '}
+                {submissionError} If the problem continues, email{' '}
                 <a
                   href="mailto:admin@ploutos.llc"
                   style={{ color: 'inherit', textDecoration: 'underline' }}
